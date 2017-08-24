@@ -1,0 +1,18 @@
+{
+
+  "description": "lorem ipsum",
+  "manifest_version": 2,
+  "name": "Youtube-subs",
+  "version": "1.0",
+  "icons": {
+    "48": "icons/ic_video_library_black_48dp_1x.png"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["*://*.youtube.com/feed/subscriptions"],
+      "js": ["jquery-3.2.1.min.js", "subs.js"]
+    }
+  ]
+
+}
