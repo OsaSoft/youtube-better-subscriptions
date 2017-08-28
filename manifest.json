@@ -1,9 +1,9 @@
 {
 
-  "description": "lorem ipsum",
+  "description": "Make navigating YouTube's subscription grid easier by hiding watched videos",
   "manifest_version": 2,
   "name": "Youtube-subs",
-  "version": "1.0",
+  "version": "0.1",
   "icons": {
     "48": "icons/ic_video_library_black_48dp_1x.png"
   },
@@ -11,7 +11,7 @@
   "content_scripts": [
     {
       "matches": ["*://*.youtube.com/feed/subscriptions"],
-      "js": ["jquery-3.2.1.min.js", "subs.js"]
+      "js": ["subs.js"]
     }
   ]
 
