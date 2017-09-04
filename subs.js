@@ -1,14 +1,27 @@
 var hidden = [];
+var newLayout = false;
+
+function isWatched(item) {
+    return (!newLayout &&
+        (item.getElementsByClassName("watched").length > 0 ||
+            item.getElementsByClassName("contains-percent-duration-watched").length > 0)) ||
+        (newLayout &&
+            (item.querySelectorAll("yt-formatted-string.style-scope.ytd-thumbnail-overlay-playback-status-renderer").length > 0 ||
+                item.querySelectorAll("#progress.style-scope.ytd-thumbnail-overlay-resume-playback-renderer").length > 0))
+}
 
 function removeWatched() {
     hidden = [];
 
-    console.log("dfd");
-
     var els = document.querySelectorAll(".feed-item-container .yt-shelf-grid-item");
+    // is it the new layout?
+    if (els.length == 0) {
+        newLayout = true;
+        els = document.querySelectorAll("ytd-grid-video-renderer.style-scope.ytd-grid-renderer");
+    }
+
     [].forEach.call(els, function (item) {
-        if (item.getElementsByClassName("watched").length > 0 ||
-        item.getElementsByClassName("contains-percent-duration-watched").length > 0) {
+        if (isWatched(item)) {
             hidden.push(item);
             item.style.display = 'none';
         }
@@ -31,8 +44,14 @@ function checkboxChange() {
 }
 
 function addButton() {
-    var subGridLi = document.createElement("li");
-    subGridLi.setAttribute("class", "yt-uix-menu-top-level-button yt-uix-menu-top-level-flow-button");
+    var subGridLi;
+    if (!newLayout) {
+        subGridLi = document.createElement("li");
+        subGridLi.setAttribute("class", "yt-uix-menu-top-level-button yt-uix-menu-top-level-flow-button");
+    } else {
+        subGridLi = document.createElement("div");
+        subGridLi.setAttribute("style", "position: fixed;bottom: 0;margin: auto;left:50%;padding:10px;text-align: center; z-index:9999;border: 5px;background: rgba(25, 25, 25, .3);");
+    }
     subGridLi.appendChild(document.createTextNode("Hide watched"));
 
     var subGridCheckbox = document.createElement("input");
@@ -42,14 +61,18 @@ function addButton() {
 
     subGridLi.appendChild(subGridCheckbox);
 
-    var feed = document.getElementsByClassName("yt-uix-menu-container feed-item-action-menu");
-    if (feed.length > 0) { //just in case
-        feed[0].insertBefore(subGridLi, feed[0].firstChild);
-
-        var messenger = document.getElementById("subs-grid");
-        messenger.addEventListener("change", checkboxChange);
+    if (!newLayout) {
+        var feed = newLayout ? document.body :
+            document.getElementsByClassName("yt-uix-menu-container feed-item-action-menu");
+        if (feed.length > 0) { //just in case
+            feed[0].insertBefore(subGridLi, feed[0].firstChild);
+        }
+    } else {
+        document.body.appendChild(subGridLi);
     }
+    var messenger = document.getElementById("subs-grid");
+    messenger.addEventListener("change", checkboxChange);
 }
 
-addButton();
 removeWatched();
+addButton();
