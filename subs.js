@@ -1,5 +1,6 @@
+var delaySeconds = 3000;
 var hidden = [];
-var newLayout = false;
+var newLayout = document.querySelectorAll(".feed-item-container .yt-shelf-grid-item").length == 0;
 
 function isWatched(item) {
     return (!newLayout &&
@@ -13,12 +14,7 @@ function isWatched(item) {
 function removeWatched() {
     hidden = [];
 
-    var els = document.querySelectorAll(".feed-item-container .yt-shelf-grid-item");
-    // is it the new layout?
-    if (els.length == 0) {
-        newLayout = true;
-        els = document.querySelectorAll("ytd-grid-video-renderer.style-scope.ytd-grid-renderer");
-    }
+    var els = newLayout ? document.querySelectorAll("ytd-grid-video-renderer.style-scope.ytd-grid-renderer") : document.querySelectorAll(".feed-item-container .yt-shelf-grid-item");
 
     [].forEach.call(els, function (item) {
         if (isWatched(item)) {
@@ -32,6 +28,7 @@ function showWatched() {
     hidden.forEach(function (it) {
         it.style.display = '';
     });
+    hidden = [];
 }
 
 function checkboxChange() {
@@ -74,5 +71,10 @@ function addButton() {
     messenger.addEventListener("change", checkboxChange);
 }
 
-removeWatched();
 addButton();
+
+var intervalID = window.setInterval(function () {
+    if (document.getElementById("subs-grid").checked) {
+        removeWatched();
+    }
+}, delaySeconds);
