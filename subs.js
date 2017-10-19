@@ -8,12 +8,11 @@ function isWatched(item) {
             item.getElementsByClassName("contains-percent-duration-watched").length > 0)) ||
         (newLayout &&
             (item.querySelectorAll("yt-formatted-string.style-scope.ytd-thumbnail-overlay-playback-status-renderer").length > 0 ||
-                item.querySelectorAll("#progress.style-scope.ytd-thumbnail-overlay-resume-playback-renderer").length > 0))
+                item.querySelectorAll("#progress.style-scope.ytd-thumbnail-overlay-resume-playback-renderer").length > 0) ||
+                item.hasAttribute("is-dismissed"))
 }
 
 function removeWatched() {
-    hidden = [];
-
     var els = newLayout ? document.querySelectorAll("ytd-grid-video-renderer.style-scope.ytd-grid-renderer") : document.querySelectorAll(".feed-item-container .yt-shelf-grid-item");
 
     [].forEach.call(els, function (item) {

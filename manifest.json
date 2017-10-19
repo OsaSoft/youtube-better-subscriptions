@@ -3,7 +3,7 @@
   "description": "Make navigating YouTube's subscription grid easier by hiding watched videos",
   "manifest_version": 2,
   "name": "Youtube-subs",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "icons": {
     "48": "icons/ic_video_library_black_48dp_1x.png"
   },
