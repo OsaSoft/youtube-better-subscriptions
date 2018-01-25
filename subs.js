@@ -40,32 +40,43 @@ function checkboxChange() {
 }
 
 function addButton() {
-    var subGridLi;
-    if (!newLayout) {
-        subGridLi = document.createElement("li");
-        subGridLi.setAttribute("class", "yt-uix-menu-top-level-button yt-uix-menu-top-level-flow-button");
+    var subGridButtonContainer;
+    if (newLayout) { //is new layout?
+        subGridButtonContainer = document.createElement("h2");
+        subGridButtonContainer.setAttribute("class", "style-scope ytd-shelf-renderer");
     } else {
-        subGridLi = document.createElement("div");
-        subGridLi.setAttribute("style", "position: fixed;bottom: 0;margin: auto;left:50%;padding:10px;text-align: center; z-index:9999;border: 5px;background: rgba(25, 25, 25, .3);");
+        subGridButtonContainer = document.createElement("li");
+        subGridButtonContainer.setAttribute("class", "yt-uix-menu-top-level-button yt-uix-menu-top-level-flow-button");
     }
-    subGridLi.appendChild(document.createTextNode("Hide watched"));
+
+    // var span = document.createElement("span");
+    // span.appendChild();
+    subGridButtonContainer.appendChild(document.createTextNode("Hide watched"));
 
     var subGridCheckbox = document.createElement("input");
     subGridCheckbox.setAttribute("id", "subs-grid");
     subGridCheckbox.setAttribute("type", "checkbox");
     subGridCheckbox.checked = true;
 
-    subGridLi.appendChild(subGridCheckbox);
+    subGridButtonContainer.appendChild(subGridCheckbox);
 
-    if (!newLayout) {
-        var feed = newLayout ? document.body :
-            document.getElementsByClassName("yt-uix-menu-container feed-item-action-menu");
-        if (feed.length > 0) { //just in case
-            feed[0].insertBefore(subGridLi, feed[0].firstChild);
+    var feed;
+    if (newLayout) { //is new layout?
+        var buttonMenu = document.querySelectorAll("#title-container #menu");
+        if (buttonMenu) {
+            buttonMenu = buttonMenu[0].firstChild;
         }
+        feed = buttonMenu ? buttonMenu : document.body;
     } else {
-        document.body.appendChild(subGridLi);
+        feed = document.getElementsByClassName("yt-uix-menu-container feed-item-action-menu");
     }
+
+    if (feed.length > 0) { //just in case
+        feed[0].insertBefore(subGridButtonContainer, feed[0].firstChild);
+    } else {
+        feed.insertBefore(subGridButtonContainer, feed.childNodes[0]); //appendChild(subGridButtonContainer);
+    }
+
     var messenger = document.getElementById("subs-grid");
     messenger.addEventListener("change", checkboxChange);
 }
