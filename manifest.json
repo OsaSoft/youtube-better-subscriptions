@@ -7,7 +7,7 @@
   "icons": {
     "48": "icons/ic_video_library_black_48dp_1x.png"
   },
-
+  "permissions": ["*://*.youtube.com/*"],
   "content_scripts": [
     {
       "matches": ["*://*.youtube.com/feed/subscriptions"],
