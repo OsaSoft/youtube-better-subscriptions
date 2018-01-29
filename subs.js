@@ -39,7 +39,7 @@ function checkboxChange() {
     }
 }
 
-function addButton() {
+function addHideWatchedCheckbox() {
     let subGridButtonContainer;
     if (newLayout) { //is new layout?
         subGridButtonContainer = document.createElement("h2");
@@ -79,10 +79,58 @@ function addButton() {
     messenger.addEventListener("change", checkboxChange);
 }
 
-addButton();
+function buildButton(videoId) {
+    let enclosingDiv = document.createElement("div");
+    enclosingDiv.setAttribute("id", "metadata-line");
+    enclosingDiv.setAttribute("class", "style-scope ytd-grid-video-renderer");
+
+    let button = document.createElement("button");
+    button.setAttribute("id", "mark-watched");
+    button.setAttribute("class", "subs-btn-mark-watched");
+    button.setAttribute("role", "button");
+
+    let markWatchedText = document.createTextNode("Mark as watched"); //TODO: translations
+
+    button.appendChild(markWatchedText);
+
+    enclosingDiv.appendChild(button);
+
+    return enclosingDiv;
+}
+
+function getVideoIdFromUrl(url) {
+    return url.split("=")[1].split("&")[0];
+}
+
+function addMarkAsWatchedButton() {
+    let thumbnails = document.getElementsByTagName("ytd-thumbnail");
+
+    for (item of thumbnails) {
+        let parent = item.parentNode;
+        if (parent.querySelectorAll("#mark-watched").length > 0) {
+            continue;
+        }
+
+        let videoId = getVideoIdFromUrl(item.querySelectorAll("a")[0].getAttribute("href"));
+
+        let button = buildButton(videoId);
+
+        parent.appendChild(button);
+    }
+}
+
+function storageChangeCallback (changes, area) {
+    for (key in changes) {
+        let storageChange = changes[key];
+        console.log("Change ins area " + area + ". Key: " + key + ", Val: " + storageChange)
+    }
+}
+
+addHideWatchedCheckbox();
 
 let intervalID = window.setInterval(function () {
     if (document.getElementById("subs-grid").checked) {
         removeWatched();
+        addMarkAsWatchedButton();
     }
 }, delaySeconds);
