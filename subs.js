@@ -1,6 +1,6 @@
-var delaySeconds = 3000; //TODO: configurable?
-var hidden = [];
-var newLayout = document.querySelectorAll(".feed-item-container .yt-shelf-grid-item").length == 0; //is it the new (~fall 2017) YT layout?
+const delaySeconds = 3000; //TODO: configurable?
+let hidden = [];
+const newLayout = document.querySelectorAll(".feed-item-container .yt-shelf-grid-item").length == 0; //is it the new (~fall 2017) YT layout?
 
 function isWatched(item) {
     return (!newLayout &&
@@ -13,25 +13,25 @@ function isWatched(item) {
 }
 
 function removeWatched() {
-    var els = newLayout ? document.querySelectorAll("ytd-grid-video-renderer.style-scope.ytd-grid-renderer") : document.querySelectorAll(".feed-item-container .yt-shelf-grid-item");
+    let els = newLayout ? document.querySelectorAll("ytd-grid-video-renderer.style-scope.ytd-grid-renderer") : document.querySelectorAll(".feed-item-container .yt-shelf-grid-item");
 
-    [].forEach.call(els, function (item) {
+    for (item of els) {
         if (isWatched(item)) {
             hidden.push(item);
             item.style.display = 'none';
         }
-    });
+    }
 }
 
 function showWatched() {
-    hidden.forEach(function (it) {
+    for (it of hidden) {
         it.style.display = '';
-    });
+    }
     hidden = [];
 }
 
 function checkboxChange() {
-    var checkbox = document.getElementById("subs-grid");
+    let checkbox = document.getElementById("subs-grid");
     if (checkbox.checked) {
         removeWatched();
     } else {
@@ -40,7 +40,7 @@ function checkboxChange() {
 }
 
 function addButton() {
-    var subGridButtonContainer;
+    let subGridButtonContainer;
     if (newLayout) { //is new layout?
         subGridButtonContainer = document.createElement("h2");
         subGridButtonContainer.setAttribute("class", "style-scope ytd-shelf-renderer");
@@ -51,16 +51,16 @@ function addButton() {
 
     subGridButtonContainer.appendChild(document.createTextNode("Hide watched")); //TODO: translations
 
-    var subGridCheckbox = document.createElement("input");
+    let subGridCheckbox = document.createElement("input");
     subGridCheckbox.setAttribute("id", "subs-grid");
     subGridCheckbox.setAttribute("type", "checkbox");
     subGridCheckbox.checked = true;
 
     subGridButtonContainer.appendChild(subGridCheckbox);
 
-    var feed;
+    let feed;
     if (newLayout) { //is new layout?
-        var buttonMenu = document.querySelectorAll("#title-container #menu");
+        let buttonMenu = document.querySelectorAll("#title-container #menu");
         if (buttonMenu) {
             buttonMenu = buttonMenu[0].firstChild;
         }
@@ -75,13 +75,13 @@ function addButton() {
         feed.insertBefore(subGridButtonContainer, feed.childNodes[0]); //appendChild(subGridButtonContainer);
     }
 
-    var messenger = document.getElementById("subs-grid");
+    let messenger = document.getElementById("subs-grid");
     messenger.addEventListener("change", checkboxChange);
 }
 
 addButton();
 
-var intervalID = window.setInterval(function () {
+let intervalID = window.setInterval(function () {
     if (document.getElementById("subs-grid").checked) {
         removeWatched();
     }
