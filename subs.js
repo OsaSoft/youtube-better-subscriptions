@@ -103,19 +103,21 @@ function getVideoIdFromUrl(url) {
 }
 
 function addMarkAsWatchedButton() {
-    let thumbnails = document.getElementsByTagName("ytd-thumbnail");
+    let els = newLayout ? document.querySelectorAll("ytd-grid-video-renderer.style-scope.ytd-grid-renderer") : document.querySelectorAll(".feed-item-container .yt-shelf-grid-item");
+    //TODO: OLD LAYOUT
 
-    for (item of thumbnails) {
-        let parent = item.parentNode;
-        if (parent.querySelectorAll("#mark-watched").length > 0) {
-            continue;
+    for (item of els) {
+        if (!isWatched(item)) {
+            let dismissableDiv = item.firstChild;
+            if (dismissableDiv.querySelectorAll("#mark-watched").length > 0) {
+                continue;
+            }
+
+            let videoId = getVideoIdFromUrl(item.querySelectorAll("a")[0].getAttribute("href"));
+            let button = buildButton(videoId);
+
+            dismissableDiv.appendChild(button);
         }
-
-        let videoId = getVideoIdFromUrl(item.querySelectorAll("a")[0].getAttribute("href"));
-
-        let button = buildButton(videoId);
-
-        parent.appendChild(button);
     }
 }
 
