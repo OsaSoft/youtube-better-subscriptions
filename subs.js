@@ -1,11 +1,21 @@
 const delaySeconds = 3000; //TODO: configurable?
+
+let brwsr;
+try {
+    brwsr = browser;
+} catch (e) {
+    if (e instanceof ReferenceError) {
+        brwsr = chrome;
+    }
+}
+
 let storage = {};
 let hidden = [];
 let hideWatched = true;
 const newLayout = document.querySelectorAll(".feed-item-container .yt-shelf-grid-item").length == 0; //is it the new (~fall 2017) YT layout?
 
 function getStorage() {
-    return browser.storage.local //TODO: use sync?
+    return brwsr.storage.local //TODO: use sync?
 }
 
 function isWatched(item) {
@@ -168,7 +178,7 @@ getStorage().get(null, function (items) { //fill our map with watched videos
 
 addHideWatchedCheckbox();
 
-browser.storage.onChanged.addListener(storageChangeCallback);
+brwsr.storage.onChanged.addListener(storageChangeCallback);
 
 let intervalID = window.setInterval(function () {
     if (document.getElementById("subs-grid").checked) {
