@@ -3,15 +3,16 @@
   "short_name": "Better Subscriptions for YouTube™",
   "manifest_version": 2,
   "name": "Better Subscriptions for YouTube™",
-  "version": "0.2.1",
+  "version": "0.5",
   "icons": {
     "48": "icons/ic_video_library_black_48dp_1x.png"
   },
-  "permissions": ["*://*.youtube.com/*"],
+  "permissions": ["*://*.youtube.com/*", "storage"],
   "content_scripts": [
     {
       "matches": ["*://*.youtube.com/feed/subscriptions"],
-      "js": ["subs.js"]
+      "js": ["subs.js"],
+      "css": ["subs.css"]
     }
   ]
 
