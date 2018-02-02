@@ -11,8 +11,12 @@
   "content_scripts": [
     {
       "matches": ["*://*.youtube.com/feed/subscriptions"],
-      "js": ["subs.js"],
+      "js": ["common.js", "subs.js"],
       "css": ["subs.css"]
+    },
+    {
+      "matches": ["*://*.youtube.com/watch?v=*"],
+      "js": ["common.js", "vid.js"]
     }
   ]
 
