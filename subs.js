@@ -123,10 +123,13 @@ function removeWatchedAndAddButton() {
     //TODO: OLD LAYOUT - still needed?
 
     for (item of els) {
-        if (isYouTubeWatched(item)) {
+        let stored = getVideoId(item) in storage;
+        let ytWatched = isYouTubeWatched(item);
+
+        if (stored || ytWatched) {
             hideItem(item);
 
-            if (getVideoId(item) in storage) {
+            if (stored && ytWatched) {
                 getStorage().remove(getVideoId(item)); //since its marked watched by YouTube, remove from storage to free space
             }
         } else {
