@@ -120,7 +120,7 @@ function addHideWatchedCheckbox() {
 function buildButton(item, videoId) {
     let enclosingDiv = document.createElement("div");
     enclosingDiv.setAttribute("id", "metadata-line");
-    enclosingDiv.setAttribute("class", "style-scope ytd-grid-video-renderer");
+    enclosingDiv.setAttribute("class", "style-scope ytd-thumbnail-overlay-toggle-button-renderer");
 
     let button = document.createElement("button");
     button.setAttribute("id", "mark-watched");
@@ -130,9 +130,8 @@ function buildButton(item, videoId) {
         markWatched(item, videoId, enclosingDiv);
     };
 
-    let markWatchedText = document.createTextNode("Mark as watched"); //TODO: translations
-
-    button.appendChild(markWatchedText);
+    //let markWatchedText = document.createTextNode("Mark as watched"); //TODO: translations
+    //button.appendChild(markWatchedText);
 
     enclosingDiv.appendChild(button);
 
@@ -157,10 +156,12 @@ function addMarkAsWatchedButton() {
             if (dismissableDiv.querySelectorAll("#mark-watched").length > 0) {
                 continue;
             }
+            else {
+                dismissableDiv = dismissableDiv.firstChild;
+            }
 
             let videoId = getVideoId(item);
             let button = buildButton(item, videoId);
-
             dismissableDiv.appendChild(button);
         }
     }
