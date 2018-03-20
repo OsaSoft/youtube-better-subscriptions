@@ -1,22 +1,9 @@
-const delaySeconds = 3000; //TODO: configurable?
-
-let brwsr;
-try {
-    brwsr = browser;
-} catch (e) {
-    if (e instanceof ReferenceError) {
-        brwsr = chrome;
-    }
-}
+const delayMilisecs = 3000; //TODO: configurable?
 
 let storage = {};
 let hidden = [];
 let hideWatched = true;
 const newLayout = document.querySelectorAll(".feed-item-container .yt-shelf-grid-item").length == 0; //is it the new (~fall 2017) YT layout?
-
-function getStorage() {
-    return brwsr.storage.local //TODO: use sync?
-}
 
 function isWatched(item) {
     return (getVideoId(item) in storage ||
@@ -30,16 +17,6 @@ function isWatched(item) {
     )
 }
 
-function removeWatched() {
-    let els = newLayout ? document.querySelectorAll("ytd-grid-video-renderer.style-scope.ytd-grid-renderer") : document.querySelectorAll(".feed-item-container .yt-shelf-grid-item");
-
-    for (item of els) {
-        if (isWatched(item)) {
-            hideItem(item);
-        }
-    }
-}
-
 function markWatched(item, videoId, button) {
     if (hideWatched) {
         hideItem(item);
@@ -50,8 +27,6 @@ function markWatched(item, videoId, button) {
     let obj = {};
     obj[videoId] = Date.now();
     getStorage().set(obj);
-
-    getStorage().get(getVideoId(item));
 }
 
 function hideItem(item) {
@@ -120,7 +95,7 @@ function addHideWatchedCheckbox() {
 function buildButton(item, videoId) {
     let enclosingDiv = document.createElement("div");
     enclosingDiv.setAttribute("id", "metadata-line");
-    enclosingDiv.setAttribute("class", "style-scope ytd-grid-video-renderer");
+    enclosingDiv.setAttribute("class", "style-scope ytd-thumbnail-overlay-toggle-button-renderer");
 
     let button = document.createElement("button");
     button.setAttribute("id", "mark-watched");
@@ -129,10 +104,6 @@ function buildButton(item, videoId) {
     button.onclick = function () {
         markWatched(item, videoId, enclosingDiv);
     };
-
-    let markWatchedText = document.createTextNode("Mark as watched"); //TODO: translations
-
-    button.appendChild(markWatchedText);
 
     enclosingDiv.appendChild(button);
 
@@ -147,20 +118,24 @@ function getVideoId(item) {
     return getVideoIdFromUrl(item.querySelectorAll("a")[0].getAttribute("href"));
 }
 
-function addMarkAsWatchedButton() {
+function removeWatchedAndAddButton() {
     let els = newLayout ? document.querySelectorAll("ytd-grid-video-renderer.style-scope.ytd-grid-renderer") : document.querySelectorAll(".feed-item-container .yt-shelf-grid-item");
-    //TODO: OLD LAYOUT
+    //TODO: OLD LAYOUT - still needed?
 
     for (item of els) {
-        if (!isWatched(item)) {
+        if (isWatched(item)) {
+            getStorage().remove(getVideoId(item)); //since its marked watched by YouTube, remove from storage to free space
+            hideItem(item);
+        } else {
             let dismissableDiv = item.firstChild;
             if (dismissableDiv.querySelectorAll("#mark-watched").length > 0) {
                 continue;
+            } else {
+                dismissableDiv = dismissableDiv.firstChild;
             }
 
             let videoId = getVideoId(item);
             let button = buildButton(item, videoId);
-
             dismissableDiv.appendChild(button);
         }
     }
@@ -182,7 +157,6 @@ brwsr.storage.onChanged.addListener(storageChangeCallback);
 
 let intervalID = window.setInterval(function () {
     if (document.getElementById("subs-grid").checked) {
-        removeWatched(); //TODO: do both these in a single sweep (checking for watched in the button adding anyway)
-        addMarkAsWatchedButton();
+        removeWatchedAndAddButton();
     }
-}, delaySeconds);
+}, delayMilisecs);

@@ -1,21 +1,25 @@
 .subs-btn-mark-watched {
-    background-color: #4A4A4AB3;
+    background-image: url('images/markwatched.svg'), /*works in Firefox*/
+                      url('chrome-extension://__MSG_@@extension_id__/images/markwatched.svg'); /*works in Chrome*/
+    height: 24px;
+    width: 24px;
+    position: absolute;
+    bottom: 3px;
+    left: 3px;
     border: none;
-    border-radius: 4px;
-    color: white;
-    text-align: center;
-    text-decoration: none;
-
+    border-radius: 2px;
+    background-color: hsl(0, 0%, 6.7%);
+    opacity: .6;
     -webkit-transition-duration: 0.4s; /* Safari */
     transition-duration: 0.4s;
 }
 
 .subs-btn-mark-watched:hover {
-    background-color: #A8A8A8;
+    opacity: .8;
     cursor: pointer;
 }
 
 .subs-btn-mark-watched:active {
-    background-color: #4A4A4A;
+    opacity: 1.0;
     cursor: pointer;
 }
