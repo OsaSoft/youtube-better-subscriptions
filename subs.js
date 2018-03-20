@@ -5,8 +5,8 @@ let hidden = [];
 let hideWatched = true;
 const newLayout = document.querySelectorAll(".feed-item-container .yt-shelf-grid-item").length == 0; //is it the new (~fall 2017) YT layout?
 
-function isWatched(item) {
-    return (getVideoId(item) in storage ||
+function isYouTubeWatched(item) {
+    return (
         (!newLayout &&
             (item.getElementsByClassName("watched").length > 0 ||
                 item.getElementsByClassName("contains-percent-duration-watched").length > 0)) || //has "WATCHED" on thumbnail
@@ -123,9 +123,12 @@ function removeWatchedAndAddButton() {
     //TODO: OLD LAYOUT - still needed?
 
     for (item of els) {
-        if (isWatched(item)) {
-            getStorage().remove(getVideoId(item)); //since its marked watched by YouTube, remove from storage to free space
+        if (isYouTubeWatched(item)) {
             hideItem(item);
+
+            if (getVideoId(item) in storage) {
+                getStorage().remove(getVideoId(item)); //since its marked watched by YouTube, remove from storage to free space
+            }
         } else {
             let dismissableDiv = item.firstChild;
             if (dismissableDiv.querySelectorAll("#mark-watched").length > 0) {
