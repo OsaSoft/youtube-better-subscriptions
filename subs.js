@@ -22,6 +22,7 @@ function removeWatched() {
 
     for (item of els) {
         if (isWatched(item)) {
+            getStorage().remove(getVideoId(item)); //since its marked watched by YouTube, remove from storage to free space
             hideItem(item);
         }
     }
@@ -37,8 +38,6 @@ function markWatched(item, videoId, button) {
     let obj = {};
     obj[videoId] = Date.now();
     getStorage().set(obj);
-
-    getStorage().get(getVideoId(item));
 }
 
 function hideItem(item) {
