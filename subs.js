@@ -107,7 +107,7 @@ function addHideWatchedCheckbox() {
 function buildButton(item, videoId) {
     let enclosingDiv = document.createElement("div");
     enclosingDiv.setAttribute("id", "metadata-line");
-    enclosingDiv.setAttribute("class", "style-scope ytd-grid-video-renderer");
+    enclosingDiv.setAttribute("class", "style-scope ytd-thumbnail-overlay-toggle-button-renderer");
 
     let button = document.createElement("button");
     button.setAttribute("id", "mark-watched");
@@ -116,10 +116,6 @@ function buildButton(item, videoId) {
     button.onclick = function () {
         markWatched(item, videoId, enclosingDiv);
     };
-
-    let markWatchedText = document.createTextNode("Mark as watched"); //TODO: translations
-
-    button.appendChild(markWatchedText);
 
     enclosingDiv.appendChild(button);
 
@@ -136,7 +132,7 @@ function getVideoId(item) {
 
 function addMarkAsWatchedButton() {
     let els = newLayout ? document.querySelectorAll("ytd-grid-video-renderer.style-scope.ytd-grid-renderer") : document.querySelectorAll(".feed-item-container .yt-shelf-grid-item");
-    //TODO: OLD LAYOUT
+    //TODO: OLD LAYOUT - maybe not needed anymore?
 
     for (item of els) {
         if (!isWatched(item)) {
@@ -144,10 +140,12 @@ function addMarkAsWatchedButton() {
             if (dismissableDiv.querySelectorAll("#mark-watched").length > 0) {
                 continue;
             }
+            else {
+                dismissableDiv = dismissableDiv.firstChild;
+            }
 
             let videoId = getVideoId(item);
             let button = buildButton(item, videoId);
-
             dismissableDiv.appendChild(button);
         }
     }

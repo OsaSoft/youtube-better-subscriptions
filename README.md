@@ -5,3 +5,9 @@ This plugin is in early development and will often change and (hopefully) includ
 Available for Firefox: https://addons.mozilla.org/cs/firefox/addon/youtube-better-subscriptions/
 
 Available for Chrome: https://chrome.google.com/webstore/detail/better-subscriptions-for/fkchdogohkjpnhfkganifkbbjcjofbjf
+
+
+The icon for the marked watched Button is based on: https://commons.wikimedia.org/wiki/File:OOjs_UI_icon_eye.svg published under the CC-BY-SA-3.0, the modified version is licensed under CC-BY-SA-4.0
+
+
+The addon as a whole is still licensed under the GPLv3
