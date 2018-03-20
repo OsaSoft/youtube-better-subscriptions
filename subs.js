@@ -1,4 +1,4 @@
-const delaySeconds = 3000; //TODO: configurable?
+const delayMilisecs = 3000; //TODO: configurable?
 
 let brwsr;
 try {
@@ -28,16 +28,6 @@ function isWatched(item) {
                 item.querySelectorAll("#progress.style-scope.ytd-thumbnail-overlay-resume-playback-renderer").length > 0) || //has progress bar on thumbnail
             item.hasAttribute("is-dismissed")) //also hide empty blocks left in by pressing "HIDE" button
     )
-}
-
-function removeWatched() {
-    let els = newLayout ? document.querySelectorAll("ytd-grid-video-renderer.style-scope.ytd-grid-renderer") : document.querySelectorAll(".feed-item-container .yt-shelf-grid-item");
-
-    for (item of els) {
-        if (isWatched(item)) {
-            hideItem(item);
-        }
-    }
 }
 
 function markWatched(item, videoId, button) {
@@ -147,12 +137,14 @@ function getVideoId(item) {
     return getVideoIdFromUrl(item.querySelectorAll("a")[0].getAttribute("href"));
 }
 
-function addMarkAsWatchedButton() {
+function removeWatchedAndAddButton() {
     let els = newLayout ? document.querySelectorAll("ytd-grid-video-renderer.style-scope.ytd-grid-renderer") : document.querySelectorAll(".feed-item-container .yt-shelf-grid-item");
-    //TODO: OLD LAYOUT
+    //TODO: OLD LAYOUT - still needed?
 
     for (item of els) {
-        if (!isWatched(item)) {
+        if (isWatched(item)) {
+            hideItem(item);
+        } else {
             let dismissableDiv = item.firstChild;
             if (dismissableDiv.querySelectorAll("#mark-watched").length > 0) {
                 continue;
@@ -182,7 +174,6 @@ brwsr.storage.onChanged.addListener(storageChangeCallback);
 
 let intervalID = window.setInterval(function () {
     if (document.getElementById("subs-grid").checked) {
-        removeWatched(); //TODO: do both these in a single sweep (checking for watched in the button adding anyway)
-        addMarkAsWatchedButton();
+        removeWatchedAndAddButton();
     }
-}, delaySeconds);
+}, delayMilisecs);
