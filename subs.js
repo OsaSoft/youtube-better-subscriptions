@@ -45,23 +45,50 @@ function checkboxChange() {
     let checkbox = document.getElementById("subs-grid");
     if (checkbox.checked) {
         hideWatched = true;
-        removeWatched();
+        removeWatchedAndAddButton();
     } else {
         hideWatched = false;
         showWatched();
     }
 }
 
-function addHideWatchedCheckbox() {
-    let subGridButtonContainer;
+function markAllAsWatched() {
+    window.alert("Pressed it!");
+}
+
+function buildUI() {
+    addHideWatchedCheckbox();
+    addHideAllMenuButton();
+}
+
+function buildMenuButtonContainer() {
+    let menuButtonContainer;
     if (newLayout) { //is new layout?
-        subGridButtonContainer = document.createElement("h2");
-        subGridButtonContainer.setAttribute("class", "style-scope ytd-shelf-renderer");
+        menuButtonContainer = document.createElement("h2");
+        menuButtonContainer.setAttribute("class", "style-scope ytd-shelf-renderer subs-grid-menu-item");
     } else {
-        subGridButtonContainer = document.createElement("li");
-        subGridButtonContainer.setAttribute("class", "yt-uix-menu-top-level-button yt-uix-menu-top-level-flow-button");
+        menuButtonContainer = document.createElement("li");
+        menuButtonContainer.setAttribute("class", "yt-uix-menu-top-level-button yt-uix-menu-top-level-flow-button");
     }
 
+    return menuButtonContainer;
+}
+
+function addHideAllMenuButton() {
+    let hideAllButtonContainer = buildMenuButtonContainer();
+    hideAllButtonContainer.setAttribute("class", "subs-grid-menu-mark-all");
+    hideAllButtonContainer.setAttribute("id", "subs-grid-menu-mark-all");
+
+    hideAllButtonContainer.appendChild(document.createTextNode("Mark all as watched"));
+
+    addElementToMenuUI(hideAllButtonContainer);
+
+    let messenger = document.getElementById("subs-grid-menu-mark-all");
+    messenger.addEventListener("click", markAllAsWatched);
+}
+
+function addHideWatchedCheckbox() {
+    let subGridButtonContainer = buildMenuButtonContainer();
     subGridButtonContainer.appendChild(document.createTextNode("Hide watched")); //TODO: translations
 
     let subGridCheckbox = document.createElement("input");
@@ -71,6 +98,13 @@ function addHideWatchedCheckbox() {
 
     subGridButtonContainer.appendChild(subGridCheckbox);
 
+    addElementToMenuUI(subGridButtonContainer);
+
+    let messenger = document.getElementById("subs-grid");
+    messenger.addEventListener("change", checkboxChange);
+}
+
+function addElementToMenuUI(element) {
     let feed;
     if (newLayout) { //is new layout?
         let buttonMenu = document.querySelectorAll("#title-container #menu");
@@ -83,13 +117,10 @@ function addHideWatchedCheckbox() {
     }
 
     if (feed.length > 0) { //just in case
-        feed[0].insertBefore(subGridButtonContainer, feed[0].firstChild);
+        feed[0].insertBefore(element, feed[0].firstChild);
     } else {
-        feed.insertBefore(subGridButtonContainer, feed.childNodes[0]); //appendChild(subGridButtonContainer);
+        feed.insertBefore(element, feed.childNodes[0]);
     }
-
-    let messenger = document.getElementById("subs-grid");
-    messenger.addEventListener("change", checkboxChange);
 }
 
 function buildButton(item, videoId) {
@@ -157,7 +188,7 @@ getStorage().get(null, function (items) { //fill our map with watched videos
     storage = items;
 });
 
-addHideWatchedCheckbox();
+buildUI();
 
 brwsr.storage.onChanged.addListener(storageChangeCallback);
 

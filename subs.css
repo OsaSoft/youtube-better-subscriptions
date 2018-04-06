@@ -23,3 +23,22 @@
     opacity: 1.0;
     cursor: pointer;
 }
+
+.subs-grid-menu-item {
+    padding-left: 20px!important;
+    padding-right: 20px!important;
+}
+
+h2.subs-grid-menu-mark-all {
+    opacity: 0.7;
+}
+
+h2.subs-grid-menu-mark-all:hover {
+    cursor: pointer;
+    opacity: 0.9;
+}
+
+h2.subs-grid-menu-mark-all:active {
+    opacity: 1.0;
+    cursor: pointer;
+}
