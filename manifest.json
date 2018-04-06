@@ -14,7 +14,7 @@
   "content_scripts": [
     {
       "matches": ["*://*.youtube.com/feed/subscriptions"],
-      "js": ["common.js", "subs.js"],
+      "js": ["common.js", "subs-ui.js", "subs.js"],
       "css": ["subs.css"]
     },
     {
