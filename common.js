@@ -10,3 +10,9 @@ try {
 function getStorage() {
     return brwsr.storage.local //TODO: use sync?
 }
+
+function setVideoInStorage(videoId) {
+    let obj = {};
+    obj[videoId] = Date.now();
+    getStorage().set(obj);
+}

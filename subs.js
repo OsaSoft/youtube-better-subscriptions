@@ -22,11 +22,11 @@ function markWatched(item, videoId, button) {
         hideItem(item);
     }
 
-    button.remove();
+    if (button != null) {
+        button.remove();
+    }
 
-    let obj = {};
-    obj[videoId] = Date.now();
-    getStorage().set(obj);
+    setVideoInStorage(videoId);
 }
 
 function checkboxChange() {
@@ -40,8 +40,13 @@ function checkboxChange() {
     }
 }
 
+//TODO: When all videos are hidden, YT doesnt load new vids
 function markAllAsWatched() {
-    window.alert("Pressed it!");
+    let els = newLayout ? document.querySelectorAll("ytd-grid-video-renderer.style-scope.ytd-grid-renderer") : document.querySelectorAll(".feed-item-container .yt-shelf-grid-item");
+
+    for (item of els) {
+        markWatched(item, getVideoId(item), null);
+    }
 }
 
 function getVideoIdFromUrl(url) {
