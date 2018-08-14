@@ -1,4 +1,4 @@
-const delayMilisecs = 3000; //TODO: configurable?
+const DELAY_MILLIS = 3000; //TODO: configurable?
 
 let storage = {};
 let hidden = [];
@@ -40,13 +40,22 @@ function checkboxChange() {
     }
 }
 
-//TODO: When all videos are hidden, YT doesnt load new vids
 function markAllAsWatched() {
     let els = newLayout ? document.querySelectorAll("ytd-grid-video-renderer.style-scope.ytd-grid-renderer") : document.querySelectorAll(".feed-item-container .yt-shelf-grid-item");
 
     for (item of els) {
         markWatched(item, getVideoId(item), null);
     }
+
+    loadMoreVideos();
+}
+
+//TODO use this in other situations where all vids are suddenly hidden
+function loadMoreVideos() {
+    //trigger the loading of more videos
+    let loadVidsScript = 'document.querySelector("yt-next-continuation").trigger();';
+    //since we need to call a function on a Polymer object on page, we need to inject script
+    injectScript(loadVidsScript);
 }
 
 function getVideoIdFromUrl(url) {
@@ -75,4 +84,4 @@ let intervalID = window.setInterval(function () {
     if (document.getElementById("subs-grid").checked) {
         removeWatchedAndAddButton();
     }
-}, delayMilisecs);
+}, DELAY_MILLIS);
