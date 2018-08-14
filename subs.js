@@ -7,13 +7,13 @@ const newLayout = document.querySelectorAll(".feed-item-container .yt-shelf-grid
 
 function isYouTubeWatched(item) {
     return (
-        (!newLayout &&
-            (item.getElementsByClassName("watched").length > 0 ||
-                item.getElementsByClassName("contains-percent-duration-watched").length > 0)) || //has "WATCHED" on thumbnail
-        (newLayout &&
-            (item.querySelectorAll("yt-formatted-string.style-scope.ytd-thumbnail-overlay-playback-status-renderer").length > 0 || //has "WATCHED" on thumbnail
-                item.querySelectorAll("#progress.style-scope.ytd-thumbnail-overlay-resume-playback-renderer").length > 0) || //has progress bar on thumbnail
-            item.hasAttribute("is-dismissed")) //also hide empty blocks left in by pressing "HIDE" button
+            (!newLayout &&
+                    (item.getElementsByClassName("watched").length > 0 ||
+                            item.getElementsByClassName("contains-percent-duration-watched").length > 0)) || //has "WATCHED" on thumbnail
+            (newLayout &&
+                    (item.querySelectorAll("yt-formatted-string.style-scope.ytd-thumbnail-overlay-playback-status-renderer").length > 0 || //has "WATCHED" on thumbnail
+                            item.querySelectorAll("#progress.style-scope.ytd-thumbnail-overlay-resume-playback-renderer").length > 0) || //has progress bar on thumbnail
+                    item.hasAttribute("is-dismissed")) //also hide empty blocks left in by pressing "HIDE" button
     )
 }
 
