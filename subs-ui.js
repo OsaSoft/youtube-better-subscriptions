@@ -99,12 +99,15 @@ function removeWatchedAndAddButton() {
     let els = newLayout ? document.querySelectorAll("ytd-grid-video-renderer.style-scope.ytd-grid-renderer") : document.querySelectorAll(".feed-item-container .yt-shelf-grid-item");
     //TODO: OLD LAYOUT - still needed?
 
+    let hiddenCount = 0;
+
     for (item of els) {
         let stored = getVideoId(item) in storage;
         let ytWatched = isYouTubeWatched(item);
 
         if (stored || ytWatched) {
             hideItem(item);
+            hiddenCount++;
 
             if (stored && ytWatched) {
                 getStorage().remove(getVideoId(item)); //since its marked watched by YouTube, remove from storage to free space
@@ -121,5 +124,10 @@ function removeWatchedAndAddButton() {
             let button = buildButton(item, videoId);
             dismissableDiv.appendChild(button);
         }
+    }
+
+    //have all vids been hidden?
+    if (hiddenCount === els.length) {
+        loadMoreVideos();
     }
 }

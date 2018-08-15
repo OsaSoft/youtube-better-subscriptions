@@ -50,8 +50,8 @@ function markAllAsWatched() {
     loadMoreVideos();
 }
 
-//TODO use this in other situations where all vids are suddenly hidden
 function loadMoreVideos() {
+    //TODO: use injection to hang a listener on Polymer vid loading to automatically hide new vids?
     //trigger the loading of more videos
     let loadVidsScript = 'document.querySelector("yt-next-continuation").trigger();';
     //since we need to call a function on a Polymer object on page, we need to inject script
