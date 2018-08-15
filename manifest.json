@@ -10,17 +10,33 @@
   "web_accessible_resources": [
     "images/*"
   ],
-  "permissions": ["*://*.youtube.com/*", "storage", "unlimitedStorage"],
+  "permissions": [
+    "*://*.youtube.com/*",
+    "storage",
+    "unlimitedStorage"
+  ],
   "content_scripts": [
     {
-      "matches": ["*://*.youtube.com/feed/subscriptions"],
-      "js": ["common.js", "subs-ui.js", "subs.js"],
-      "css": ["subs.css"]
+      "matches": [
+        "*://*.youtube.com/feed/subscriptions"
+      ],
+      "js": [
+        "common.js",
+        "subs-ui.js",
+        "subs.js"
+      ],
+      "css": [
+        "subs.css"
+      ]
     },
     {
-      "matches": ["*://*.youtube.com/watch?v=*"],
-      "js": ["common.js", "vid.js"]
+      "matches": [
+        "*://*.youtube.com/watch?v=*"
+      ],
+      "js": [
+        "common.js",
+        "vid.js"
+      ]
     }
   ]
-
 }
