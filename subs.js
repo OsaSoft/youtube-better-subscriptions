@@ -72,16 +72,22 @@ function storageChangeCallback(changes, area) {
     }
 }
 
-getStorage().get(null, function (items) { //fill our map with watched videos
-    storage = items;
-});
+function initSubs() {
+    getStorage().get(null, function (items) { //fill our map with watched videos
+        storage = items;
+    });
 
-buildUI();
+    buildUI();
 
-brwsr.storage.onChanged.addListener(storageChangeCallback);
+    brwsr.storage.onChanged.addListener(storageChangeCallback);
 
-let intervalID = window.setInterval(function () {
-    if (document.getElementById("subs-grid").checked) {
-        removeWatchedAndAddButton();
-    }
-}, DELAY_MILLIS);
+    let intervalID = window.setInterval(function () {
+        if (document.getElementById("subs-grid").checked) {
+            removeWatchedAndAddButton();
+        }
+    }, DELAY_MILLIS);
+}
+
+function stopSubs() {
+    brwsr.storage.onChanged.removeListener(storageChangeCallback);
+}
