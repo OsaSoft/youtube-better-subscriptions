@@ -20,12 +20,16 @@ function setVideoInStorage(videoId) {
 }
 
 function injectScript(scriptString, removeAfterExec = true) {
+    log("Injecting script: \n" + scriptString);
+
     let injectedScript = document.createElement("script");
     injectedScript.innerHTML = scriptString;
 
     document.head.appendChild(injectedScript);
 
     if (removeAfterExec) {
+        log("Removing injected script");
+
         //remove after execution
         document.head.removeChild(injectedScript);
     }

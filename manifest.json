@@ -18,24 +18,18 @@
   "content_scripts": [
     {
       "matches": [
-        "*://*.youtube.com/feed/subscriptions"
+        "*://*.youtube.com/*"
       ],
       "js": [
+        "util.js",
         "common.js",
+        "pageHandler.js",
         "subs-ui.js",
-        "subs.js"
+        "subs.js",
+        "vid.js"
       ],
       "css": [
         "subs.css"
-      ]
-    },
-    {
-      "matches": [
-        "*://*.youtube.com/watch?v=*"
-      ],
-      "js": [
-        "common.js",
-        "vid.js"
       ]
     }
   ]
