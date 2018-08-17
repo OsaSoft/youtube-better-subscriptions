@@ -1,4 +1,4 @@
-var debug = true;
+var debug = false;
 
 function log(text) {
     if (debug) {

@@ -23,10 +23,13 @@ function buildMenuButtonContainer() {
     let menuButtonContainer;
     if (isNewLayout) { //is new layout?
         menuButtonContainer = document.createElement("h2");
-        menuButtonContainer.setAttribute("class", "style-scope ytd-shelf-renderer subs-grid-menu-item");
+        menuButtonContainer.classList.add("yt-simple-endpoint");
+        menuButtonContainer.classList.add("style-scope");
+        menuButtonContainer.classList.add("ytd-compact-link-renderer");
     } else {
         menuButtonContainer = document.createElement("li");
-        menuButtonContainer.setAttribute("class", "yt-uix-menu-top-level-button yt-uix-menu-top-level-flow-button");
+        menuButtonContainer.classList.add("yt-uix-menu-top-level-button");
+        menuButtonContainer.classList.add("yt-uix-menu-top-level-flow-button");
     }
 
     return menuButtonContainer;
@@ -34,7 +37,7 @@ function buildMenuButtonContainer() {
 
 function addHideAllMenuButton() {
     let hideAllButtonContainer = buildMenuButtonContainer();
-    hideAllButtonContainer.setAttribute("class", "subs-grid-menu-mark-all");
+    hideAllButtonContainer.classList.add("subs-grid-menu-mark-all");
     hideAllButtonContainer.setAttribute("id", "subs-grid-menu-mark-all");
 
     hideAllButtonContainer.appendChild(document.createTextNode("Mark all as watched"));
@@ -65,24 +68,12 @@ function addHideWatchedCheckbox() {
 function addElementToMenuUI(element) {
     log("Adding element to menu UI");
 
-    let feed;
     if (isNewLayout) { //is new layout?
-        let buttonMenu = document.querySelectorAll("#menu > ytd-menu-renderer.style-scope.ytd-shelf-renderer");
-        console.log(buttonMenu);
-        if (buttonMenu) {
-            //TODO: Going through YT nav causes multiple identicals. How do we choose the right, visible one?
-            buttonMenu = buttonMenu[buttonMenu.length - 1].querySelector("div#top-level-buttons.style-scope.ytd-menu-renderer");
-        }
-        console.log(buttonMenu);
-        feed = buttonMenu ? buttonMenu : document.body;
+        let topMenuEnd = document.getElementById("end");
+        topMenuEnd.parentNode.insertBefore(element, topMenuEnd);
     } else {
-        feed = document.getElementsByClassName("yt-uix-menu-container feed-item-action-menu");
-    }
-
-    if (feed.length > 0) { //just in case
-        feed[0].insertBefore(element, feed[0].firstChild);
-    } else {
-        feed.insertBefore(element, feed.childNodes[0]);
+        let uiContainer = document.getElementsByClassName("yt-uix-menu-container feed-item-action-menu");
+        uiContainer.insertBefore(element, uiContainer.childNodes[0]);
     }
 
     addedElems.push(element);
@@ -91,11 +82,12 @@ function addElementToMenuUI(element) {
 function buildButton(item, videoId) {
     let enclosingDiv = document.createElement("div");
     enclosingDiv.setAttribute("id", "metadata-line");
-    enclosingDiv.setAttribute("class", "style-scope ytd-thumbnail-overlay-toggle-button-renderer");
+    enclosingDiv.classList.add("style-scope");
+    enclosingDiv.classList.add("ytd-thumbnail-overlay-toggle-button-renderer");
 
     let button = document.createElement("button");
     button.setAttribute("id", "mark-watched");
-    button.setAttribute("class", "subs-btn-mark-watched");
+    button.classList.add("subs-btn-mark-watched");
     button.setAttribute("role", "button");
     button.onclick = function () {
         markWatched(item, videoId, enclosingDiv);
