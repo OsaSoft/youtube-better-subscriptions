@@ -1,3 +1,5 @@
+let addedElems = [];
+
 function hideItem(item) {
     hidden.push(item);
     item.style.display = 'none';
@@ -11,13 +13,15 @@ function showWatched() {
 }
 
 function buildUI() {
+    log("Building subs UI");
+
     addHideWatchedCheckbox();
     addHideAllMenuButton();
 }
 
 function buildMenuButtonContainer() {
     let menuButtonContainer;
-    if (newLayout) { //is new layout?
+    if (isNewLayout) { //is new layout?
         menuButtonContainer = document.createElement("h2");
         menuButtonContainer.setAttribute("class", "style-scope ytd-shelf-renderer subs-grid-menu-item");
     } else {
@@ -59,12 +63,17 @@ function addHideWatchedCheckbox() {
 }
 
 function addElementToMenuUI(element) {
+    log("Adding element to menu UI");
+
     let feed;
-    if (newLayout) { //is new layout?
-        let buttonMenu = document.querySelectorAll("#title-container #menu");
+    if (isNewLayout) { //is new layout?
+        let buttonMenu = document.querySelectorAll("#menu > ytd-menu-renderer.style-scope.ytd-shelf-renderer");
+        console.log(buttonMenu);
         if (buttonMenu) {
-            buttonMenu = buttonMenu[0].firstChild;
+            //TODO: Going through YT nav causes multiple identicals. How do we choose the right, visible one?
+            buttonMenu = buttonMenu[buttonMenu.length - 1].querySelector("div#top-level-buttons.style-scope.ytd-menu-renderer");
         }
+        console.log(buttonMenu);
         feed = buttonMenu ? buttonMenu : document.body;
     } else {
         feed = document.getElementsByClassName("yt-uix-menu-container feed-item-action-menu");
@@ -75,6 +84,8 @@ function addElementToMenuUI(element) {
     } else {
         feed.insertBefore(element, feed.childNodes[0]);
     }
+
+    addedElems.push(element);
 }
 
 function buildButton(item, videoId) {
@@ -96,8 +107,9 @@ function buildButton(item, videoId) {
 }
 
 function removeWatchedAndAddButton() {
-    let els = newLayout ? document.querySelectorAll("ytd-grid-video-renderer.style-scope.ytd-grid-renderer") : document.querySelectorAll(".feed-item-container .yt-shelf-grid-item");
-    //TODO: OLD LAYOUT - still needed?
+    log("Removing watched from feed and adding overlay");
+
+    let els = isNewLayout ? document.querySelectorAll("ytd-grid-video-renderer.style-scope.ytd-grid-renderer") : document.querySelectorAll(".feed-item-container .yt-shelf-grid-item");
 
     let hiddenCount = 0;
 
@@ -130,4 +142,12 @@ function removeWatchedAndAddButton() {
     if (hiddenCount === els.length) {
         loadMoreVideos();
     }
+}
+
+function removeUI() {
+    addedElems.forEach((elem) => {
+        elem.parentNode.removeChild(elem);
+    });
+
+    addedElems = [];
 }

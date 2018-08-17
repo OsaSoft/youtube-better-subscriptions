@@ -1,5 +1,22 @@
-function handlePageChange(url) {
-    switch (url) {
+const PAGES = Object.freeze({
+    "subscriptions": "/feed/subscriptions",
+    "video": "/watch"
+});
+
+function handlePageChange(page) {
+    log("Page was changed to " + page);
+
+    //unload old page
+    stopSubs();
+
+    //handle new page
+    switch (page) {
+        case PAGES.subscriptions:
+            initSubs();
+            break;
+        case PAGES.video:
+            onVideoPage();
+            break
     }
 }
 
@@ -10,11 +27,13 @@ function initPageHandler() {
     if (pageLoader == null) {
         window.requestAnimationFrame(initPageHandler);
     } else {
+        log("Found page loader");
+
         let pageChangeObserver = new MutationObserver((mutations) => {
             mutations.forEach((mutationRecord) => {
                 //is page fully loaded?
                 if (mutationRecord.target.attributes["aria-valuenow"].value === "100") {
-                    handlePageChange(window.location.href);
+                    handlePageChange(window.location.pathname);
                 }
             });
         });
@@ -27,4 +46,5 @@ function initPageHandler() {
     }
 }
 
+log("Initializing...");
 initPageHandler();

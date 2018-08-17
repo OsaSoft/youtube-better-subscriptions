@@ -3,14 +3,16 @@ const DELAY_MILLIS = 3000; //TODO: configurable?
 let storage = {};
 let hidden = [];
 let hideWatched = true;
-const newLayout = document.querySelectorAll(".feed-item-container .yt-shelf-grid-item").length == 0; //is it the new (~fall 2017) YT layout?
+let intervalId = null;
+
+let isNewLayout = true; //is it the new (~fall 2017) YT layout?
 
 function isYouTubeWatched(item) {
     return (
-            (!newLayout &&
+            (!isNewLayout &&
                     (item.getElementsByClassName("watched").length > 0 ||
                             item.getElementsByClassName("contains-percent-duration-watched").length > 0)) || //has "WATCHED" on thumbnail
-            (newLayout &&
+            (isNewLayout &&
                     (item.querySelectorAll("yt-formatted-string.style-scope.ytd-thumbnail-overlay-playback-status-renderer").length > 0 || //has "WATCHED" on thumbnail
                             item.querySelectorAll("#progress.style-scope.ytd-thumbnail-overlay-resume-playback-renderer").length > 0) || //has progress bar on thumbnail
                     item.hasAttribute("is-dismissed")) //also hide empty blocks left in by pressing "HIDE" button
@@ -41,7 +43,7 @@ function checkboxChange() {
 }
 
 function markAllAsWatched() {
-    let els = newLayout ? document.querySelectorAll("ytd-grid-video-renderer.style-scope.ytd-grid-renderer") : document.querySelectorAll(".feed-item-container .yt-shelf-grid-item");
+    let els = isNewLayout ? document.querySelectorAll("ytd-grid-video-renderer.style-scope.ytd-grid-renderer") : document.querySelectorAll(".feed-item-container .yt-shelf-grid-item");
 
     for (item of els) {
         markWatched(item, getVideoId(item), null);
@@ -51,6 +53,8 @@ function markAllAsWatched() {
 }
 
 function loadMoreVideos() {
+    log("Loading more videos");
+
     //TODO: use injection to hang a listener on Polymer vid loading to automatically hide new vids?
     //trigger the loading of more videos
     let loadVidsScript = 'document.querySelector("yt-next-continuation").trigger();';
@@ -67,12 +71,16 @@ function getVideoId(item) {
 }
 
 function storageChangeCallback(changes, area) {
-    for (key in changes) {
+        for (key in changes) {
         storage[key] = changes[key].newValue;
     }
 }
 
 function initSubs() {
+    log("Initializing subs page...");
+
+    isNewLayout = document.querySelectorAll(".feed-item-container .yt-shelf-grid-item").length == 0;
+
     getStorage().get(null, function (items) { //fill our map with watched videos
         storage = items;
     });
@@ -81,13 +89,21 @@ function initSubs() {
 
     brwsr.storage.onChanged.addListener(storageChangeCallback);
 
-    let intervalID = window.setInterval(function () {
+    removeWatchedAndAddButton();
+
+    intervalId = window.setInterval(function () {
         if (document.getElementById("subs-grid").checked) {
             removeWatchedAndAddButton();
         }
     }, DELAY_MILLIS);
+
+    log("Initializing subs page... DONE")
 }
 
 function stopSubs() {
+    log("Stopping subs page behaviour");
+
+    removeUI();
     brwsr.storage.onChanged.removeListener(storageChangeCallback);
+    window.clearInterval(intervalId);
 }
