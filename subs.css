@@ -24,20 +24,20 @@
 }
 
 .subs-grid-menu-item {
-  padding-left: 20px !important;
-  padding-right: 20px !important;
+  padding-left: 10pt !important;
+  padding-right: 10pt !important;
 }
 
-h2.subs-grid-menu-mark-all {
+.subs-grid-menu-mark-all {
   opacity: 0.7;
 }
 
-h2.subs-grid-menu-mark-all:hover {
+.subs-grid-menu-mark-all:hover {
   cursor: pointer;
   opacity: 0.9;
 }
 
-h2.subs-grid-menu-mark-all:active {
+.subs-grid-menu-mark-all:active {
   opacity: 1.0;
   cursor: pointer;
 }
