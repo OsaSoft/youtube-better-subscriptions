@@ -29,8 +29,12 @@ function markWatched(item, videoId, button) {
     setVideoInStorage(videoId);
 }
 
+function markUnwatched(videoId) {
+    getStorage().remove(videoId);
+}
+
 function checkboxChange() {
-    let checkbox = document.getElementById("subs-grid");
+    let checkbox = document.getElementById(HIDE_WATCHED_CHECKBOX);
     if (checkbox.checked) {
         hideWatched = true;
         removeWatchedAndAddButton();
@@ -43,7 +47,7 @@ function checkboxChange() {
 function markAllAsWatched() {
     let els = isPolymer ? document.querySelectorAll("ytd-grid-video-renderer.style-scope.ytd-grid-renderer") : document.querySelectorAll(".feed-item-container .yt-shelf-grid-item");
 
-    for (item of els) {
+    for (let item of els) {
         markWatched(item, getVideoId(item), null);
     }
 
@@ -71,15 +75,20 @@ function getVideoId(item) {
 }
 
 function storageChangeCallback(changes, area) {
-    for (key in changes) {
-        storage[key] = changes[key].newValue;
+    for (let key in changes) {
+        let newValue = changes[key].newValue;
+        if (newValue != null) { // is new added
+            storage[key] = newValue;
+        } else { // is removed
+            delete storage[key];
+        }
     }
 }
 
 function initSubs() {
     log("Initializing subs page...");
 
-    getStorage().get(null, function (items) { //fill our map with watched videos
+    getStorage().get(null, items => { //fill our map with watched videos
         storage = items;
     });
 
@@ -87,13 +96,13 @@ function initSubs() {
 
     brwsr.storage.onChanged.addListener(storageChangeCallback);
 
-    removeWatchedAndAddButton();
-
     intervalId = window.setInterval(function () {
-        if (document.getElementById("subs-grid").checked) {
+        if (document.getElementById(HIDE_WATCHED_CHECKBOX).checked) {
             removeWatchedAndAddButton();
         }
     }, DELAY_MILLIS);
+
+    removeWatchedAndAddButton();
 
     log("Initializing subs page... DONE");
 }
