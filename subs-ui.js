@@ -1,3 +1,9 @@
+const HIDE_WATCHED_CHECKBOX = PREFIX + "subs-grid";
+const MARK_ALL_WATCHED_BTN = PREFIX + "subs-grid-menu-mark-all";
+const MARK_WATCHED_BTN = PREFIX + "mark-watched";
+const MARK_UNWATCHED_BTN = PREFIX + "mark-unwatched";
+const METADATA_LINE = PREFIX + "metadata-line";
+
 let addedElems = [];
 
 function hideItem(item) {
@@ -6,8 +12,18 @@ function hideItem(item) {
 }
 
 function showWatched() {
-    for (it of hidden) {
-        it.style.display = '';
+    for (let item of hidden) {
+        // find Mark as watched button and change it to Unmark as watched
+        let metaDataLine = item.querySelector("#" + METADATA_LINE);
+        if (metaDataLine != null) {
+            let dismissibleDiv = metaDataLine.parentNode;
+            dismissibleDiv.removeChild(metaDataLine);
+
+            let markUnwatchedBtn = buildMarkWatchedButton(item, getVideoId(item), false);
+            dismissibleDiv.appendChild(markUnwatchedBtn);
+        }
+
+        item.style.display = '';
     }
     hidden = [];
 }
@@ -21,16 +37,17 @@ function buildUI() {
 
 function buildMenuButtonContainer() {
     let menuButtonContainer;
-    if (isNewLayout) { //is new layout?
+    if (isPolymer) { //is new layout?
         menuButtonContainer = document.createElement("h2");
         menuButtonContainer.classList.add("yt-simple-endpoint");
         menuButtonContainer.classList.add("style-scope");
         menuButtonContainer.classList.add("ytd-compact-link-renderer");
     } else {
-        menuButtonContainer = document.createElement("li");
-        menuButtonContainer.classList.add("yt-uix-menu-top-level-button");
-        menuButtonContainer.classList.add("yt-uix-menu-top-level-flow-button");
+        menuButtonContainer = document.createElement("span");
+        menuButtonContainer.classList.add("yt-uix-clickcard");
     }
+
+    menuButtonContainer.classList.add("subs-grid-menu-item");
 
     return menuButtonContainer;
 }
@@ -38,13 +55,13 @@ function buildMenuButtonContainer() {
 function addHideAllMenuButton() {
     let hideAllButtonContainer = buildMenuButtonContainer();
     hideAllButtonContainer.classList.add("subs-grid-menu-mark-all");
-    hideAllButtonContainer.setAttribute("id", "subs-grid-menu-mark-all");
+    hideAllButtonContainer.setAttribute("id", MARK_ALL_WATCHED_BTN);
 
     hideAllButtonContainer.appendChild(document.createTextNode("Mark all as watched"));
 
     addElementToMenuUI(hideAllButtonContainer);
 
-    let messenger = document.getElementById("subs-grid-menu-mark-all");
+    let messenger = document.getElementById(MARK_ALL_WATCHED_BTN);
     messenger.addEventListener("click", markAllAsWatched);
 }
 
@@ -53,7 +70,7 @@ function addHideWatchedCheckbox() {
     subGridButtonContainer.appendChild(document.createTextNode("Hide watched")); //TODO: translations
 
     let subGridCheckbox = document.createElement("input");
-    subGridCheckbox.setAttribute("id", "subs-grid");
+    subGridCheckbox.setAttribute("id", HIDE_WATCHED_CHECKBOX);
     subGridCheckbox.setAttribute("type", "checkbox");
     subGridCheckbox.checked = true;
 
@@ -61,37 +78,50 @@ function addHideWatchedCheckbox() {
 
     addElementToMenuUI(subGridButtonContainer);
 
-    let messenger = document.getElementById("subs-grid");
+    let messenger = document.getElementById(HIDE_WATCHED_CHECKBOX);
     messenger.addEventListener("change", checkboxChange);
 }
 
 function addElementToMenuUI(element) {
     log("Adding element to menu UI");
 
-    if (isNewLayout) { //is new layout?
+    if (isPolymer) { //is new layout?
         let topMenuEnd = document.getElementById("end");
-        topMenuEnd.parentNode.insertBefore(element, topMenuEnd);
+        if (topMenuEnd != null) { //just in case...
+            topMenuEnd.parentNode.insertBefore(element, topMenuEnd);
+        }
     } else {
-        let uiContainer = document.getElementsByClassName("yt-uix-menu-container feed-item-action-menu");
-        uiContainer.insertBefore(element, uiContainer.childNodes[0]);
+        let uiContainer = document.getElementById("yt-masthead-user");
+        if (uiContainer != null) { //just in case...
+            uiContainer.insertBefore(element, uiContainer.children[0]);
+        }
     }
 
     addedElems.push(element);
 }
 
-function buildButton(item, videoId) {
+function buildMarkWatchedButton(item, videoId, isMarkWatchedBtn = true) {
     let enclosingDiv = document.createElement("div");
-    enclosingDiv.setAttribute("id", "metadata-line");
-    enclosingDiv.classList.add("style-scope");
-    enclosingDiv.classList.add("ytd-thumbnail-overlay-toggle-button-renderer");
+    enclosingDiv.setAttribute("id", METADATA_LINE);
+    enclosingDiv.classList.add("style-scope", "ytd-thumbnail-overlay-toggle-button-renderer");
 
     let button = document.createElement("button");
-    button.setAttribute("id", "mark-watched");
-    button.classList.add("subs-btn-mark-watched");
+    button.setAttribute("id", isMarkWatchedBtn ? MARK_WATCHED_BTN : MARK_UNWATCHED_BTN);
+    button.classList.add(isMarkWatchedBtn ? "subs-btn-mark-watched" : "subs-btn-mark-unwatched");
     button.setAttribute("role", "button");
-    button.onclick = function () {
-        markWatched(item, videoId, enclosingDiv);
-    };
+    if (isMarkWatchedBtn) {
+        button.onclick = () => {
+            markWatched(item, videoId, enclosingDiv);
+        };
+    } else {
+        button.onclick = () => {
+            markUnwatched(videoId);
+            let metaDataElem = item.querySelector("#" + METADATA_LINE);
+            let container = metaDataElem.parentNode;
+            container.removeChild(metaDataElem);
+            container.appendChild(buildMarkWatchedButton(item, videoId));
+        }
+    }
 
     enclosingDiv.appendChild(button);
 
@@ -101,11 +131,11 @@ function buildButton(item, videoId) {
 function removeWatchedAndAddButton() {
     log("Removing watched from feed and adding overlay");
 
-    let els = isNewLayout ? document.querySelectorAll("ytd-grid-video-renderer.style-scope.ytd-grid-renderer") : document.querySelectorAll(".feed-item-container .yt-shelf-grid-item");
+    let els = isPolymer ? document.querySelectorAll("ytd-grid-video-renderer.style-scope.ytd-grid-renderer") : document.querySelectorAll(".feed-item-container .yt-shelf-grid-item");
 
     let hiddenCount = 0;
 
-    for (item of els) {
+    for (let item of els) {
         let stored = getVideoId(item) in storage;
         let ytWatched = isYouTubeWatched(item);
 
@@ -114,19 +144,24 @@ function removeWatchedAndAddButton() {
             hiddenCount++;
 
             if (stored && ytWatched) {
-                getStorage().remove(getVideoId(item)); //since its marked watched by YouTube, remove from storage to free space
+                markUnwatched(getVideoId(item)); //since its marked watched by YouTube, remove from storage to free space
             }
         } else {
             let dismissableDiv = item.firstChild;
-            if (dismissableDiv.querySelectorAll("#mark-watched").length > 0) {
+
+            // does it already have the "Mark as Watched" button?
+            if (dismissableDiv.querySelector("#" + MARK_WATCHED_BTN) != null) {
                 continue;
             } else {
                 dismissableDiv = dismissableDiv.firstChild;
+
+                if (!isPolymer) {
+                    dismissableDiv = dismissableDiv.firstChild;
+                }
             }
 
-            let videoId = getVideoId(item);
-            let button = buildButton(item, videoId);
-            dismissableDiv.appendChild(button);
+            let markAsWatchedButton = buildMarkWatchedButton(item, getVideoId(item));
+            dismissableDiv.appendChild(markAsWatchedButton);
         }
     }
 

@@ -3,7 +3,7 @@
   "short_name": "Better Subscriptions for YouTube™",
   "manifest_version": 2,
   "name": "Better Subscriptions for YouTube™",
-  "version": "0.7",
+  "version": "0.7.1",
   "icons": {
     "48": "icons/ic_video_library_black_48dp_1x.png"
   },
@@ -23,10 +23,10 @@
       "js": [
         "util.js",
         "common.js",
-        "pageHandler.js",
         "subs-ui.js",
         "subs.js",
-        "vid.js"
+        "vid.js",
+        "pageHandler.js"
       ],
       "css": [
         "subs.css"

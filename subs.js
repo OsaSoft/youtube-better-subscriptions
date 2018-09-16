@@ -5,14 +5,12 @@ let hidden = [];
 let hideWatched = true;
 let intervalId = null;
 
-let isNewLayout = true; //is it the new (~fall 2017) YT layout?
-
 function isYouTubeWatched(item) {
     return (
-            (!isNewLayout &&
+            (!isPolymer &&
                     (item.getElementsByClassName("watched").length > 0 ||
                             item.getElementsByClassName("contains-percent-duration-watched").length > 0)) || //has "WATCHED" on thumbnail
-            (isNewLayout &&
+            (isPolymer &&
                     (item.querySelectorAll("yt-formatted-string.style-scope.ytd-thumbnail-overlay-playback-status-renderer").length > 0 || //has "WATCHED" on thumbnail
                             item.querySelectorAll("#progress.style-scope.ytd-thumbnail-overlay-resume-playback-renderer").length > 0) || //has progress bar on thumbnail
                     item.hasAttribute("is-dismissed")) //also hide empty blocks left in by pressing "HIDE" button
@@ -31,8 +29,12 @@ function markWatched(item, videoId, button) {
     setVideoInStorage(videoId);
 }
 
+function markUnwatched(videoId) {
+    getStorage().remove(videoId);
+}
+
 function checkboxChange() {
-    let checkbox = document.getElementById("subs-grid");
+    let checkbox = document.getElementById(HIDE_WATCHED_CHECKBOX);
     if (checkbox.checked) {
         hideWatched = true;
         removeWatchedAndAddButton();
@@ -43,9 +45,9 @@ function checkboxChange() {
 }
 
 function markAllAsWatched() {
-    let els = isNewLayout ? document.querySelectorAll("ytd-grid-video-renderer.style-scope.ytd-grid-renderer") : document.querySelectorAll(".feed-item-container .yt-shelf-grid-item");
+    let els = isPolymer ? document.querySelectorAll("ytd-grid-video-renderer.style-scope.ytd-grid-renderer") : document.querySelectorAll(".feed-item-container .yt-shelf-grid-item");
 
-    for (item of els) {
+    for (let item of els) {
         markWatched(item, getVideoId(item), null);
     }
 
@@ -53,13 +55,15 @@ function markAllAsWatched() {
 }
 
 function loadMoreVideos() {
-    log("Loading more videos");
+    if (isPolymer) {
+        log("Loading more videos");
 
-    //TODO: use injection to hang a listener on Polymer vid loading to automatically hide new vids?
-    //trigger the loading of more videos
-    let loadVidsScript = 'document.querySelector("yt-next-continuation").trigger();';
-    //since we need to call a function on a Polymer object on page, we need to inject script
-    injectScript(loadVidsScript);
+        //TODO: use injection to hang a listener on Polymer vid loading to automatically hide new vids?
+        //trigger the loading of more videos
+        let loadVidsScript = 'document.querySelector("yt-next-continuation").trigger();';
+        //since we need to call a function on a Polymer object on page, we need to inject script
+        injectScript(loadVidsScript);
+    }
 }
 
 function getVideoIdFromUrl(url) {
@@ -71,17 +75,20 @@ function getVideoId(item) {
 }
 
 function storageChangeCallback(changes, area) {
-        for (key in changes) {
-        storage[key] = changes[key].newValue;
+    for (let key in changes) {
+        let newValue = changes[key].newValue;
+        if (newValue != null) { // is new added
+            storage[key] = newValue;
+        } else { // is removed
+            delete storage[key];
+        }
     }
 }
 
 function initSubs() {
     log("Initializing subs page...");
 
-    isNewLayout = document.querySelectorAll(".feed-item-container .yt-shelf-grid-item").length == 0;
-
-    getStorage().get(null, function (items) { //fill our map with watched videos
+    getStorage().get(null, items => { //fill our map with watched videos
         storage = items;
     });
 
@@ -89,15 +96,15 @@ function initSubs() {
 
     brwsr.storage.onChanged.addListener(storageChangeCallback);
 
-    removeWatchedAndAddButton();
-
     intervalId = window.setInterval(function () {
-        if (document.getElementById("subs-grid").checked) {
+        if (document.getElementById(HIDE_WATCHED_CHECKBOX).checked) {
             removeWatchedAndAddButton();
         }
     }, DELAY_MILLIS);
 
-    log("Initializing subs page... DONE")
+    removeWatchedAndAddButton();
+
+    log("Initializing subs page... DONE");
 }
 
 function stopSubs() {
