@@ -10,7 +10,7 @@ try {
 }
 
 function getStorage() {
-    return brwsr.storage.local //TODO: use sync?
+    return brwsr.storage.local; //TODO: use sync?
 }
 
 function setVideoInStorage(videoId) {

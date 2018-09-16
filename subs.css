@@ -1,7 +1,5 @@
-.subs-btn-mark-watched {
-  background-image: url('images/markwatched.svg'), /*works in Firefox*/ url('chrome-extension://__MSG_@@extension_id__/images/markwatched.svg'); /*works in Chrome*/
+.subs-btn-mark-watched, .subs-btn-mark-unwatched {
   height: 24px;
-  width: 24px;
   position: absolute;
   bottom: 3px;
   left: 3px;
@@ -13,12 +11,22 @@
   transition-duration: 0.4s;
 }
 
-.subs-btn-mark-watched:hover {
+.subs-btn-mark-watched {
+  width: 24px;
+  background-image: url('images/markwatched.svg'), /*works in Firefox*/ url('chrome-extension://__MSG_@@extension_id__/images/markwatched.svg'); /*works in Chrome*/
+}
+
+.subs-btn-mark-unwatched {
+  width: 95px;
+  background-image: url('images/markunwatched.svg'), /*works in Firefox*/ url('chrome-extension://__MSG_@@extension_id__/images/markunwatched.svg'); /*works in Chrome*/
+}
+
+.subs-btn-mark-watched:hover, .subs-btn-mark-unwatched:hover {
   opacity: .8;
   cursor: pointer;
 }
 
-.subs-btn-mark-watched:active {
+.subs-btn-mark-watched:active, .subs-btn-mark-unwatched:active {
   opacity: 1.0;
   cursor: pointer;
 }
