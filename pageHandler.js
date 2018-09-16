@@ -1,3 +1,6 @@
+let isPolymer = document.getElementById("masthead-positioner") == null;
+log("Polymer detected: " + isPolymer);
+
 const PAGES = Object.freeze({
     "subscriptions": "/feed/subscriptions",
     "video": "/watch"
@@ -24,22 +27,25 @@ function initPageHandler() {
     let pageLoader = document.querySelector("yt-page-navigation-progress");
 
     //if the page loader element isnt ready, wait for it
-    if (pageLoader == null) {
+    if (pageLoader == null && isPolymer) {
         window.requestAnimationFrame(initPageHandler);
     } else {
-        log("Found page loader");
+        if (isPolymer) {
+            log("Found page loader");
 
-        let pageChangeObserver = new MutationObserver((mutations) => {
-            mutations.forEach((mutationRecord) => {
-                //is page fully loaded?
-                if (mutationRecord.target.attributes["aria-valuenow"].value === "100") {
-                    handlePageChange(window.location.pathname);
-                }
+
+            let pageChangeObserver = new MutationObserver((mutations) => {
+                mutations.forEach((mutationRecord) => {
+                    //is page fully loaded?
+                    if (mutationRecord.target.attributes["aria-valuenow"].value === "100") {
+                        handlePageChange(window.location.pathname);
+                    }
+                });
             });
-        });
 
-        //observe when the page loader becomes visible or hidden
-        pageChangeObserver.observe(pageLoader, {attributes: true, attributeFilter: ['hidden']});
+            //observe when the page loader becomes visible or hidden
+            pageChangeObserver.observe(pageLoader, {attributes: true, attributeFilter: ['hidden']});
+        }
 
         //first page doesnt trigger the event, so lets do it manually
         handlePageChange(window.location.pathname);

@@ -21,16 +21,17 @@ function buildUI() {
 
 function buildMenuButtonContainer() {
     let menuButtonContainer;
-    if (isNewLayout) { //is new layout?
+    if (isPolymer) { //is new layout?
         menuButtonContainer = document.createElement("h2");
         menuButtonContainer.classList.add("yt-simple-endpoint");
         menuButtonContainer.classList.add("style-scope");
         menuButtonContainer.classList.add("ytd-compact-link-renderer");
     } else {
-        menuButtonContainer = document.createElement("li");
-        menuButtonContainer.classList.add("yt-uix-menu-top-level-button");
-        menuButtonContainer.classList.add("yt-uix-menu-top-level-flow-button");
+        menuButtonContainer = document.createElement("span");
+        menuButtonContainer.classList.add("yt-uix-clickcard");
     }
+
+    menuButtonContainer.classList.add("subs-grid-menu-item");
 
     return menuButtonContainer;
 }
@@ -68,12 +69,16 @@ function addHideWatchedCheckbox() {
 function addElementToMenuUI(element) {
     log("Adding element to menu UI");
 
-    if (isNewLayout) { //is new layout?
+    if (isPolymer) { //is new layout?
         let topMenuEnd = document.getElementById("end");
-        topMenuEnd.parentNode.insertBefore(element, topMenuEnd);
+        if (topMenuEnd != null) { //just in case...
+            topMenuEnd.parentNode.insertBefore(element, topMenuEnd);
+        }
     } else {
-        let uiContainer = document.getElementsByClassName("yt-uix-menu-container feed-item-action-menu");
-        uiContainer.insertBefore(element, uiContainer.childNodes[0]);
+        let uiContainer = document.getElementById("yt-masthead-user");
+        if (uiContainer != null) { //just in case...
+            uiContainer.insertBefore(element, uiContainer.children[0]);
+        }
     }
 
     addedElems.push(element);
@@ -101,7 +106,7 @@ function buildButton(item, videoId) {
 function removeWatchedAndAddButton() {
     log("Removing watched from feed and adding overlay");
 
-    let els = isNewLayout ? document.querySelectorAll("ytd-grid-video-renderer.style-scope.ytd-grid-renderer") : document.querySelectorAll(".feed-item-container .yt-shelf-grid-item");
+    let els = isPolymer ? document.querySelectorAll("ytd-grid-video-renderer.style-scope.ytd-grid-renderer") : document.querySelectorAll(".feed-item-container .yt-shelf-grid-item");
 
     let hiddenCount = 0;
 
@@ -122,6 +127,10 @@ function removeWatchedAndAddButton() {
                 continue;
             } else {
                 dismissableDiv = dismissableDiv.firstChild;
+
+                if (!isPolymer) {
+                    dismissableDiv = dismissableDiv.firstChild;
+                }
             }
 
             let videoId = getVideoId(item);
