@@ -20,6 +20,8 @@ function isYouTubeWatched(item) {
 function markWatched(item, videoId, button) {
     if (hideWatched) {
         hideItem(item);
+    } else {
+        changeMarkWatchedToMarkUnwatched(item);
     }
 
     if (button != null) {
@@ -58,11 +60,14 @@ function loadMoreVideos() {
     if (isPolymer) {
         log("Loading more videos");
 
-        //TODO: use injection to hang a listener on Polymer vid loading to automatically hide new vids?
-        //trigger the loading of more videos
-        let loadVidsScript = 'document.querySelector("yt-next-continuation").trigger();';
-        //since we need to call a function on a Polymer object on page, we need to inject script
-        injectScript(loadVidsScript);
+        // workaround to load more videos, slightly scroll in the sidebar :)
+        let sidebar = document.getElementById("guide-inner-content");
+        let top = sidebar.scrollTop;
+        // +1 -1 so the scroll moves a bit even if its at complete bottom or top
+        sidebar.scrollTop += 1;
+        sidebar.scrollTop -= 1;
+        // move it back to original position
+        sidebar.scrollTop = top;
     }
 }
 

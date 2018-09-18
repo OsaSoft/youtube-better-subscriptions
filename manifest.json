@@ -3,7 +3,7 @@
   "short_name": "Better Subscriptions for YouTube™",
   "manifest_version": 2,
   "name": "Better Subscriptions for YouTube™",
-  "version": "0.8",
+  "version": "0.8.1",
   "icons": {
     "48": "icons/ic_video_library_black_48dp_1x.png"
   },
