@@ -1,5 +1,5 @@
-var debug = false;
-var date = false;
+let debug = false;
+let date = false;
 
 function log(text) {
     if (debug) {

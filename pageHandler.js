@@ -33,7 +33,6 @@ function initPageHandler() {
         if (isPolymer) {
             log("Found page loader");
 
-
             let pageChangeObserver = new MutationObserver((mutations) => {
                 mutations.forEach((mutationRecord) => {
                     //is page fully loaded?
