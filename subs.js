@@ -103,7 +103,11 @@ function initSubs() {
 
     intervalId = window.setInterval(function () {
         if (document.getElementById(HIDE_WATCHED_CHECKBOX).checked) {
-            removeWatchedAndAddButton();
+            try {
+                removeWatchedAndAddButton();
+            } catch (e) {
+                logError(e);
+            }
         }
     }, DELAY_MILLIS);
 
