@@ -11,18 +11,21 @@ function hideItem(item) {
     item.style.display = 'none';
 }
 
+function changeMarkWatchedToMarkUnwatched(item) {
+    // find Mark as watched button and change it to Unmark as watched
+    let metaDataLine = item.querySelector("#" + METADATA_LINE);
+    if (metaDataLine != null) {
+        let dismissibleDiv = metaDataLine.parentNode;
+        dismissibleDiv.removeChild(metaDataLine);
+
+        let markUnwatchedBtn = buildMarkWatchedButton(item, getVideoId(item), false);
+        dismissibleDiv.appendChild(markUnwatchedBtn);
+    }
+}
+
 function showWatched() {
     for (let item of hidden) {
-        // find Mark as watched button and change it to Unmark as watched
-        let metaDataLine = item.querySelector("#" + METADATA_LINE);
-        if (metaDataLine != null) {
-            let dismissibleDiv = metaDataLine.parentNode;
-            dismissibleDiv.removeChild(metaDataLine);
-
-            let markUnwatchedBtn = buildMarkWatchedButton(item, getVideoId(item), false);
-            dismissibleDiv.appendChild(markUnwatchedBtn);
-        }
-
+        changeMarkWatchedToMarkUnwatched(item);
         item.style.display = '';
     }
     hidden = [];
@@ -165,10 +168,8 @@ function removeWatchedAndAddButton() {
         }
     }
 
-    //have all vids been hidden?
-    if (hiddenCount === els.length) {
-        loadMoreVideos();
-    }
+    // if needed, triggers more videos to be loaded in feed
+    loadMoreVideos();
 }
 
 function removeUI() {
