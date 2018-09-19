@@ -36,13 +36,19 @@ function markUnwatched(videoId) {
 }
 
 function checkboxChange() {
-    let checkbox = document.getElementById(HIDE_WATCHED_CHECKBOX);
-    if (checkbox.checked) {
-        hideWatched = true;
-        removeWatchedAndAddButton();
-    } else {
-        hideWatched = false;
-        showWatched();
+    try {
+        let checkbox = document.getElementById(HIDE_WATCHED_CHECKBOX);
+        log("Hide Watched checkbox was changed. New value is: " + checkbox.checked);
+
+        if (checkbox.checked) {
+            hideWatched = true;
+            removeWatchedAndAddButton();
+        } else {
+            hideWatched = false;
+            showWatched();
+        }
+    } catch (e) {
+        logError(e);
     }
 }
 

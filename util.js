@@ -16,7 +16,7 @@ function logError(error) {
 
 function prepareMessage(text = null) {
     let message = LOG_HEADER;
-    if (printDate) message += new Date().toUTCString() + ": ";
+    if (printDate) message += new Date().toTimeString() + ": ";
     if (text != null) message += text;
 
     return message;

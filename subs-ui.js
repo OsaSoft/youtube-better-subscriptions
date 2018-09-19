@@ -24,6 +24,8 @@ function changeMarkWatchedToMarkUnwatched(item) {
 }
 
 function showWatched() {
+    log("Showing watched videos");
+
     for (let item of hidden) {
         changeMarkWatchedToMarkUnwatched(item);
         item.style.display = '';
@@ -167,6 +169,7 @@ function removeWatchedAndAddButton() {
             dismissableDiv.appendChild(markAsWatchedButton);
         }
     }
+    log("Removing watched from feed and adding overlay... Done");
 
     // if needed, triggers more videos to be loaded in feed
     loadMoreVideos();
