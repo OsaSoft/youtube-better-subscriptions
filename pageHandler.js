@@ -12,14 +12,18 @@ function handlePageChange(page) {
     //unload old page
     stopSubs();
 
-    //handle new page
-    switch (page) {
-        case PAGES.subscriptions:
-            initSubs();
-            break;
-        case PAGES.video:
-            onVideoPage();
-            break
+    try {
+        //handle new page
+        switch (page) {
+            case PAGES.subscriptions:
+                initSubs();
+                break;
+            case PAGES.video:
+                onVideoPage();
+                break
+        }
+    } catch (e) {
+        logError(e)
     }
 }
 

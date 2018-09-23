@@ -4,11 +4,14 @@ const MARK_WATCHED_BTN = PREFIX + "mark-watched";
 const MARK_UNWATCHED_BTN = PREFIX + "mark-unwatched";
 const METADATA_LINE = PREFIX + "metadata-line";
 
+const HIDDEN_CLASS = PREFIX + "hidden";
+
 let addedElems = [];
 
 function hideItem(item) {
     hidden.push(item);
     item.style.display = 'none';
+    item.classList.add(HIDDEN_CLASS);
 }
 
 function changeMarkWatchedToMarkUnwatched(item) {
@@ -24,11 +27,16 @@ function changeMarkWatchedToMarkUnwatched(item) {
 }
 
 function showWatched() {
+    log("Showing watched videos");
+
     for (let item of hidden) {
         changeMarkWatchedToMarkUnwatched(item);
         item.style.display = '';
+        item.classList.remove(HIDDEN_CLASS);
     }
     hidden = [];
+
+    processSections();
 }
 
 function buildUI() {
@@ -114,7 +122,7 @@ function buildMarkWatchedButton(item, videoId, isMarkWatchedBtn = true) {
     button.setAttribute("role", "button");
     if (isMarkWatchedBtn) {
         button.onclick = () => {
-            markWatched(item, videoId, enclosingDiv);
+            markWatched(item, videoId);
         };
     } else {
         button.onclick = () => {
@@ -131,10 +139,38 @@ function buildMarkWatchedButton(item, videoId, isMarkWatchedBtn = true) {
     return enclosingDiv;
 }
 
+function processSections() {
+    log("Processing sections");
+
+    let sections = document.querySelectorAll(sectionsQuery());
+    log("Found " + sections.length + " sections.");
+
+    for (let section of sections) {
+        let sectionTitle = section.querySelector(sectionTitleQuery()).textContent;
+
+        if (section.querySelector(vidQuery()) == null) {
+            // section has no videos that arent hidden, so hide it
+            if (!section.classList.contains(HIDDEN_CLASS)) {
+                log("Hiding section '" + sectionTitle + "'");
+                section.style.display = 'none';
+                section.classList.add(HIDDEN_CLASS);
+            }
+        } else {
+            // section has some videos that arent hidden, in case we hid it before, show it now
+            if (section.classList.contains(HIDDEN_CLASS)) {
+                log("Showing section '" + sectionTitle + "'");
+                section.style.display = '';
+                section.classList.remove(HIDDEN_CLASS);
+            }
+        }
+    }
+    log("Processing sections... Done");
+}
+
 function removeWatchedAndAddButton() {
     log("Removing watched from feed and adding overlay");
 
-    let els = isPolymer ? document.querySelectorAll("ytd-grid-video-renderer.style-scope.ytd-grid-renderer") : document.querySelectorAll(".feed-item-container .yt-shelf-grid-item");
+    let els = document.querySelectorAll(vidQuery());
 
     let hiddenCount = 0;
 
@@ -167,9 +203,13 @@ function removeWatchedAndAddButton() {
             dismissableDiv.appendChild(markAsWatchedButton);
         }
     }
+    log("Removing watched from feed and adding overlay... Done");
 
-    // if needed, triggers more videos to be loaded in feed
-    loadMoreVideos();
+    // if we hid any videos, see if sections need changing, or videos loading
+    if (hiddenCount > 0) {
+        processSections();
+        loadMoreVideos();
+    }
 }
 
 function removeUI() {
