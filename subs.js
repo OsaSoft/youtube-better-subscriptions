@@ -17,15 +17,12 @@ function isYouTubeWatched(item) {
     )
 }
 
-function markWatched(item, videoId, button) {
+function markWatched(item, videoId) {
+    changeMarkWatchedToMarkUnwatched(item);
+
     if (hideWatched) {
         hideItem(item);
-    } else {
-        changeMarkWatchedToMarkUnwatched(item);
-    }
-
-    if (button != null) {
-        button.remove();
+        processSections();
     }
 
     setVideoInStorage(videoId);
@@ -53,10 +50,10 @@ function checkboxChange() {
 }
 
 function markAllAsWatched() {
-    let els = isPolymer ? document.querySelectorAll("ytd-grid-video-renderer.style-scope.ytd-grid-renderer") : document.querySelectorAll(".feed-item-container .yt-shelf-grid-item");
+    let els = document.querySelectorAll(vidQuery());
 
     for (let item of els) {
-        markWatched(item, getVideoId(item), null);
+        markWatched(item, getVideoId(item));
     }
 
     loadMoreVideos();

@@ -1,6 +1,6 @@
 const LOG_HEADER = "[YT-Better-Subs] ";
 
-let debug = true;
+let debug = false;
 let printDate = false;
 
 function log(text) {

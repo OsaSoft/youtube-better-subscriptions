@@ -23,6 +23,7 @@
       "js": [
         "util.js",
         "common.js",
+        "queries.js",
         "subs-ui.js",
         "subs.js",
         "vid.js",
