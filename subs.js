@@ -17,15 +17,12 @@ function isYouTubeWatched(item) {
     )
 }
 
-function markWatched(item, videoId, button) {
+function markWatched(item, videoId) {
+    changeMarkWatchedToMarkUnwatched(item);
+
     if (hideWatched) {
         hideItem(item);
-    } else {
-        changeMarkWatchedToMarkUnwatched(item);
-    }
-
-    if (button != null) {
-        button.remove();
+        processSections();
     }
 
     setVideoInStorage(videoId);
@@ -36,21 +33,27 @@ function markUnwatched(videoId) {
 }
 
 function checkboxChange() {
-    let checkbox = document.getElementById(HIDE_WATCHED_CHECKBOX);
-    if (checkbox.checked) {
-        hideWatched = true;
-        removeWatchedAndAddButton();
-    } else {
-        hideWatched = false;
-        showWatched();
+    try {
+        let checkbox = document.getElementById(HIDE_WATCHED_CHECKBOX);
+        log("Hide Watched checkbox was changed. New value is: " + checkbox.checked);
+
+        if (checkbox.checked) {
+            hideWatched = true;
+            removeWatchedAndAddButton();
+        } else {
+            hideWatched = false;
+            showWatched();
+        }
+    } catch (e) {
+        logError(e);
     }
 }
 
 function markAllAsWatched() {
-    let els = isPolymer ? document.querySelectorAll("ytd-grid-video-renderer.style-scope.ytd-grid-renderer") : document.querySelectorAll(".feed-item-container .yt-shelf-grid-item");
+    let els = document.querySelectorAll(vidQuery());
 
     for (let item of els) {
-        markWatched(item, getVideoId(item), null);
+        markWatched(item, getVideoId(item));
     }
 
     loadMoreVideos();
@@ -103,7 +106,11 @@ function initSubs() {
 
     intervalId = window.setInterval(function () {
         if (document.getElementById(HIDE_WATCHED_CHECKBOX).checked) {
-            removeWatchedAndAddButton();
+            try {
+                removeWatchedAndAddButton();
+            } catch (e) {
+                logError(e);
+            }
         }
     }, DELAY_MILLIS);
 
