@@ -49,3 +49,7 @@
   opacity: 1.0;
   cursor: pointer;
 }
+
+input {
+    vertical-align: -3px;
+}
