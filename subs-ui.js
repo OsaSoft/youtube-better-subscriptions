@@ -3,8 +3,10 @@ const MARK_ALL_WATCHED_BTN = PREFIX + "subs-grid-menu-mark-all";
 const MARK_WATCHED_BTN = PREFIX + "mark-watched";
 const MARK_UNWATCHED_BTN = PREFIX + "mark-unwatched";
 const METADATA_LINE = PREFIX + "metadata-line";
+const COLLAPSE_SECTION_CHECKBOX = PREFIX + "collapse-section";
 
 const HIDDEN_CLASS = PREFIX + "hidden";
+const COLLAPSE_CLASS = PREFIX + "collapse-section";
 
 let addedElems = [];
 
@@ -90,7 +92,7 @@ function addHideWatchedCheckbox() {
     addElementToMenuUI(subGridButtonContainer);
 
     let messenger = document.getElementById(HIDE_WATCHED_CHECKBOX);
-    messenger.addEventListener("change", checkboxChange);
+    messenger.addEventListener("change", hideWatchedChanged);
 }
 
 function addElementToMenuUI(element) {
@@ -139,6 +141,30 @@ function buildMarkWatchedButton(item, videoId, isMarkWatchedBtn = true) {
     return enclosingDiv;
 }
 
+let collapsibleIdNum = 0;
+function addCollapsibleBtnToSection(sectionHeader) {
+    try {
+        // only add if doesnt have it already
+        if (sectionHeader.parentNode.querySelector("." + COLLAPSE_CLASS) == null) {
+
+            let collapsibleId = COLLAPSE_SECTION_CHECKBOX + collapsibleIdNum++;
+
+            let collapseCheckbox = document.createElement("input");
+            collapseCheckbox.setAttribute("id", collapsibleId);
+            collapseCheckbox.setAttribute("type", "checkbox");
+            collapseCheckbox.checked = true;
+            collapseCheckbox.classList.add(COLLAPSE_CLASS);
+
+            sectionHeader.parentNode.appendChild(collapseCheckbox);
+
+            let messenger = document.getElementById(collapsibleId);
+            messenger.addEventListener("change", collapseSectionChanged);
+        }
+    } catch (e) {
+        logError(e);
+    }
+}
+
 function processSections() {
     log("Processing sections");
 
@@ -146,8 +172,13 @@ function processSections() {
     log("Found " + sections.length + " sections.");
 
     for (let section of sections) {
-        let sectionTitle = section.querySelector(sectionTitleQuery()).textContent;
+        let sectionHeader = section.querySelector(sectionTitleQuery());
+        let sectionTitle = sectionHeader.textContent;
 
+        // add collapse button to sections
+        addCollapsibleBtnToSection(sectionHeader);
+
+        // hide or show sections
         if (section.querySelector(vidQuery()) == null) {
             // section has no videos that arent hidden, so hide it
             if (!section.classList.contains(HIDDEN_CLASS)) {

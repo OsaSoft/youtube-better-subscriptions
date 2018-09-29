@@ -32,9 +32,9 @@ function markUnwatched(videoId) {
     getStorage().remove(videoId);
 }
 
-function checkboxChange() {
+function hideWatchedChanged(event) {
     try {
-        let checkbox = document.getElementById(HIDE_WATCHED_CHECKBOX);
+        let checkbox = event.target;
         log("Hide Watched checkbox was changed. New value is: " + checkbox.checked);
 
         if (checkbox.checked) {
@@ -43,6 +43,23 @@ function checkboxChange() {
         } else {
             hideWatched = false;
             showWatched();
+        }
+    } catch (e) {
+        logError(e);
+    }
+}
+
+function collapseSectionChanged(event) {
+    try {
+        let checkbox = event.target;
+        log("Checkbox for section " + checkbox.getAttribute("id") + " changed. New value is: " + checkbox.checked);
+
+        let contentDiv = checkbox.closest(sectionDismissableQuery()).querySelector(sectionContentsQuery());
+        if (checkbox.checked) {
+            contentDiv.style.display = '';
+        } else {
+            contentDiv.style.display = 'none';
+            loadMoreVideos();
         }
     } catch (e) {
         logError(e);
