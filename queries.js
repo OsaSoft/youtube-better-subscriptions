@@ -21,3 +21,19 @@ function sectionTitleQuery() {
         return "span.branded-page-module-title-text";
     }
 }
+
+function sectionDismissableQuery() {
+    if (isPolymer) {
+        return "#dismissable";
+    } else {
+        return ".feed-item-dismissable";
+    }
+}
+
+function sectionContentsQuery() {
+    if (isPolymer) {
+        return "#contents";
+    } else {
+        return ".multirow-shelf";
+    }
+}

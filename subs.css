@@ -49,3 +49,7 @@
   opacity: 1.0;
   cursor: pointer;
 }
+
+#osasoft-better-subscriptions_subs-grid {
+  vertical-align: -3px;
+}
