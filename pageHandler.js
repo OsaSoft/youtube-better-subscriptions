@@ -7,6 +7,9 @@ const PAGES = Object.freeze({
 });
 
 function handlePageChange(page) {
+    //remove trailing /
+    page = page.replace(/\/$/, "");
+
     log("Page was changed to " + page);
 
     //unload old page
