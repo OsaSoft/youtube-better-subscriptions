@@ -34,15 +34,19 @@ function markUnwatched(videoId) {
 
 function hideWatchedChanged(event) {
     try {
-        let checkbox = event.target;
-        log("Hide Watched checkbox was changed. New value is: " + checkbox.checked);
+        let toggle = document.getElementById(HIDE_WATCHED_TOGGLE);
+        log("Hide Watched checkbox was changed. New value is: " + !hideWatched);
 
-        if (checkbox.checked) {
-            hideWatched = true;
-            removeWatchedAndAddButton();
-        } else {
+        if (hideWatched) {
             hideWatched = false;
+            toggle.classList.remove("subs-btn-hide-watched-checked");
+            toggle.classList.add("subs-btn-hide-watched-unchecked");
             showWatched();
+        } else {
+            hideWatched = true;
+            toggle.classList.remove("subs-btn-hide-watched-unchecked");
+            toggle.classList.add("subs-btn-hide-watched-checked");
+            removeWatchedAndAddButton();
         }
     } catch (e) {
         logError(e);
@@ -122,7 +126,7 @@ function initSubs() {
     brwsr.storage.onChanged.addListener(storageChangeCallback);
 
     intervalId = window.setInterval(function () {
-        if (document.getElementById(HIDE_WATCHED_CHECKBOX).checked) {
+        if (document.getElementById(HIDE_WATCHED_TOGGLE).checked) {
             try {
                 removeWatchedAndAddButton();
             } catch (e) {
