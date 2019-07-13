@@ -8,6 +8,6 @@ try {
 }
 
 brwsr.runtime.onInstalled.addListener(() => brwsr.tabs.create({
-            url: "changelog.html"
+            url: "pages/changelog.html"
         })
 );
