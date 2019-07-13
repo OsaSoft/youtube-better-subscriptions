@@ -126,7 +126,7 @@ function initSubs() {
     brwsr.storage.onChanged.addListener(storageChangeCallback);
 
     intervalId = window.setInterval(function () {
-        if (document.getElementById(HIDE_WATCHED_TOGGLE).checked) {
+        if (hideWatched) {
             try {
                 removeWatchedAndAddButton();
             } catch (e) {
