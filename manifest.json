@@ -3,7 +3,7 @@
   "short_name": "Better Subs",
   "manifest_version": 2,
   "name": "Better Subscriptions for YouTube™",
-  "version": "0.11",
+  "version": "0.12",
   "applications": {
     "gecko": {
       "id": "better-subs@osasoft.cloud"
