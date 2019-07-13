@@ -1,10 +1,10 @@
 const LOG_HEADER = "[YT-Better-Subs] ";
 
-let debug = true;
+let enableLogging = true;
 let printDate = false;
 
 function log(text) {
-    if (debug) {
+    if (enableLogging) {
         console.log(prepareMessage(text));
     }
 }
