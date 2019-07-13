@@ -1,4 +1,5 @@
-const HIDE_WATCHED_CHECKBOX = PREFIX + "subs-grid";
+const HIDE_WATCHED_TOGGLE = PREFIX + "hide-watched-toggle";
+const HIDE_WATCHED_LABEL = PREFIX + "hide-watched-toggle-label";
 const MARK_ALL_WATCHED_BTN = PREFIX + "subs-grid-menu-mark-all";
 const MARK_WATCHED_BTN = PREFIX + "mark-watched";
 const MARK_UNWATCHED_BTN = PREFIX + "mark-unwatched";
@@ -7,6 +8,8 @@ const COLLAPSE_SECTION_CHECKBOX = PREFIX + "collapse-section";
 
 const HIDDEN_CLASS = PREFIX + "hidden";
 const COLLAPSE_CLASS = PREFIX + "collapse-section";
+
+let showHideWatchedLabel = false;
 
 let addedElems = [];
 
@@ -79,20 +82,37 @@ function addHideAllMenuButton() {
 }
 
 function addHideWatchedCheckbox() {
-    let subGridButtonContainer = buildMenuButtonContainer();
-    subGridButtonContainer.appendChild(document.createTextNode("Hide watched")); //TODO: translations
+    if (showHideWatchedLabel) {
+        let hideWatchedLabel = buildMenuButtonContainer();
+        hideWatchedLabel.setAttribute("id", HIDE_WATCHED_LABEL);
+        hideWatchedLabel.appendChild(document.createTextNode("Hide watched")); //TODO: translations
+        addElementToMenuUI(hideWatchedLabel);
 
-    let subGridCheckbox = document.createElement("input");
-    subGridCheckbox.setAttribute("id", HIDE_WATCHED_CHECKBOX);
-    subGridCheckbox.setAttribute("type", "checkbox");
-    subGridCheckbox.checked = true;
+        let messenger = document.getElementById(HIDE_WATCHED_LABEL);
+        messenger.addEventListener("click", hideWatchedChanged);
+    }
 
-    subGridButtonContainer.appendChild(subGridCheckbox);
+    let toggleContainer = document.createElement("div");
+    toggleContainer.setAttribute("id", HIDE_WATCHED_TOGGLE);
+    toggleContainer.classList.add("toggle-container", "style-scope", "paper-toggle-button");
+    if (hideWatched) {
+        toggleContainer.classList.add("subs-btn-hide-watched-checked");
+    } else {
+        toggleContainer.classList.add("subs-btn-hide-watched-unchecked");
+    }
 
-    addElementToMenuUI(subGridButtonContainer);
+    let toggleBar = document.createElement("div");
+    toggleBar.classList.add("toggle-bar", "style-scope", "paper-toggle-button");
+    let toggleButton = document.createElement("div");
+    toggleButton.classList.add("toggle-button", "style-scope", "paper-toggle-button");
 
-    let messenger = document.getElementById(HIDE_WATCHED_CHECKBOX);
-    messenger.addEventListener("change", hideWatchedChanged);
+    toggleContainer.appendChild(toggleBar);
+    toggleContainer.appendChild(toggleButton);
+
+    addElementToMenuUI(toggleContainer);
+
+    let messenger = document.getElementById(HIDE_WATCHED_TOGGLE);
+    messenger.addEventListener("click", hideWatchedChanged);
 }
 
 function addElementToMenuUI(element) {
@@ -142,6 +162,7 @@ function buildMarkWatchedButton(item, videoId, isMarkWatchedBtn = true) {
 }
 
 let collapsibleIdNum = 0;
+
 function addCollapsibleBtnToSection(sectionHeader) {
     try {
         // only add if doesnt have it already
