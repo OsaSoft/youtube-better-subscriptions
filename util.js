@@ -3,9 +3,9 @@ const LOG_HEADER = "[YT-Better-Subs] ";
 let enableLogging = true;
 let printDate = false;
 
-function log(text) {
+function log(content) {
     if (enableLogging) {
-        console.log(prepareMessage(text));
+        console.log(prepareMessage(content));
     }
 }
 
@@ -14,10 +14,10 @@ function logError(error) {
     console.error(error.stack.substring(0, 1000));
 }
 
-function prepareMessage(text = null) {
+function prepareMessage(content = null) {
     let message = LOG_HEADER;
     if (printDate) message += new Date().toTimeString() + ": ";
-    if (text != null) message += text;
+    if (content != null) message += (typeof content === 'object') ? JSON.stringify(content) : content;
 
     return message;
 }

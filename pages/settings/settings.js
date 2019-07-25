@@ -1,25 +1,26 @@
-const DEFAULT_SETTINGS = {
-    "settings.hide.watched.label": true,
-    "settings.hide.watched.default": true
-};
-
 let settings = {...DEFAULT_SETTINGS};
 
-getSyncStorage().get("settings", items => {
-    settings = {...items.settings};
+log("Initializing settings page...");
+
+getSyncStorage().get(SETTINGS_KEY, items => {
+    log("Settings loaded..." + JSON.stringify(items[SETTINGS_KEY]));
+
+    settings = {...settings, ...items[SETTINGS_KEY]};
 
     hideSpinners();
     showSettings();
     updateSettings();
 });
 
-brwsr.storage.onChanged.addListener(storageChanged);
+document.addEventListener("DOMContentLoaded", () => document.getElementById("settings-save").addEventListener("click", saveSettings));
 
 function updateSettings() {
     for (let key in settings) {
         let elem = document.getElementById(key);
         if (elem && elem.matches('input[type="checkbox"]')) {
             elem.checked = settings[key];
+        } else {
+            elem.value = settings[key];
         }
     }
 }
@@ -37,20 +38,18 @@ function hideSpinners() {
 }
 
 function saveSettings() {
-    document.querySelectorAll("input")
-}
+    let values = {};
 
-function storageChanged(changes, area) {
-    if (area === "sync") {
-        for (let key in changes) {
-            let newValue = changes[key].newValue;
-            if (newValue != null) { // is new added
-                settings[key] = newValue;
-            } else { // is removed
-                delete settings[key];
-            }
+    for (let elem of document.querySelectorAll("input[id^='settings.']")) {
+        if (elem.matches('input[type="checkbox"]')) {
+            values[elem.id] = elem.checked;
+        } else {
+            values[elem.id] = elem.value
         }
-
-        updateSettings();
     }
+
+    log("Saving values:" + JSON.stringify(values));
+    let storageVal = {};
+    storageVal[SETTINGS_KEY] = values;
+    getSyncStorage().set(storageVal);
 }

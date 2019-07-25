@@ -1,5 +1,13 @@
 const PREFIX = "osasoft-better-subscriptions_";
 
+const DEFAULT_SETTINGS = {
+    "settings.hide.watched.label": true,
+    "settings.hide.watched.default": true,
+    "settings.hide.watched.refresh.rate": 3000
+};
+
+const SETTINGS_KEY = "settings";
+
 let brwsr;
 try {
     brwsr = browser;

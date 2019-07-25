@@ -32,9 +32,13 @@
 <div id="settings-subscriptions" class="hidden">
   <form>
     <label for="settings.hide.watched.label">Show Hide Watched label</label>
-    <input id="settings.hide.watched.label" type="checkbox"/>
+    <input id="settings.hide.watched.label" type="checkbox"/><br/>
+
     <label for="settings.hide.watched.default">Hide watched default state</label>
-    <input id="settings.hide.watched.default" type="checkbox"/>
+    <input id="settings.hide.watched.default" type="checkbox"/><br/>
+
+    <label for="settings.hide.watched.refresh.rate">Refresh rate for feed clearing (milliseconds)</label>
+    <input id="settings.hide.watched.refresh.rate" type="number"/><br/>
   </form>
   <br/>
   More settings to come soon!
@@ -61,4 +65,4 @@
   More settings to come soon!
 </div>
 
-<button id="settings-save" onclick="saveSettings">Save Settings</button>
+<button id="settings-save">Save Settings</button>
