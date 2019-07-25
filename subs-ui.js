@@ -9,7 +9,8 @@ const COLLAPSE_SECTION_CHECKBOX = PREFIX + "collapse-section";
 const HIDDEN_CLASS = PREFIX + "hidden";
 const COLLAPSE_CLASS = PREFIX + "collapse-section";
 
-let showHideWatchedLabel = false;
+let showHideWatchedLabel = true;
+let showHideWatchedLabel = true;
 
 let addedElems = [];
 

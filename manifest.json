@@ -39,6 +39,7 @@
         "pageHandler.js"
       ],
       "css": [
+        "common.css",
         "subs.css"
       ]
     }

@@ -104,12 +104,14 @@ function getVideoId(item) {
 }
 
 function storageChangeCallback(changes, area) {
-    for (let key in changes) {
-        let newValue = changes[key].newValue;
-        if (newValue != null) { // is new added
-            storage[key] = newValue;
-        } else { // is removed
-            delete storage[key];
+    if (area === "local") {
+        for (let key in changes) {
+            let newValue = changes[key].newValue;
+            if (newValue != null) { // is new added
+                storage[key] = newValue;
+            } else { // is removed
+                delete storage[key];
+            }
         }
     }
 }
