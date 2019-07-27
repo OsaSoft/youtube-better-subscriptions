@@ -1,62 +1,68 @@
-let isPolymer = document.getElementById("masthead-positioner") == null;
-log("Polymer detected: " + isPolymer);
+let isPolymer = false;
 
-const PAGES = Object.freeze({
-    "subscriptions": "/feed/subscriptions",
-    "video": "/watch"
-});
+settingsLoadedCallbacks.push(initExtension);
 
-function handlePageChange(page) {
-    //remove trailing /
-    page = page.replace(/\/$/, "");
+function initExtension() {
+    isPolymer = document.getElementById("masthead-positioner") == null;
+    log("Polymer detected: " + isPolymer);
 
-    log("Page was changed to " + page);
+    const PAGES = Object.freeze({
+        "subscriptions": "/feed/subscriptions",
+        "video": "/watch"
+    });
 
-    //unload old page
-    stopSubs();
+    function handlePageChange(page) {
+        //remove trailing /
+        page = page.replace(/\/$/, "");
 
-    try {
-        //handle new page
-        switch (page) {
-            case PAGES.subscriptions:
-                initSubs();
-                break;
-            case PAGES.video:
-                onVideoPage();
-                break
+        log("Page was changed to " + page);
+
+        //unload old page
+        stopSubs();
+
+        try {
+            //handle new page
+            switch (page) {
+                case PAGES.subscriptions:
+                    initSubs();
+                    break;
+                case PAGES.video:
+                    onVideoPage();
+                    break
+            }
+        } catch (e) {
+            logError(e)
         }
-    } catch (e) {
-        logError(e)
     }
-}
 
-function initPageHandler() {
-    let pageLoader = document.querySelector("yt-page-navigation-progress");
+    function initPageHandler() {
+        let pageLoader = document.querySelector("yt-page-navigation-progress");
 
-    //if the page loader element isnt ready, wait for it
-    if (pageLoader == null && isPolymer) {
-        window.requestAnimationFrame(initPageHandler);
-    } else {
-        if (isPolymer) {
-            log("Found page loader");
+        //if the page loader element isnt ready, wait for it
+        if (pageLoader == null && isPolymer) {
+            window.requestAnimationFrame(initPageHandler);
+        } else {
+            if (isPolymer) {
+                log("Found page loader");
 
-            let pageChangeObserver = new MutationObserver((mutations) => {
-                mutations.forEach((mutationRecord) => {
-                    //is page fully loaded?
-                    if (mutationRecord.target.attributes["aria-valuenow"].value === "100") {
-                        handlePageChange(window.location.pathname);
-                    }
+                let pageChangeObserver = new MutationObserver((mutations) => {
+                    mutations.forEach((mutationRecord) => {
+                        //is page fully loaded?
+                        if (mutationRecord.target.attributes["aria-valuenow"].value === "100") {
+                            handlePageChange(window.location.pathname);
+                        }
+                    });
                 });
-            });
 
-            //observe when the page loader becomes visible or hidden
-            pageChangeObserver.observe(pageLoader, {attributes: true, attributeFilter: ['hidden']});
+                //observe when the page loader becomes visible or hidden
+                pageChangeObserver.observe(pageLoader, {attributes: true, attributeFilter: ['hidden']});
+            }
+
+            //first page doesnt trigger the event, so lets do it manually
+            handlePageChange(window.location.pathname);
         }
-
-        //first page doesnt trigger the event, so lets do it manually
-        handlePageChange(window.location.pathname);
     }
-}
 
-log("Initializing...");
-initPageHandler();
+    log("Initializing...");
+    initPageHandler();
+}

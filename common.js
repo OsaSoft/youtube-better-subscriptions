@@ -1,5 +1,14 @@
 const PREFIX = "osasoft-better-subscriptions_";
 
+const DEFAULT_SETTINGS = {
+    "settings.hide.watched.label": true,
+    "settings.hide.watched.default": true,
+    "settings.hide.watched.refresh.rate": 3000,
+    "settings.log.enabled": false
+};
+
+const SETTINGS_KEY = "settings";
+
 let brwsr;
 try {
     brwsr = browser;
@@ -13,8 +22,20 @@ function getStorage() {
     return brwsr.storage.local; //TODO: use sync?
 }
 
+function getSyncStorage() {
+    return brwsr.storage.sync;
+}
+
 function setVideoInStorage(videoId) {
     let obj = {};
     obj[videoId] = Date.now();
     getStorage().set(obj);
+}
+
+function hide(element) {
+    element.classList.add("hidden");
+}
+
+function show(element) {
+    element.classList.remove("hidden");
 }
