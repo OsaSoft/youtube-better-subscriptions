@@ -21,3 +21,16 @@ function prepareMessage(content = null) {
 
     return message;
 }
+
+function download(filename, content, applicationType = "text/plain") {
+    let element = document.createElement('a');
+    element.setAttribute('href', 'data:' + applicationType + ';charset=utf-8,' + encodeURIComponent(content));
+    element.setAttribute('download', filename);
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+}
