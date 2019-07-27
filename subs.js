@@ -1,8 +1,6 @@
-const DELAY_MILLIS = 3000; //TODO: configurable?
-
 let storage = {};
 let hidden = [];
-let hideWatched = true;
+let hideWatched = null;
 let intervalId = null;
 
 function isYouTubeWatched(item) {
@@ -104,18 +102,22 @@ function getVideoId(item) {
 }
 
 function storageChangeCallback(changes, area) {
-    for (let key in changes) {
-        let newValue = changes[key].newValue;
-        if (newValue != null) { // is new added
-            storage[key] = newValue;
-        } else { // is removed
-            delete storage[key];
+    if (area === "local") {
+        for (let key in changes) {
+            let newValue = changes[key].newValue;
+            if (newValue != null) { // is new added
+                storage[key] = newValue;
+            } else { // is removed
+                delete storage[key];
+            }
         }
     }
 }
 
 function initSubs() {
     log("Initializing subs page...");
+
+    hideWatched = settings["settings.hide.watched.default"];
 
     getStorage().get(null, items => { //fill our map with watched videos
         storage = items;
@@ -133,7 +135,7 @@ function initSubs() {
                 logError(e);
             }
         }
-    }, DELAY_MILLIS);
+    }, settings["settings.hide.watched.refresh.rate"]);
 
     removeWatchedAndAddButton();
 

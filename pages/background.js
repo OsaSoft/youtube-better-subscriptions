@@ -7,6 +7,16 @@ try {
     }
 }
 
+brwsr.runtime.onMessage.addListener(function(message) {
+    switch (message.action) {
+        case "openOptionsPage":
+            brwsr.runtime.openOptionsPage();
+            break;
+        default:
+            break;
+    }
+});
+
 brwsr.runtime.onInstalled.addListener(() => brwsr.tabs.create({
             url: "pages/changelog.html"
         })
