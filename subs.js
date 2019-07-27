@@ -1,8 +1,6 @@
-const DELAY_MILLIS = 3000; //TODO: configurable?
-
 let storage = {};
 let hidden = [];
-let hideWatched = true;
+let hideWatched = null;
 let intervalId = null;
 
 function isYouTubeWatched(item) {
@@ -118,6 +116,8 @@ function storageChangeCallback(changes, area) {
 
 function initSubs() {
     log("Initializing subs page...");
+
+    hideWatched = settings["settings.hide.watched.default"];
 
     getStorage().get(null, items => { //fill our map with watched videos
         storage = items;

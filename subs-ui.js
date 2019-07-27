@@ -1,6 +1,7 @@
 const HIDE_WATCHED_TOGGLE = PREFIX + "hide-watched-toggle";
 const HIDE_WATCHED_LABEL = PREFIX + "hide-watched-toggle-label";
 const MARK_ALL_WATCHED_BTN = PREFIX + "subs-grid-menu-mark-all";
+const SETTINGS_BTN = PREFIX + "subs-grid-menu-settings";
 const MARK_WATCHED_BTN = PREFIX + "mark-watched";
 const MARK_UNWATCHED_BTN = PREFIX + "mark-unwatched";
 const METADATA_LINE = PREFIX + "metadata-line";
@@ -8,9 +9,6 @@ const COLLAPSE_SECTION_CHECKBOX = PREFIX + "collapse-section";
 
 const HIDDEN_CLASS = PREFIX + "hidden";
 const COLLAPSE_CLASS = PREFIX + "collapse-section";
-
-let showHideWatchedLabel = true;
-let showHideWatchedLabel = true;
 
 let addedElems = [];
 
@@ -50,6 +48,7 @@ function buildUI() {
 
     addHideWatchedCheckbox();
     addHideAllMenuButton();
+    addSettingsButton();
 }
 
 function buildMenuButtonContainer() {
@@ -69,6 +68,17 @@ function buildMenuButtonContainer() {
     return menuButtonContainer;
 }
 
+function addSettingsButton() {
+    let settingsButton = buildMenuButtonContainer();
+    settingsButton.classList.add("subs-btn-settings");
+    settingsButton.setAttribute("id", SETTINGS_BTN);
+
+    addElementToMenuUI(settingsButton);
+
+    let messenger = document.getElementById(SETTINGS_BTN);
+    messenger.addEventListener("click", () => brwsr.runtime.sendMessage({"action": "openOptionsPage"}));
+}
+
 function addHideAllMenuButton() {
     let hideAllButtonContainer = buildMenuButtonContainer();
     hideAllButtonContainer.classList.add("subs-grid-menu-mark-all");
@@ -83,7 +93,7 @@ function addHideAllMenuButton() {
 }
 
 function addHideWatchedCheckbox() {
-    if (showHideWatchedLabel) {
+    if (settings["settings.hide.watched.label"]) {
         let hideWatchedLabel = buildMenuButtonContainer();
         hideWatchedLabel.setAttribute("id", HIDE_WATCHED_LABEL);
         hideWatchedLabel.appendChild(document.createTextNode("Hide watched")); //TODO: translations

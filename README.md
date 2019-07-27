@@ -9,5 +9,6 @@ Available for Chrome: https://chrome.google.com/webstore/detail/better-subscript
 
 The icon for the marked watched Button is based on: https://commons.wikimedia.org/wiki/File:OOjs_UI_icon_eye.svg published under the CC-BY-SA-3.0, the modified version is licensed under CC-BY-SA-4.0
 
+The icon for the settings Button is taken based on: https://commons.wikimedia.org/wiki/File:OOjs_UI_icon_settings.svg published under the MIT licence, , the modified version is licensed under MIT
 
 The addon as a whole is still licensed under the GPLv3

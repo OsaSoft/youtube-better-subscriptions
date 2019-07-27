@@ -3,10 +3,10 @@
   "short_name": "Better Subs",
   "manifest_version": 2,
   "name": "Better Subscriptions for YouTube™",
-  "version": "0.12.1",
+  "version": "0.13",
   "applications": {
     "gecko": {
-      "id": "{5dc6dafa-584e-424a-bf90-1d1d8cfa3caa}"
+      "id": "foo@bar.com"
     }
   },
   "icons": {
@@ -46,7 +46,7 @@
     }
   ],
   "background": {
-    "scripts": ["pages/changelog.js"]
+    "scripts": ["pages/background.js"]
   },
   "options_ui": {
     "page": "pages/settings/settings.html"
