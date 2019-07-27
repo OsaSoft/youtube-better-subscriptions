@@ -1,16 +1,6 @@
-let settings = {...DEFAULT_SETTINGS};
-
 log("Initializing settings page...");
 
-getSyncStorage().get(SETTINGS_KEY, items => {
-    log("Settings loaded..." + JSON.stringify(items[SETTINGS_KEY]));
-
-    settings = {...settings, ...items[SETTINGS_KEY]};
-
-    hideSpinners();
-    showSettings();
-    updateSettings();
-});
+settingsLoadedCallbacks.push(hideSpinners, showSettings, updateSettings);
 
 document.addEventListener("DOMContentLoaded", setupButtons);
 

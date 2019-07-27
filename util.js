@@ -1,10 +1,13 @@
 const LOG_HEADER = "[YT-Better-Subs] ";
 
-let enableLogging = true;
 let printDate = false;
 
+function isLogEnabled() {
+    return settings["settings.log.enabled"];
+}
+
 function log(content) {
-    if (enableLogging) {
+    if (isLogEnabled()) {
         console.log(prepareMessage(content));
     }
 }

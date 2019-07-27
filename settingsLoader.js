@@ -1,11 +1,13 @@
 let settings = {...DEFAULT_SETTINGS};
 
+let settingsLoadedCallbacks = [];
+
 getSyncStorage().get(SETTINGS_KEY, items => {
-    settings = {...settings, ...items.settings};
+    log("Settings loaded");
 
-    hideSpinners();
-    showSettings();
-    updateSettings();
+    settings = {...settings, ...items[SETTINGS_KEY]};
+
+    for (let callback of settingsLoadedCallbacks) {
+        callback();
+    }
 });
-
-brwsr.storage.onChanged.addListener(storageChanged);

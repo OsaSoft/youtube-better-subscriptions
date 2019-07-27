@@ -135,7 +135,7 @@ function initSubs() {
                 logError(e);
             }
         }
-    }, DELAY_MILLIS);
+    }, settings["settings.hide.watched.refresh.rate"]);
 
     removeWatchedAndAddButton();
 
