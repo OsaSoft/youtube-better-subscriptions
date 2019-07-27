@@ -6,7 +6,7 @@
   "version": "0.13",
   "applications": {
     "gecko": {
-      "id": "foo@bar.com"
+      "id": "{5dc6dafa-584e-424a-bf90-1d1d8cfa3caa}"
     }
   },
   "icons": {
