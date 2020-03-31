@@ -249,7 +249,7 @@ function removeWatchedAndAddButton() {
                 markUnwatched(getVideoId(item)); //since its marked watched by YouTube, remove from storage to free space
             }
         } else {
-            let dismissableDiv = item.firstChild;
+            let dismissableDiv = item.firstElementChild;
 
             // does it already have the "Mark as Watched" button?
             if (dismissableDiv.querySelector("#" + MARK_WATCHED_BTN) != null) {
