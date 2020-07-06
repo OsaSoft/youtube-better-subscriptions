@@ -25,7 +25,7 @@ function changeMarkWatchedToMarkUnwatched(item) {
         let dismissibleDiv = metaDataLine.parentNode;
         dismissibleDiv.removeChild(metaDataLine);
 
-        let markUnwatchedBtn = buildMarkWatchedButton(item, getVideoId(item), false);
+        let markUnwatchedBtn = buildMarkWatchedButton(dismissibleDiv, item, getVideoId(item), false);
         dismissibleDiv.appendChild(markUnwatchedBtn);
     }
 }
@@ -144,7 +144,7 @@ function addElementToMenuUI(element) {
     addedElems.push(element);
 }
 
-function buildMarkWatchedButton(item, videoId, isMarkWatchedBtn = true) {
+function buildMarkWatchedButton(dismissibleDiv, item, videoId, isMarkWatchedBtn = true) {
     let enclosingDiv = document.createElement("div");
     enclosingDiv.setAttribute("id", METADATA_LINE);
     enclosingDiv.classList.add("style-scope", "ytd-thumbnail-overlay-toggle-button-renderer");
@@ -163,11 +163,16 @@ function buildMarkWatchedButton(item, videoId, isMarkWatchedBtn = true) {
             let metaDataElem = item.querySelector("#" + METADATA_LINE);
             let container = metaDataElem.parentNode;
             container.removeChild(metaDataElem);
-            container.appendChild(buildMarkWatchedButton(item, videoId));
+            container.appendChild(buildMarkWatchedButton(dismissibleDiv, item, videoId));
         }
     }
 
     enclosingDiv.appendChild(button);
+
+    if (isMarkWatchedBtn)
+        dismissibleDiv.classList.remove("semitransparent");
+    else
+        dismissibleDiv.classList.add("semitransparent");
 
     return enclosingDiv;
 }
@@ -262,9 +267,8 @@ function removeWatchedAndAddButton() {
                 }
             }
 
-            let markAsWatchedButton = buildMarkWatchedButton(item, getVideoId(item));
-            dismissableDiv.appendChild(markAsWatchedButton);
-        }
+        let markAsWatchedButton = buildMarkWatchedButton(dismissableDiv, item, getVideoId(item));
+        dismissableDiv.appendChild(markAsWatchedButton);
     }
     log("Removing watched from feed and adding overlay... Done");
 
