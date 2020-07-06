@@ -209,6 +209,8 @@ function processSections() {
 
     for (let section of sections) {
         let sectionHeader = section.querySelector(sectionTitleQuery());
+        // Temporary fix for PAGES.channel TODO: refactor this (when more pages added)
+        if (!sectionHeader) break;
         let sectionTitle = sectionHeader.textContent;
 
         // add collapse button to sections
@@ -282,4 +284,14 @@ function removeUI() {
     });
 
     addedElems = [];
+
+    // delete built buttons
+    document.querySelectorAll("#" + METADATA_LINE).forEach(e => e.remove());
+
+    // make hidden videos visible
+    for (let item of hidden) {
+        item.style.display = '';
+        item.classList.remove(HIDDEN_CLASS);
+    }
+    hidden = [];
 }
