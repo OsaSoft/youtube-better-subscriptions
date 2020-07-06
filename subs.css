@@ -34,6 +34,7 @@
 }
 
 .subs-btn-mark-watched {
+  display: none;
   width: 24px;
   background-image: url('images/markwatched.svg'), /*works in Firefox*/ url('chrome-extension://__MSG_@@extension_id__/images/markwatched.svg'); /*works in Chrome*/
   background-size: cover;
@@ -53,6 +54,10 @@
 .subs-btn-mark-watched:active, .subs-btn-mark-unwatched:active, .subs-btn-hide-watched-checked:active, .subs-btn-hide-watched-unchecked:active {
   opacity: 1.0;
   cursor: pointer;
+}
+
+ytd-grid-video-renderer.style-scope.ytd-grid-renderer:hover .subs-btn-mark-watched {
+  display: inline-block;
 }
 
 .subs-grid-menu-item {
