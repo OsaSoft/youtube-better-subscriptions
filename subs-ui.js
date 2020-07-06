@@ -34,7 +34,6 @@ function showWatched() {
     log("Showing watched videos");
 
     for (let item of hidden) {
-        changeMarkWatchedToMarkUnwatched(item);
         item.style.display = '';
         item.classList.remove(HIDDEN_CLASS);
     }
@@ -244,31 +243,29 @@ function removeWatchedAndAddButton() {
 
     for (let item of els) {
         let stored = getVideoId(item) in storage;
-        let ytWatched = isYouTubeWatched(item);
+        let dismissableDiv = item.firstElementChild;
+        let button = stored? MARK_UNWATCHED_BTN : MARK_WATCHED_BTN;
 
-        if (stored || ytWatched) {
+        if (stored && hideWatched) {
             hideItem(item);
             hiddenCount++;
+        }
 
-            if (stored && ytWatched) {
-                markUnwatched(getVideoId(item)); //since its marked watched by YouTube, remove from storage to free space
-            }
+        // does it already have any button?
+        if (dismissableDiv.querySelector("#" + button) != null) {
+            continue;
         } else {
-            let dismissableDiv = item.firstElementChild;
+            dismissableDiv = dismissableDiv.firstChild;
 
-            // does it already have the "Mark as Watched" button?
-            if (dismissableDiv.querySelector("#" + MARK_WATCHED_BTN) != null) {
-                continue;
-            } else {
+            if (!isPolymer) {
                 dismissableDiv = dismissableDiv.firstChild;
-
-                if (!isPolymer) {
-                    dismissableDiv = dismissableDiv.firstChild;
-                }
             }
+        }
 
-        let markAsWatchedButton = buildMarkWatchedButton(dismissableDiv, item, getVideoId(item));
-        dismissableDiv.appendChild(markAsWatchedButton);
+        // stored = false - build "Mark as watched"
+        // stored = true  - build "Mark as unwatched"
+        let markButton = buildMarkWatchedButton(dismissableDiv, item, getVideoId(item), !stored);
+        dismissableDiv.appendChild(markButton);
     }
     log("Removing watched from feed and adding overlay... Done");
 

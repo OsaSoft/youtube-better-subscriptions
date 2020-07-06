@@ -22,6 +22,14 @@ function getStorage() {
     return brwsr.storage.local; //TODO: use sync?
 }
 
+function loadStorage() {
+    return new Promise(function (resolve, reject) {
+        getStorage().get(null, function (items) {
+            resolve(items);
+        });
+    })
+}
+
 function getSyncStorage() {
     return brwsr.storage.sync;
 }

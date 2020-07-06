@@ -3,17 +3,6 @@ let hidden = [];
 let hideWatched = null;
 let intervalId = null;
 
-function isYouTubeWatched(item) {
-    return (
-            (!isPolymer &&
-                    (item.getElementsByClassName("watched").length > 0 ||
-                            item.getElementsByClassName("contains-percent-duration-watched").length > 0)) || //has "WATCHED" on thumbnail
-            (isPolymer &&
-                    (item.querySelectorAll("yt-formatted-string.style-scope.ytd-thumbnail-overlay-playback-status-renderer").length > 0 || //has "WATCHED" on thumbnail
-                            item.querySelectorAll("#progress.style-scope.ytd-thumbnail-overlay-resume-playback-renderer").length > 0) || //has progress bar on thumbnail
-                    item.hasAttribute("is-dismissed")) //also hide empty blocks left in by pressing "HIDE" button
-    )
-}
 
 function markWatched(item, videoId) {
     changeMarkWatchedToMarkUnwatched(item);
@@ -117,28 +106,28 @@ function storageChangeCallback(changes, area) {
 function initSubs() {
     log("Initializing subs page...");
 
-    hideWatched = settings["settings.hide.watched.default"];
-
-    getStorage().get(null, items => { //fill our map with watched videos
+    loadStorage().then(function (items) {
         storage = items;
-    });
 
-    buildUI();
+        hideWatched = settings["settings.hide.watched.default"];
 
-    brwsr.storage.onChanged.addListener(storageChangeCallback);
+        buildUI();
 
-    intervalId = window.setInterval(function () {
-        if (hideWatched) {
-            try {
-                removeWatchedAndAddButton();
-            } catch (e) {
-                logError(e);
+        brwsr.storage.onChanged.addListener(storageChangeCallback);
+
+        intervalId = window.setInterval(function () {
+            if (hideWatched) {
+                try {
+                    removeWatchedAndAddButton();
+                } catch (e) {
+                    logError(e);
+                }
             }
-        }
-    }, settings["settings.hide.watched.refresh.rate"]);
+        }, settings["settings.hide.watched.refresh.rate"]);
 
-    removeWatchedAndAddButton();
+        removeWatchedAndAddButton();
 
+    });
     log("Initializing subs page... DONE");
 }
 
