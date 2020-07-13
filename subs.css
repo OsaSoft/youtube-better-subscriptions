@@ -2,6 +2,7 @@
   height: 24px;
   padding: 0 10pt !important;
   background-image: url('images/icon_settings.svg'), /*works in Firefox*/ url('chrome-extension://__MSG_@@extension_id__/images/icon_settings.svg'); /*works in Chrome*/
+  background-repeat: no-repeat;
 }
 
 .subs-btn-hide-watched-checked, .subs-btn-hide-watched-unchecked {
