@@ -48,6 +48,9 @@ function buildUI() {
     addHideWatchedCheckbox();
     addHideAllMenuButton();
     addSettingsButton();
+
+    if (settings["settings.hide.watched.ui.stick.right"])
+        addedElems[0].after(...addedElems)
 }
 
 function buildMenuButtonContainer() {
@@ -133,7 +136,10 @@ function addElementToMenuUI(element) {
     if (isPolymer) { //is new layout?
         let topMenuEnd = document.getElementById("end");
         if (topMenuEnd != null) { //just in case...
-            topMenuEnd.parentNode.insertBefore(element, topMenuEnd);
+            if (settings["settings.hide.watched.ui.stick.right"])
+                topMenuEnd.prepend(element);
+            else
+                topMenuEnd.parentNode.insertBefore(element, topMenuEnd);
         }
     } else {
         let uiContainer = document.getElementById("yt-masthead-user");

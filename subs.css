@@ -1,10 +1,12 @@
 .subs-btn-settings {
   height: 24px;
+  padding: 0 10pt !important;
   background-image: url('images/icon_settings.svg'), /*works in Firefox*/ url('chrome-extension://__MSG_@@extension_id__/images/icon_settings.svg'); /*works in Chrome*/
 }
 
 .subs-btn-hide-watched-checked, .subs-btn-hide-watched-unchecked {
   opacity: .8;
+  margin: 0 12px !important;
 }
 
 .subs-btn-hide-watched-checked .toggle-button {
@@ -61,8 +63,7 @@ ytd-grid-video-renderer.style-scope.ytd-grid-renderer:hover .subs-btn-mark-watch
 }
 
 .subs-grid-menu-item {
-  padding-left: 10pt !important;
-  padding-right: 10pt !important;
+  margin: 0 12px !important;
 }
 
 .subs-grid-menu-mark-all {
@@ -81,4 +82,8 @@ ytd-grid-video-renderer.style-scope.ytd-grid-renderer:hover .subs-btn-mark-watch
 
 #osasoft-better-subscriptions_subs-grid {
   vertical-align: -3px;
+}
+
+#end.ytd-masthead {
+  min-width: auto !important;
 }
