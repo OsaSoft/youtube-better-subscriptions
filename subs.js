@@ -109,7 +109,9 @@ function initSubs() {
     loadStorage().then(function (items) {
         storage = items;
 
-        hideWatched = settings["settings.hide.watched.default"];
+        if (hideWatched == null || !settings["settings.hide.watched.keep.state"]) {
+            hideWatched = settings["settings.hide.watched.default"];
+        }
 
         buildUI();
 
