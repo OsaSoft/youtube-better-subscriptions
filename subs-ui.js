@@ -79,16 +79,18 @@ function addSettingsButton() {
 }
 
 function addHideAllMenuButton() {
-    let hideAllButtonContainer = buildMenuButtonContainer();
-    hideAllButtonContainer.classList.add("subs-grid-menu-mark-all");
-    hideAllButtonContainer.setAttribute("id", MARK_ALL_WATCHED_BTN);
+    if (settings["settings.hide.watched.all.label"]) {
+        let hideAllButtonContainer = buildMenuButtonContainer();
+        hideAllButtonContainer.classList.add("subs-grid-menu-mark-all");
+        hideAllButtonContainer.setAttribute("id", MARK_ALL_WATCHED_BTN);
 
-    hideAllButtonContainer.appendChild(document.createTextNode("Mark all as watched"));
+        hideAllButtonContainer.appendChild(document.createTextNode("Mark all as watched"));
 
-    addElementToMenuUI(hideAllButtonContainer);
+        addElementToMenuUI(hideAllButtonContainer);
 
-    let messenger = document.getElementById(MARK_ALL_WATCHED_BTN);
-    messenger.addEventListener("click", markAllAsWatched);
+        let messenger = document.getElementById(MARK_ALL_WATCHED_BTN);
+        messenger.addEventListener("click", markAllAsWatched);
+    }
 }
 
 function addHideWatchedCheckbox() {
