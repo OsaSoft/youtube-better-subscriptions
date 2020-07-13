@@ -6,7 +6,8 @@ const DEFAULT_SETTINGS = {
     "settings.hide.watched.keep.state": true,
     "settings.hide.watched.refresh.rate": 3000,
     "settings.log.enabled": false,
-    "settings.hide.watched.support.channel": true
+    "settings.hide.watched.support.channel": true,
+    "settings.hide.watched.auto.store": true
 };
 
 const SETTINGS_KEY = "settings";
