@@ -10,6 +10,7 @@ function initExtension() {
         "subscriptions": "/feed/subscriptions",
         "video": "/watch",
         "channel": "/videos",
+		"home": ""
     });
 
     function handlePageChange(page) {

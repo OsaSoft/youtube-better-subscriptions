@@ -265,7 +265,7 @@ function removeWatchedAndAddButton() {
         if (dismissableDiv.querySelector("#" + button) != null) {
             continue;
         } else {
-            dismissableDiv = dismissableDiv.firstChild;
+            let dismissableDiv = item.querySelector("#dismissable");
 
             if (!isPolymer) {
                 dismissableDiv = dismissableDiv.firstChild;
