@@ -8,7 +8,8 @@ function initExtension() {
 
     const PAGES = Object.freeze({
         "subscriptions": "/feed/subscriptions",
-        "video": "/watch"
+        "video": "/watch",
+		"home": ""
     });
 
     function handlePageChange(page) {
@@ -28,6 +29,9 @@ function initExtension() {
                     break;
                 case PAGES.video:
                     onVideoPage();
+                    break
+				case PAGES.home:
+                    initSubs();
                     break
             }
         } catch (e) {
