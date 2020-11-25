@@ -78,7 +78,7 @@
     r="2"
     id="circle3751"
     style="filter:url(#filter3775);fill:#ffffff"/>
-  <line x1="4" x2="22" y1="90%" y2="10%" stroke="white" stroke-width="3"/>
-  <line x1="22" x2="4" y1="90%" y2="10%" stroke="white" stroke-width="3"/>
+  <line x1="2" x2="22" y1="90%" y2="10%" stroke="white" stroke-width="3"/>
+  <line x1="22" x2="2" y1="90%" y2="10%" stroke="white" stroke-width="3"/>
   <text x="25" y="17" style="font: bold 12px sans-serif; fill: white;">WATCHED</text>
 </svg>
