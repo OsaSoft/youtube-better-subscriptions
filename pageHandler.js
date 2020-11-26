@@ -9,6 +9,7 @@ function initExtension() {
     const PAGES = Object.freeze({
         "subscriptions": "/feed/subscriptions",
         "video": "/watch",
+        "channel": "/videos",
 		"home": ""
     });
 
@@ -32,7 +33,10 @@ function initExtension() {
                     break
 				case PAGES.home:
                     initSubs();
-                    break
+                    break;
+                default:
+                    if (page.includes(PAGES.channel) && settings["settings.hide.watched.support.channel"])
+                        initSubs();
             }
         } catch (e) {
             logError(e)

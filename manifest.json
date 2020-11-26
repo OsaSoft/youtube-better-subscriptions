@@ -49,6 +49,7 @@
     "scripts": ["pages/background.js"]
   },
   "options_ui": {
-    "page": "pages/settings/settings.html"
+    "page": "pages/settings/settings.html",
+    "open_in_tab": true
   }
 }
