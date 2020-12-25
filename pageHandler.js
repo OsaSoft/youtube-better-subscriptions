@@ -13,9 +13,9 @@ function initExtension() {
         "home": ""
     });
 
-    function handlePageChange(page) {
+    function handlePageChange() {
         //remove trailing /
-        page = page.replace(/\/$/, "");
+        let page = getCurrentPage();
 
         log("Page was changed to " + page);
 
@@ -57,7 +57,7 @@ function initExtension() {
                     mutations.forEach((mutationRecord) => {
                         //is page fully loaded?
                         if (mutationRecord.target.attributes["aria-valuenow"].value === "100") {
-                            handlePageChange(window.location.pathname);
+                            handlePageChange();
                         }
                     });
                 });
@@ -67,7 +67,7 @@ function initExtension() {
             }
 
             //first page doesnt trigger the event, so lets do it manually
-            handlePageChange(window.location.pathname);
+            handlePageChange();
         }
     }
 
