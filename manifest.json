@@ -46,7 +46,9 @@
     }
   ],
   "background": {
-    "scripts": ["pages/background.js"]
+    "scripts": [
+      "pages/background.js"
+    ]
   },
   "options_ui": {
     "page": "pages/settings/settings.html",
