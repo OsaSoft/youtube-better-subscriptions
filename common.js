@@ -52,3 +52,12 @@ function hide(element) {
 function show(element) {
     element.classList.remove("hidden");
 }
+
+function getCurrentPage() {
+    let path = window.location.pathname;
+    if (path != null) {
+        return path.replace(/\/$/, "");
+    }
+
+    return "";
+}
