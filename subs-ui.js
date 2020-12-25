@@ -254,7 +254,7 @@ function removeWatchedAndAddButton() {
     for (let item of els) {
         let stored = getVideoId(item) in storage;
         let dismissableDiv = item.firstElementChild;
-        let button = stored? MARK_UNWATCHED_BTN : MARK_WATCHED_BTN;
+        let button = stored ? MARK_UNWATCHED_BTN : MARK_WATCHED_BTN;
 
         if (stored && hideWatched) {
             hideItem(item);
@@ -265,7 +265,7 @@ function removeWatchedAndAddButton() {
         if (dismissableDiv.querySelector("#" + button) != null) {
             continue;
         } else {
-            let dismissableDiv = item.querySelector("#dismissable");
+            dismissableDiv = dismissableDiv.firstChild;
 
             if (!isPolymer) {
                 dismissableDiv = dismissableDiv.firstChild;
