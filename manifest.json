@@ -3,7 +3,7 @@
   "short_name": "Better Subs",
   "manifest_version": 2,
   "name": "Better Subscriptions for YouTube™",
-  "version": "0.13.1.1",
+  "version": "0.14",
   "applications": {
     "gecko": {
       "id": "{5dc6dafa-584e-424a-bf90-1d1d8cfa3caa}"
@@ -46,9 +46,12 @@
     }
   ],
   "background": {
-    "scripts": ["pages/background.js"]
+    "scripts": [
+      "pages/background.js"
+    ]
   },
   "options_ui": {
-    "page": "pages/settings/settings.html"
+    "page": "pages/settings/settings.html",
+    "open_in_tab": true
   }
 }

@@ -3,3 +3,7 @@
 .hidden {
   display: none;
 }
+
+.semitransparent {
+  opacity: 0.5 !important;
+}

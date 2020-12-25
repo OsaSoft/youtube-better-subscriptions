@@ -1,0 +1,20 @@
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  font-size: 12px;
+}
+
+h4 {
+  padding: 10px;
+}
+
+.settings__container {
+  margin: 0 auto;
+  max-width: 800px;
+  padding: 0 10px;
+  background-color: #f4f6ff;
+}
+
+button#watched\.clear {
+  color: red !important;
+}
