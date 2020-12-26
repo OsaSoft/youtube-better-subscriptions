@@ -3,6 +3,18 @@ let hidden = [];
 let hideWatched = null;
 let intervalId = null;
 
+function isYouTubeWatched(item) {
+    let ytWatchedPercentThreshold = settings["settings.mark.watched.youtube.watched.percentage"];
+    return ytWatchedPercentThreshold !== null && (
+            (!isPolymer &&
+                    (item.getElementsByClassName("watched").length > 0 ||
+                            item.getElementsByClassName("contains-percent-duration-watched").length > 0)) || //has "WATCHED" on thumbnail
+            (isPolymer &&
+                    (item.querySelectorAll("yt-formatted-string.style-scope.ytd-thumbnail-overlay-playback-status-renderer").length > 0 || //has "WATCHED" on thumbnail
+                            item.querySelectorAll("#progress.style-scope.ytd-thumbnail-overlay-resume-playback-renderer").length > 0) || //has progress bar on thumbnail TODO allow percentage threshold
+                    item.hasAttribute("is-dismissed")) //also hide empty blocks left in by pressing "HIDE" button
+    )
+}
 
 function markWatched(item, videoId) {
     changeMarkWatchedToMarkUnwatched(item);

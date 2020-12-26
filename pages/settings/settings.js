@@ -31,7 +31,10 @@ function saveSettings() {
     let values = {};
 
     for (let elem of document.querySelectorAll("input[id^='settings.']")) {
-        if (elem.matches('input[type="checkbox"]')) {
+        if (elem.id === "settings.mark.watched.youtube.watched.percentage") {
+            //TODO allow percentage selection
+            values[elem.id] = elem.checked ? 0 : null;
+        } else if (elem.matches('input[type="checkbox"]')) {
             values[elem.id] = elem.checked;
         } else {
             values[elem.id] = elem.value
