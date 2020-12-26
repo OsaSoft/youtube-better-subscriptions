@@ -32,7 +32,7 @@ function initExtension() {
                     onVideoPage();
                     break
                 case PAGES.home:
-                    initSubs();
+                    if (settings["settings.hide.watched.support.home"]) initSubs();
                     break;
                 default:
                     if (page.includes(PAGES.channel) && settings["settings.hide.watched.support.channel"])

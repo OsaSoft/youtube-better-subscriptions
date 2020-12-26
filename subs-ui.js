@@ -252,11 +252,15 @@ function removeWatchedAndAddButton() {
     let hiddenCount = 0;
 
     for (let item of els) {
-        let stored = getVideoId(item) in storage;
+        let videoId = getVideoId(item);
+        let stored = videoId in storage;
         let dismissableDiv = item.firstElementChild;
         let button = stored ? MARK_UNWATCHED_BTN : MARK_WATCHED_BTN;
 
-        if (stored && hideWatched) {
+        if (!stored && isYouTubeWatched(item)) {
+            markWatched(item, videoId);
+            stored = true;
+        } else if (stored && hideWatched) {
             hideItem(item);
             hiddenCount++;
         }
