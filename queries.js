@@ -24,7 +24,7 @@ function sectionTitleQuery() {
 
 function sectionDismissableQuery() {
     if (isPolymer) {
-        return "#dismissable";
+        return "#dismissible";
     } else {
         return ".feed-item-dismissable";
     }
