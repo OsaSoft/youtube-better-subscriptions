@@ -3,7 +3,7 @@
   "short_name": "Better Subs",
   "manifest_version": 2,
   "name": "Better Subscriptions for YouTube™",
-  "version": "0.15.2",
+  "version": "0.16.0",
   "applications": {
     "gecko": {
       "id": "{5dc6dafa-584e-424a-bf90-1d1d8cfa3caa}"

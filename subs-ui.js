@@ -109,7 +109,7 @@ function addHideWatchedCheckbox() {
 
     let toggleContainer = document.createElement("div");
     toggleContainer.setAttribute("id", HIDE_WATCHED_TOGGLE);
-    toggleContainer.classList.add("toggle-container", "style-scope", "paper-toggle-button");
+    toggleContainer.classList.add("toggle-container", "style-scope", "tp-yt-paper-toggle-button");
     if (hideWatched) {
         toggleContainer.classList.add("subs-btn-hide-watched-checked");
     } else {
@@ -117,9 +117,9 @@ function addHideWatchedCheckbox() {
     }
 
     let toggleBar = document.createElement("div");
-    toggleBar.classList.add("toggle-bar", "style-scope", "paper-toggle-button");
+    toggleBar.classList.add("toggle-bar", "style-scope", "tp-yt-paper-toggle-button");
     let toggleButton = document.createElement("div");
-    toggleButton.classList.add("toggle-button", "style-scope", "paper-toggle-button");
+    toggleButton.classList.add("toggle-button", "style-scope", "tp-yt-paper-toggle-button");
 
     toggleContainer.appendChild(toggleBar);
     toggleContainer.appendChild(toggleButton);
