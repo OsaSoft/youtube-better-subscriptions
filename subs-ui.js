@@ -109,7 +109,7 @@ function addHideWatchedCheckbox() {
 
     let toggleContainer = document.createElement("div");
     toggleContainer.setAttribute("id", HIDE_WATCHED_TOGGLE);
-    toggleContainer.classList.add("toggle-container", "style-scope", "paper-toggle-button");
+    toggleContainer.classList.add("toggle-container", "style-scope", "tp-yt-paper-toggle-button");
     if (hideWatched) {
         toggleContainer.classList.add("subs-btn-hide-watched-checked");
     } else {
@@ -117,9 +117,9 @@ function addHideWatchedCheckbox() {
     }
 
     let toggleBar = document.createElement("div");
-    toggleBar.classList.add("toggle-bar", "style-scope", "paper-toggle-button");
+    toggleBar.classList.add("toggle-bar", "style-scope", "tp-yt-paper-toggle-button");
     let toggleButton = document.createElement("div");
-    toggleButton.classList.add("toggle-button", "style-scope", "paper-toggle-button");
+    toggleButton.classList.add("toggle-button", "style-scope", "tp-yt-paper-toggle-button");
 
     toggleContainer.appendChild(toggleBar);
     toggleContainer.appendChild(toggleButton);
@@ -254,7 +254,7 @@ function removeWatchedAndAddButton() {
     for (let item of els) {
         let videoId = getVideoId(item);
         let stored = videoId in storage;
-        let dismissableDiv = item.firstElementChild;
+        let dismissibleDiv = item.firstElementChild;
         let button = stored ? MARK_UNWATCHED_BTN : MARK_WATCHED_BTN;
 
         if (!stored && isYouTubeWatched(item)) {
@@ -263,23 +263,26 @@ function removeWatchedAndAddButton() {
         } else if (stored && hideWatched) {
             hideItem(item);
             hiddenCount++;
+        } else if (hidePremieres && isPremiere(item)) {
+            hideItem(item);
+            hiddenCount++;
         }
 
         // does it already have any button?
-        if (dismissableDiv.querySelector("#" + button) != null) {
+        if (dismissibleDiv.querySelector("#" + button) != null) {
             continue;
         } else {
-            dismissableDiv = dismissableDiv.firstChild;
+            dismissibleDiv = dismissibleDiv.firstChild;
 
             if (!isPolymer) {
-                dismissableDiv = dismissableDiv.firstChild;
+                dismissibleDiv = dismissibleDiv.firstChild;
             }
         }
 
         // stored = false - build "Mark as watched"
         // stored = true  - build "Mark as unwatched"
-        let markButton = buildMarkWatchedButton(dismissableDiv, item, getVideoId(item), !stored);
-        dismissableDiv.appendChild(markButton);
+        let markButton = buildMarkWatchedButton(dismissibleDiv, item, getVideoId(item), !stored);
+        dismissibleDiv.appendChild(markButton);
     }
     log("Removing watched from feed and adding overlay... Done");
 
