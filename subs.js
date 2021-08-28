@@ -1,7 +1,7 @@
 let storage = {};
 let hidden = [];
 let hideWatched = null;
-let hidePremieres = settings["settings.hide.premieres"];
+let hidePremieres = null;
 let intervalId = null;
 
 function isYouTubeWatched(item) {
@@ -18,9 +18,10 @@ function isYouTubeWatched(item) {
 }
 
 function isPremiere(item) {
-    let thumbOverlay = item.querySelector("ytd-thumbnail-overlay-time-status-renderer")
+    log("Checking item " + item + " for premiere");
+    let thumbOverlay = item.querySelector("ytd-thumbnail-overlay-time-status-renderer");
     if (thumbOverlay == null) return false;
-    return thumbOverlay.getAttribute("overlay-style") === "UPCOMING"
+    return thumbOverlay.getAttribute("overlay-style") === "UPCOMING";
 }
 
 function markWatched(item, videoId) {
@@ -130,6 +131,9 @@ function initSubs() {
 
         if (hideWatched == null || !settings["settings.hide.watched.keep.state"]) {
             hideWatched = settings["settings.hide.watched.default"];
+        }
+        if (hidePremieres == null) {
+            hidePremieres = settings["settings.hide.premieres"];
         }
 
         buildUI();
