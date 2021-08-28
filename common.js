@@ -11,7 +11,8 @@ const DEFAULT_SETTINGS = {
     "settings.log.enabled": false,
     "settings.hide.watched.support.channel": true,
     "settings.hide.watched.support.home": true,
-    "settings.hide.watched.auto.store": true
+    "settings.hide.watched.auto.store": true,
+    "settings.hide.premieres": false,
 };
 
 const SETTINGS_KEY = "settings";
