@@ -9,6 +9,11 @@ function updateSettings() {
         let elem = document.getElementById(key);
         if (elem && elem.matches('input[type="checkbox"]')) {
             elem.checked = settings[key];
+            // quick workaround for now
+            // TODO fix once its a percentage slider
+            if (elem.id === "settings.mark.watched.youtube.watched.percentage") {
+                elem.checked = settings[key] === 0
+            }
         } else {
             elem.value = settings[key];
         }
