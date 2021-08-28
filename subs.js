@@ -1,6 +1,7 @@
 let storage = {};
 let hidden = [];
 let hideWatched = null;
+let hidePremieres = settings["settings.hide.premieres"];
 let intervalId = null;
 
 function isYouTubeWatched(item) {
@@ -14,6 +15,12 @@ function isYouTubeWatched(item) {
                             item.querySelectorAll("#progress.style-scope.ytd-thumbnail-overlay-resume-playback-renderer").length > 0) || //has progress bar on thumbnail TODO allow percentage threshold
                     item.hasAttribute("is-dismissed")) //also hide empty blocks left in by pressing "HIDE" button
     )
+}
+
+function isPremiere(item) {
+    let thumbOverlay = item.querySelector("ytd-thumbnail-overlay-time-status-renderer")
+    if (thumbOverlay == null) return false;
+    return thumbOverlay.getAttribute("overlay-style") === "UPCOMING"
 }
 
 function markWatched(item, videoId) {
