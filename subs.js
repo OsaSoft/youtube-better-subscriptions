@@ -104,7 +104,7 @@ function loadMoreVideos() {
 
 function getVideoIdFromUrl(url) {
     if(url.includes("shorts")){
-        return url.split("/")[5];
+        return url.split("shorts/")[1].split("&")[0];
     } else {
         return url.split("=")[1].split("&")[0];
     }
