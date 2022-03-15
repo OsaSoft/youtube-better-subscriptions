@@ -103,7 +103,11 @@ function loadMoreVideos() {
 }
 
 function getVideoIdFromUrl(url) {
-    return url.split("=")[1].split("&")[0];
+    if(url.includes("shorts")){
+        return url.split("shorts/")[1].split("&")[0];
+    } else {
+        return url.split("=")[1].split("&")[0];
+    }
 }
 
 function getVideoId(item) {
