@@ -1,21 +1,32 @@
 log("Initializing settings page...");
 
-settingsLoadedCallbacks.push(hideSpinners, showSettings, updateSettings);
-
 document.addEventListener("DOMContentLoaded", setupButtons);
+document.addEventListener("DOMContentLoaded", initSettings);
+
+function initSettings() {
+    if (settingsLoaded) {
+        hideSpinners();
+        showSettings();
+        updateSettings();
+    } else {
+        settingsLoadedCallbacks.push(hideSpinners, showSettings, updateSettings);
+    }
+}
 
 function updateSettings() {
     for (let key in settings) {
         let elem = document.getElementById(key);
-        if (elem && elem.matches('input[type="checkbox"]')) {
-            elem.checked = settings[key];
-            // quick workaround for now
-            // TODO fix once its a percentage slider
-            if (elem.id === "settings.mark.watched.youtube.watched.percentage") {
-                elem.checked = settings[key] === 0
+        if (elem) {
+            if (elem.matches('input[type="checkbox"]')) {
+                elem.checked = settings[key];
+            } else {
+                elem.value = settings[key];
             }
         } else {
-            elem.value = settings[key];
+            logError({
+                "message": "Updating setting #" + key + " returned " + elem,
+                "stack": "settings.js:updateSettings",
+            });
         }
     }
 }
@@ -36,10 +47,7 @@ function saveSettings() {
     let values = {};
 
     for (let elem of document.querySelectorAll("input[id^='settings.']")) {
-        if (elem.id === "settings.mark.watched.youtube.watched.percentage") {
-            //TODO allow percentage selection
-            values[elem.id] = elem.checked ? 0 : null;
-        } else if (elem.matches('input[type="checkbox"]')) {
+        if (elem.matches('input[type="checkbox"]')) {
             values[elem.id] = elem.checked;
         } else {
             values[elem.id] = elem.value

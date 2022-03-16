@@ -2,10 +2,11 @@ let storage = {};
 let hidden = [];
 let hideWatched = null;
 let hidePremieres = null;
+let hideShorts = null;
 let intervalId = null;
 
 function isYouTubeWatched(item) {
-    let ytWatchedPercentThreshold = settings["settings.mark.watched.youtube.watched.percentage"];
+    let ytWatchedPercentThreshold = settings["settings.mark.watched.youtube.watched"];
     return ytWatchedPercentThreshold !== null && (
             (!isPolymer &&
                     (item.getElementsByClassName("watched").length > 0 ||
@@ -22,6 +23,17 @@ function isPremiere(item) {
     let thumbOverlay = item.querySelector("ytd-thumbnail-overlay-time-status-renderer");
     if (thumbOverlay == null) return false;
     return thumbOverlay.getAttribute("overlay-style") === "UPCOMING";
+}
+
+function isShort(item) {
+    log("Checking item " + item + " for short");
+
+    // new shorts url which YT is currently rolling out
+    let containsShortInUrl = item.querySelectorAll("a")[0].getAttribute("href").includes("shorts");
+    // legacy detection
+    let containsShortInTitle = getVideoTitle(item).includes("#shorts");
+
+    return containsShortInUrl || containsShortInTitle;
 }
 
 function markWatched(item, videoId) {
@@ -103,7 +115,7 @@ function loadMoreVideos() {
 }
 
 function getVideoIdFromUrl(url) {
-    if(url.includes("shorts")){
+    if (url.includes("shorts")) {
         return url.split("shorts/")[1].split("&")[0];
     } else {
         return url.split("=")[1].split("&")[0];
@@ -112,6 +124,10 @@ function getVideoIdFromUrl(url) {
 
 function getVideoId(item) {
     return getVideoIdFromUrl(item.querySelectorAll("a")[0].getAttribute("href"));
+}
+
+function getVideoTitle(item) {
+    return item.querySelector("#video-title").title;
 }
 
 function storageChangeCallback(changes, area) {
@@ -138,6 +154,9 @@ function initSubs() {
         }
         if (hidePremieres == null) {
             hidePremieres = settings["settings.hide.premieres"];
+        }
+        if (hideShorts == null) {
+            hideShorts = settings["settings.hide.shorts"];
         }
 
         buildUI();
