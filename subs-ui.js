@@ -266,6 +266,9 @@ function removeWatchedAndAddButton() {
         } else if (hidePremieres && isPremiere(item)) {
             hideItem(item);
             hiddenCount++;
+        } else if (hideShorts && isShort(item)) {
+            hideItem(item);
+            hiddenCount++;
         }
 
         // does it already have any button?

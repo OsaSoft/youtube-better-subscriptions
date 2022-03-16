@@ -7,12 +7,13 @@ const DEFAULT_SETTINGS = {
     "settings.hide.watched.default": true,
     "settings.hide.watched.keep.state": true,
     "settings.hide.watched.refresh.rate": 3000,
-    "settings.mark.watched.youtube.watched.percentage": null, //null means OFF
+    "settings.mark.watched.youtube.watched": false,
     "settings.log.enabled": false,
     "settings.hide.watched.support.channel": true,
     "settings.hide.watched.support.home": true,
     "settings.hide.watched.auto.store": true,
     "settings.hide.premieres": false,
+    "settings.hide.shorts": false,
 };
 
 const SETTINGS_KEY = "settings";
