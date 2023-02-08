@@ -1,6 +1,8 @@
 function vidQuery() {
     if (isPolymer) {
-        return "ytd-grid-video-renderer.style-scope.ytd-grid-renderer:not(." + HIDDEN_CLASS + ")" + ", ytd-rich-item-renderer.style-scope.ytd-rich-grid-renderer:not(." + HIDDEN_CLASS + ")";
+        return "ytd-grid-video-renderer.style-scope.ytd-grid-renderer:not(." + HIDDEN_CLASS + ")" +
+                ", ytd-rich-item-renderer.style-scope.ytd-rich-grid-renderer:not(." + HIDDEN_CLASS + ")" +
+                ", ytd-rich-item-renderer.style-scope.ytd-rich-grid-row:not(." + HIDDEN_CLASS + ")";
     } else {
         return ".feed-item-container .yt-shelf-grid-item:not(." + HIDDEN_CLASS + ")";
     }
