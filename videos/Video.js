@@ -50,7 +50,9 @@ class Video {
     }
 
     hide() {
-        hideItem(this.containingDiv);
+        hidden.push(this.containingDiv);
+        this.containingDiv.style.display = 'none';
+        this.containingDiv.classList.add(HIDDEN_CLASS);
     }
 
     markWatched() {
