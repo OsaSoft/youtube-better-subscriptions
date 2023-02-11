@@ -33,13 +33,13 @@ function updateSettings() {
 
 function showSettings() {
     for (let elem of document.querySelectorAll("[id^='settings-']")) {
-        show(elem);
+        elem.classList.remove("hidden");
     }
 }
 
 function hideSpinners() {
     for (let elem of document.getElementsByClassName("sk-circle")) {
-        hide(elem);
+        elem.classList.add("hidden");
     }
 }
 

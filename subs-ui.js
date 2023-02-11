@@ -237,10 +237,10 @@ function removeWatchedAndAddButton() {
         } else if (vid.isStored && hideWatched) {
             vid.hide();
             hiddenCount++;
-        } else if (hidePremieres && isPremiere(item)) {
+        } else if (hidePremieres && vid.isPremiere) {
             vid.hide();
             hiddenCount++;
-        } else if (hideShorts && isShort(item)) {
+        } else if (hideShorts && vid.isShort) {
             vid.hide();
             hiddenCount++;
         }

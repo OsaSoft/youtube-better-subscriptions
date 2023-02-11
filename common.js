@@ -49,14 +49,6 @@ function setVideoInStorage(videoId) {
     getStorage().set(obj);
 }
 
-function hide(element) {
-    element.classList.add("hidden");
-}
-
-function show(element) {
-    element.classList.remove("hidden");
-}
-
 function getCurrentPage() {
     let path = window.location.pathname;
     if (path != null) {

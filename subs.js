@@ -14,24 +14,6 @@ function isYouTubeWatched(item) {
     )
 }
 
-function isPremiere(item) {
-    log("Checking item " + item + " for premiere");
-    let thumbOverlay = item.querySelector("ytd-thumbnail-overlay-time-status-renderer");
-    if (thumbOverlay == null) return false;
-    return thumbOverlay.getAttribute("overlay-style") === "UPCOMING";
-}
-
-function isShort(item) {
-    log("Checking item " + item + " for short");
-
-    // new shorts url which YT is currently rolling out
-    let containsShortInUrl = item.querySelectorAll("a")[0].getAttribute("href").includes("shorts");
-    // legacy detection
-    let containsShortInTitle = getVideoTitle(item).includes("#shorts");
-
-    return containsShortInUrl || containsShortInTitle;
-}
-
 function hideWatchedChanged(event) {
     try {
         let toggle = document.getElementById(HIDE_WATCHED_TOGGLE);
