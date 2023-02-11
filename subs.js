@@ -8,13 +8,9 @@ let intervalId = null;
 function isYouTubeWatched(item) {
     let ytWatchedPercentThreshold = settings["settings.mark.watched.youtube.watched"];
     return ytWatchedPercentThreshold !== null && (
-            (!isPolymer &&
-                    (item.getElementsByClassName("watched").length > 0 ||
-                            item.getElementsByClassName("contains-percent-duration-watched").length > 0)) || //has "WATCHED" on thumbnail
-            (isPolymer &&
-                    (item.querySelectorAll("yt-formatted-string.style-scope.ytd-thumbnail-overlay-playback-status-renderer").length > 0 || //has "WATCHED" on thumbnail
-                            item.querySelectorAll("#progress.style-scope.ytd-thumbnail-overlay-resume-playback-renderer").length > 0) || //has progress bar on thumbnail TODO allow percentage threshold
-                    item.hasAttribute("is-dismissed")) //also hide empty blocks left in by pressing "HIDE" button
+            (item.querySelectorAll("yt-formatted-string.style-scope.ytd-thumbnail-overlay-playback-status-renderer").length > 0 || //has "WATCHED" on thumbnail
+                    item.querySelectorAll("#progress.style-scope.ytd-thumbnail-overlay-resume-playback-renderer").length > 0) || //has progress bar on thumbnail TODO allow percentage threshold
+            item.hasAttribute("is-dismissed") //also hide empty blocks left in by pressing "HIDE" button
     )
 }
 
@@ -34,21 +30,6 @@ function isShort(item) {
     let containsShortInTitle = getVideoTitle(item).includes("#shorts");
 
     return containsShortInUrl || containsShortInTitle;
-}
-
-function markWatched(item, videoId) {
-    changeMarkWatchedToMarkUnwatched(item);
-
-    if (hideWatched) {
-        hideItem(item);
-        processSections();
-    }
-
-    setVideoInStorage(videoId);
-}
-
-function markUnwatched(videoId) {
-    getStorage().remove(videoId);
 }
 
 function hideWatchedChanged(event) {
@@ -93,37 +74,23 @@ function markAllAsWatched() {
     let els = document.querySelectorAll(vidQuery());
 
     for (let item of els) {
-        markWatched(item, getVideoId(item));
+        new SubscriptionVideo(item).markWatched();
     }
 
     loadMoreVideos();
 }
 
 function loadMoreVideos() {
-    if (isPolymer) {
-        log("Loading more videos");
+    log("Loading more videos");
 
-        // workaround to load more videos, slightly scroll in the sidebar :)
-        let sidebar = document.getElementById("guide-inner-content");
-        let top = sidebar.scrollTop;
-        // +1 -1 so the scroll moves a bit even if its at complete bottom or top
-        sidebar.scrollTop += 1;
-        sidebar.scrollTop -= 1;
-        // move it back to original position
-        sidebar.scrollTop = top;
-    }
-}
-
-function getVideoIdFromUrl(url) {
-    if (url.includes("shorts")) {
-        return url.split("shorts/")[1].split("&")[0];
-    } else {
-        return url.split("=")[1].split("&")[0];
-    }
-}
-
-function getVideoId(item) {
-    return getVideoIdFromUrl(item.querySelectorAll("a")[0].getAttribute("href"));
+    // workaround to load more videos, slightly scroll in the sidebar :)
+    let sidebar = document.getElementById("guide-inner-content");
+    let top = sidebar.scrollTop;
+    // +1 -1 so the scroll moves a bit even if its at complete bottom or top
+    sidebar.scrollTop += 1;
+    sidebar.scrollTop -= 1;
+    // move it back to original position
+    sidebar.scrollTop = top;
 }
 
 function getVideoTitle(item) {

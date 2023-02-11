@@ -18,18 +18,6 @@ function hideItem(item) {
     item.classList.add(HIDDEN_CLASS);
 }
 
-function changeMarkWatchedToMarkUnwatched(item) {
-    // find Mark as watched button and change it to Unmark as watched
-    let metaDataLine = item.querySelector("#" + METADATA_LINE);
-    if (metaDataLine != null) {
-        let dismissibleDiv = metaDataLine.parentNode;
-        dismissibleDiv.removeChild(metaDataLine);
-
-        let markUnwatchedBtn = buildMarkWatchedButton(dismissibleDiv, item, getVideoId(item), false);
-        dismissibleDiv.appendChild(markUnwatchedBtn);
-    }
-}
-
 function showWatched() {
     log("Showing watched videos");
 
@@ -55,15 +43,10 @@ function buildUI() {
 
 function buildMenuButtonContainer() {
     let menuButtonContainer;
-    if (isPolymer) { //is new layout?
-        menuButtonContainer = document.createElement("h2");
-        menuButtonContainer.classList.add("yt-simple-endpoint");
-        menuButtonContainer.classList.add("style-scope");
-        menuButtonContainer.classList.add("ytd-compact-link-renderer");
-    } else {
-        menuButtonContainer = document.createElement("span");
-        menuButtonContainer.classList.add("yt-uix-clickcard");
-    }
+    menuButtonContainer = document.createElement("h2");
+    menuButtonContainer.classList.add("yt-simple-endpoint");
+    menuButtonContainer.classList.add("style-scope");
+    menuButtonContainer.classList.add("ytd-compact-link-renderer");
 
     menuButtonContainer.classList.add("subs-grid-menu-item");
 
@@ -133,19 +116,12 @@ function addHideWatchedCheckbox() {
 function addElementToMenuUI(element) {
     log("Adding element to menu UI");
 
-    if (isPolymer) { //is new layout?
-        let topMenuEnd = document.getElementById("end");
-        if (topMenuEnd != null) { //just in case...
-            if (settings["settings.hide.watched.ui.stick.right"])
-                topMenuEnd.prepend(element);
-            else
-                topMenuEnd.parentNode.insertBefore(element, topMenuEnd);
-        }
-    } else {
-        let uiContainer = document.getElementById("yt-masthead-user");
-        if (uiContainer != null) { //just in case...
-            uiContainer.insertBefore(element, uiContainer.children[0]);
-        }
+    let topMenuEnd = document.getElementById("end");
+    if (topMenuEnd != null) { //just in case...
+        if (settings["settings.hide.watched.ui.stick.right"])
+            topMenuEnd.prepend(element);
+        else
+            topMenuEnd.parentNode.insertBefore(element, topMenuEnd);
     }
 
     addedElems.push(element);
@@ -160,13 +136,15 @@ function buildMarkWatchedButton(dismissibleDiv, item, videoId, isMarkWatchedBtn 
     button.setAttribute("id", isMarkWatchedBtn ? MARK_WATCHED_BTN : MARK_UNWATCHED_BTN);
     button.classList.add(isMarkWatchedBtn ? "subs-btn-mark-watched" : "subs-btn-mark-unwatched");
     button.setAttribute("role", "button");
+
+    let vid = new SubscriptionVideo(item);
     if (isMarkWatchedBtn) {
         button.onclick = () => {
-            markWatched(item, videoId);
+            vid.markWatched();
         };
     } else {
         button.onclick = () => {
-            markUnwatched(videoId);
+            vid.markUnwatched();
             let metaDataElem = item.querySelector("#" + METADATA_LINE);
             let container = metaDataElem.parentNode;
             container.removeChild(metaDataElem);
@@ -252,40 +230,25 @@ function removeWatchedAndAddButton() {
     let hiddenCount = 0;
 
     for (let item of els) {
-        let videoId = getVideoId(item);
-        let stored = videoId in storage;
-        let dismissibleDiv = item.firstElementChild;
-        let button = stored ? MARK_UNWATCHED_BTN : MARK_WATCHED_BTN;
+        let vid = new SubscriptionVideo(item);
 
-        if (!stored && isYouTubeWatched(item)) {
-            markWatched(item, videoId);
-            stored = true;
-        } else if (stored && hideWatched) {
-            hideItem(item);
+        if (!vid.isStored && isYouTubeWatched(item)) {
+            vid.markWatched();
+        } else if (vid.isStored && hideWatched) {
+            vid.hide();
             hiddenCount++;
         } else if (hidePremieres && isPremiere(item)) {
-            hideItem(item);
+            vid.hide();
             hiddenCount++;
         } else if (hideShorts && isShort(item)) {
-            hideItem(item);
+            vid.hide();
             hiddenCount++;
         }
 
         // does it already have any button?
-        if (dismissibleDiv.querySelector("#" + button) != null) {
-            continue;
-        } else {
-            dismissibleDiv = dismissibleDiv.firstChild;
-
-            if (!isPolymer) {
-                dismissibleDiv = dismissibleDiv.firstChild;
-            }
+        if (!vid.hasButton()) {
+            vid.addButton();
         }
-
-        // stored = false - build "Mark as watched"
-        // stored = true  - build "Mark as unwatched"
-        let markButton = buildMarkWatchedButton(dismissibleDiv, item, getVideoId(item), !stored);
-        dismissibleDiv.appendChild(markButton);
     }
     log("Removing watched from feed and adding overlay... Done");
 

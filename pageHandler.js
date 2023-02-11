@@ -1,11 +1,6 @@
-let isPolymer = false;
-
 settingsLoadedCallbacks.push(initExtension);
 
 function initExtension() {
-    isPolymer = document.getElementById("masthead-positioner") == null;
-    log("Polymer detected: " + isPolymer);
-
     const PAGES = Object.freeze({
         "subscriptions": "/feed/subscriptions",
         "video": "/watch",
@@ -47,24 +42,22 @@ function initExtension() {
         let pageLoader = document.querySelector("yt-page-navigation-progress");
 
         //if the page loader element isnt ready, wait for it
-        if (pageLoader == null && isPolymer) {
+        if (pageLoader == null) {
             window.requestAnimationFrame(initPageHandler);
         } else {
-            if (isPolymer) {
-                log("Found page loader");
+            log("Found page loader");
 
-                let pageChangeObserver = new MutationObserver((mutations) => {
-                    mutations.forEach((mutationRecord) => {
-                        //is page fully loaded?
-                        if (mutationRecord.target.attributes["aria-valuenow"].value === "100") {
-                            handlePageChange();
-                        }
-                    });
+            let pageChangeObserver = new MutationObserver((mutations) => {
+                mutations.forEach((mutationRecord) => {
+                    //is page fully loaded?
+                    if (mutationRecord.target.attributes["aria-valuenow"].value === "100") {
+                        handlePageChange();
+                    }
                 });
+            });
 
-                //observe when the page loader becomes visible or hidden
-                pageChangeObserver.observe(pageLoader, {attributes: true, attributeFilter: ['hidden']});
-            }
+            //observe when the page loader becomes visible or hidden
+            pageChangeObserver.observe(pageLoader, {attributes: true, attributeFilter: ['hidden']});
 
             //first page doesnt trigger the event, so lets do it manually
             handlePageChange();
