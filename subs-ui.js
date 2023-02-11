@@ -12,12 +12,6 @@ const COLLAPSE_CLASS = PREFIX + "collapse-section";
 
 let addedElems = [];
 
-function hideItem(item) {
-    hidden.push(item);
-    item.style.display = 'none';
-    item.classList.add(HIDDEN_CLASS);
-}
-
 function showWatched() {
     log("Showing watched videos");
 
@@ -234,13 +228,11 @@ function removeWatchedAndAddButton() {
 
         if (!vid.isStored && isYouTubeWatched(item)) {
             vid.markWatched();
-        } else if (vid.isStored && hideWatched) {
-            vid.hide();
-            hiddenCount++;
-        } else if (hidePremieres && isPremiere(item)) {
-            vid.hide();
-            hiddenCount++;
-        } else if (hideShorts && isShort(item)) {
+        } else if (
+                (hideWatched && vid.isStored) ||
+                (hidePremieres && vid.isPremiere) ||
+                (hideShorts && vid.isShort)
+        ) {
             vid.hide();
             hiddenCount++;
         }
