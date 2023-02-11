@@ -32,21 +32,6 @@ function isShort(item) {
     return containsShortInUrl || containsShortInTitle;
 }
 
-function markWatched(item, videoId) {
-    changeMarkWatchedToMarkUnwatched(item);
-
-    if (hideWatched) {
-        hideItem(item);
-        processSections();
-    }
-
-    setVideoInStorage(videoId);
-}
-
-function markUnwatched(videoId) {
-    getStorage().remove(videoId);
-}
-
 function hideWatchedChanged(event) {
     try {
         let toggle = document.getElementById(HIDE_WATCHED_TOGGLE);
@@ -89,7 +74,7 @@ function markAllAsWatched() {
     let els = document.querySelectorAll(vidQuery());
 
     for (let item of els) {
-        markWatched(item, getVideoId(item));
+        new SubscriptionVideo(item).markWatched();
     }
 
     loadMoreVideos();
@@ -106,18 +91,6 @@ function loadMoreVideos() {
     sidebar.scrollTop -= 1;
     // move it back to original position
     sidebar.scrollTop = top;
-}
-
-function getVideoIdFromUrl(url) {
-    if (url.includes("shorts")) {
-        return url.split("shorts/")[1].split("&")[0];
-    } else {
-        return url.split("=")[1].split("&")[0];
-    }
-}
-
-function getVideoId(item) {
-    return getVideoIdFromUrl(item.querySelectorAll("a")[0].getAttribute("href"));
 }
 
 function getVideoTitle(item) {

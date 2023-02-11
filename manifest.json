@@ -34,6 +34,7 @@
         "common.js",
         "settingsLoader.js",
         "queries.js",
+        "videos/SubscriptionsVideo.js",
         "subs-ui.js",
         "subs.js",
         "vid.js",
