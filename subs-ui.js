@@ -55,15 +55,10 @@ function buildUI() {
 
 function buildMenuButtonContainer() {
     let menuButtonContainer;
-    if (isPolymer) { //is new layout?
-        menuButtonContainer = document.createElement("h2");
-        menuButtonContainer.classList.add("yt-simple-endpoint");
-        menuButtonContainer.classList.add("style-scope");
-        menuButtonContainer.classList.add("ytd-compact-link-renderer");
-    } else {
-        menuButtonContainer = document.createElement("span");
-        menuButtonContainer.classList.add("yt-uix-clickcard");
-    }
+    menuButtonContainer = document.createElement("h2");
+    menuButtonContainer.classList.add("yt-simple-endpoint");
+    menuButtonContainer.classList.add("style-scope");
+    menuButtonContainer.classList.add("ytd-compact-link-renderer");
 
     menuButtonContainer.classList.add("subs-grid-menu-item");
 
@@ -133,19 +128,12 @@ function addHideWatchedCheckbox() {
 function addElementToMenuUI(element) {
     log("Adding element to menu UI");
 
-    if (isPolymer) { //is new layout?
-        let topMenuEnd = document.getElementById("end");
-        if (topMenuEnd != null) { //just in case...
-            if (settings["settings.hide.watched.ui.stick.right"])
-                topMenuEnd.prepend(element);
-            else
-                topMenuEnd.parentNode.insertBefore(element, topMenuEnd);
-        }
-    } else {
-        let uiContainer = document.getElementById("yt-masthead-user");
-        if (uiContainer != null) { //just in case...
-            uiContainer.insertBefore(element, uiContainer.children[0]);
-        }
+    let topMenuEnd = document.getElementById("end");
+    if (topMenuEnd != null) { //just in case...
+        if (settings["settings.hide.watched.ui.stick.right"])
+            topMenuEnd.prepend(element);
+        else
+            topMenuEnd.parentNode.insertBefore(element, topMenuEnd);
     }
 
     addedElems.push(element);
@@ -276,10 +264,6 @@ function removeWatchedAndAddButton() {
             continue;
         } else {
             dismissibleDiv = dismissibleDiv.firstChild;
-
-            if (!isPolymer) {
-                dismissibleDiv = dismissibleDiv.firstChild;
-            }
         }
 
         // stored = false - build "Mark as watched"
