@@ -4,6 +4,7 @@ function initExtension() {
     const PAGES = Object.freeze({
         "subscriptions": "/feed/subscriptions",
         "video": "/watch",
+        "short": "/shorts",
         "channel": "/videos",
         "home": ""
     });
@@ -30,8 +31,11 @@ function initExtension() {
                     if (settings["settings.hide.watched.support.home"]) initSubs();
                     break;
                 default:
-                    if (page.includes(PAGES.channel) && settings["settings.hide.watched.support.channel"])
+                    if (page.includes(PAGES.short)) {
+                        onShortPage();
+                    } else if (page.includes(PAGES.channel) && settings["settings.hide.watched.support.channel"]) {
                         initSubs();
+                    }
             }
         } catch (e) {
             logError(e)

@@ -6,3 +6,12 @@ function onVideoPage() {
         setVideoInStorage(videoId);
     }
 }
+
+function onShortPage() {
+    if (settings["settings.hide.watched.auto.store"]) {
+        let videoId = getCurrentPage().split('/')[2];
+
+        log("Marking short " + videoId + " as watched from shorts page");
+        setVideoInStorage(videoId);
+    }
+}
