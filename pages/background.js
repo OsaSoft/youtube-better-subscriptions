@@ -1,4 +1,4 @@
-const currentVersion = "0.17.2";
+const currentVersion = "0.17.3";
 
 const LAST_SHOWN_CHANGELOG_KEY = "changelog.lastShown";
 
