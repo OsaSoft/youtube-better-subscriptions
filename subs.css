@@ -37,7 +37,7 @@
 }
 
 .subs-btn-mark-watched {
-  display: none;
+  /*display: none;*/
   width: 24px;
   background-image: url('images/markwatched.svg'), /*works in Firefox*/ url('chrome-extension://__MSG_@@extension_id__/images/markwatched.svg'); /*works in Chrome*/
   background-size: cover;
