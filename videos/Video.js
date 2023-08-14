@@ -7,7 +7,12 @@ function getVideoIdFromUrl(url) {
 }
 
 function getVideoId(item) {
-    return getVideoIdFromUrl(item.querySelectorAll("a")[0].getAttribute("href"));
+    let videoUrl = item.querySelectorAll("a")[0].getAttribute("href");
+    if (videoUrl != null) {
+        return getVideoIdFromUrl(videoUrl);
+    } else {
+        log("Video URL is null - ad.");
+    }
 }
 
 function changeMarkWatchedToMarkUnwatched(item) {
@@ -38,7 +43,12 @@ class Video {
         }
 
         log("Checking video " + this.videoId + " for short");
-        this.isShort = containingDiv.querySelectorAll("a")[0].getAttribute("href").includes("shorts");
+        let videoHref = containingDiv.querySelectorAll("a")[0].getAttribute("href");
+        if (videoHref != null) {
+            this.isShort = videoHref.includes("shorts");
+        } else {
+            log("Video URL is null - ad.");
+        }
     }
 
     hasButton() {
