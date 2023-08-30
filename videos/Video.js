@@ -45,9 +45,10 @@ class Video {
         log("Checking video " + this.videoId + " for short");
         let videoHref = containingDiv.querySelectorAll("a")[0].getAttribute("href");
         if (videoHref != null) {
-            this.isShort = videoHref.includes("shorts");
+            this.isShort = (videoHref.includes("shorts") || videoHref.includes("adurl"));
         } else {
             log("Video URL is null - ad.");
+            this.isShort = true;
         }
     }
 

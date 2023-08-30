@@ -1,7 +1,7 @@
 class SubscriptionVideo extends Video {
     constructor(containingDiv) {
         super(containingDiv);
-        this.contentDiv = this.containingDiv.firstElementChild;
+        this.contentDiv = this.containingDiv.querySelector(".ytd-rich-item-renderer");
     }
 
     hasButton() {
