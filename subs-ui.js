@@ -47,7 +47,16 @@ function buildMenuButtonContainer() {
     return menuButtonContainer;
 }
 
+function deleteOldButton(ID){
+    const oldButton = document.querySelector(`#${ID}`);
+    if (oldButton) {
+        oldButton.remove();
+    }
+}
+
 function addSettingsButton() {
+    deleteOldButton(SETTINGS_BTN);
+
     let settingsButton = buildMenuButtonContainer();
     settingsButton.classList.add("subs-btn-settings");
     settingsButton.setAttribute("id", SETTINGS_BTN);
@@ -60,6 +69,8 @@ function addSettingsButton() {
 
 function addHideAllMenuButton() {
     if (settings["settings.hide.watched.all.label"]) {
+        deleteOldButton(MARK_ALL_WATCHED_BTN);
+
         let hideAllButtonContainer = buildMenuButtonContainer();
         hideAllButtonContainer.classList.add("subs-grid-menu-mark-all");
         hideAllButtonContainer.setAttribute("id", MARK_ALL_WATCHED_BTN);
@@ -75,6 +86,8 @@ function addHideAllMenuButton() {
 
 function addHideWatchedCheckbox() {
     if (settings["settings.hide.watched.label"]) {
+        deleteOldButton(HIDE_WATCHED_LABEL);
+
         let hideWatchedLabel = buildMenuButtonContainer();
         hideWatchedLabel.setAttribute("id", HIDE_WATCHED_LABEL);
         hideWatchedLabel.appendChild(document.createTextNode("Hide watched")); //TODO: translations
@@ -83,6 +96,8 @@ function addHideWatchedCheckbox() {
         let messenger = document.getElementById(HIDE_WATCHED_LABEL);
         messenger.addEventListener("click", hideWatchedChanged);
     }
+
+    deleteOldButton(HIDE_WATCHED_TOGGLE);
 
     let toggleContainer = document.createElement("div");
     toggleContainer.setAttribute("id", HIDE_WATCHED_TOGGLE);

@@ -37,3 +37,14 @@ function download(filename, content, applicationType = "text/plain") {
 
     document.body.removeChild(element);
 }
+function isRendered(domObj) {
+    if (domObj == document.body) {
+        return true;
+    }
+
+    var cs = getComputedStyle(domObj);
+    if (cs.getPropertyValue("display") != "none" && cs.getPropertyValue("visibility") != "hidden") {
+        return isRendered(domObj.parentNode);
+    }
+    return false;
+}
