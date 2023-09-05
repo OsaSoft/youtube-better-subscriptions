@@ -47,7 +47,7 @@ function buildMenuButtonContainer() {
     return menuButtonContainer;
 }
 
-function deleteOldButton(ID){
+function deleteOldButton(ID) {
     const oldButton = document.querySelector(`#${ID}`);
     if (oldButton) {
         oldButton.remove();
@@ -244,9 +244,9 @@ function removeWatchedAndAddButton() {
         if (!vid.isStored && isYouTubeWatched(item)) {
             vid.markWatched();
         } else if (
-                (hideWatched && vid.isStored) ||
-                (hidePremieres && vid.isPremiere) ||
-                (hideShorts && vid.isShort)
+            (hideWatched && vid.isStored) ||
+            (hidePremieres && vid.isPremiere) ||
+            (hideShorts && vid.isShort)
         ) {
             vid.hide();
             hiddenCount++;
@@ -256,6 +256,40 @@ function removeWatchedAndAddButton() {
         if (!vid.hasButton()) {
             vid.addButton();
         }
+    }
+
+    const gridElement = document.querySelector('ytd-two-column-browse-results-renderer[page-subtype="subscriptions"] ytd-rich-grid-renderer #contents');
+    if (gridElement && isRendered(gridElement)) {
+        gridElement.style.display = 'grid';
+        gridElement.style.gridTemplateColumns = 'repeat(var(--ytd-rich-grid-items-per-row), minmax(310px, 1fr))';
+        gridElement.style.maxWidth = '3150px';
+
+        [...gridElement.querySelectorAll(':scope > ytd-rich-section-renderer')].forEach(richSectionElement => {
+            richSectionElement.style.gridColumn = '1 / -1';
+
+            const contents = richSectionElement.querySelector(':scope > #content > ytd-rich-shelf-renderer > #dismissible > #contents');
+
+            if (!contents) {
+                return;
+            }
+            if (![...contents.childNodes].some(child => isRendered(child))) {
+                richSectionElement.style.display = 'none';
+            }
+        });
+
+        [...gridElement.querySelectorAll(':scope > ytd-rich-grid-row')].forEach(gridRow => {
+            gridRow.style.display = 'contents';
+
+            const contents = gridRow.querySelector('#contents')
+            if (!contents) {
+                return;
+            }
+            contents.style.display = 'contents';
+
+            [...contents.querySelectorAll(':scope > ytd-rich-item-renderer')].forEach(item => {
+                item.style.width = 'calc(100% - var(--ytd-rich-grid-item-margin))';
+            });
+        });
     }
     log("Removing watched from feed and adding overlay... Done");
 
