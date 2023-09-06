@@ -4,7 +4,7 @@
   "manifest_version": 2,
   "name": "Better Subscriptions for YouTube™",
   "version": "0.17.5",
-  "applications": {
+  "browser_specific_settings": {
     "gecko": {
       "id": "{5dc6dafa-584e-424a-bf90-1d1d8cfa3caa}"
     }
