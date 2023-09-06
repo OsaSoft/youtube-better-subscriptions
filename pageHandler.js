@@ -9,7 +9,7 @@ function initExtension() {
         "home": ""
     });
 
-    function handlePageChange() {
+    async function handlePageChange() {
         //remove trailing /
         let page = getCurrentPage();
 
@@ -22,7 +22,7 @@ function initExtension() {
             //handle new page
             switch (page) {
                 case PAGES.subscriptions:
-                    initSubs();
+                    await initSubs();
                     break;
                 case PAGES.video:
                     onVideoPage();
@@ -34,7 +34,7 @@ function initExtension() {
                     if (page.includes(PAGES.short)) {
                         onShortPage();
                     } else if (page.includes(PAGES.channel) && settings["settings.hide.watched.support.channel"]) {
-                        initSubs();
+                        await initSubs();
                     }
             }
         } catch (e) {

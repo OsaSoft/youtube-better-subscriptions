@@ -1,4 +1,3 @@
-let storage = {};
 let hidden = [];
 let hideWatched = null;
 let hidePremieres = null;
@@ -79,52 +78,35 @@ function getVideoTitle(item) {
     return item.querySelector("#video-title").title;
 }
 
-function storageChangeCallback(changes, area) {
-    if (area === "local") {
-        for (let key in changes) {
-            let newValue = changes[key].newValue;
-            if (newValue != null) { // is new added
-                storage[key] = newValue;
-            } else { // is removed
-                delete storage[key];
-            }
-        }
-    }
-}
-
-function initSubs() {
+async function initSubs() {
     log("Initializing subs page...");
 
-    loadStorage().then(function (items) {
-        storage = items;
+    await loadWatchedVideos();
 
-        if (hideWatched == null || !settings["settings.hide.watched.keep.state"]) {
-            hideWatched = settings["settings.hide.watched.default"];
-        }
-        if (hidePremieres == null) {
-            hidePremieres = settings["settings.hide.premieres"];
-        }
-        if (hideShorts == null) {
-            hideShorts = settings["settings.hide.shorts"];
-        }
+    if (hideWatched == null || !settings["settings.hide.watched.keep.state"]) {
+        hideWatched = settings["settings.hide.watched.default"];
+    }
+    if (hidePremieres == null) {
+        hidePremieres = settings["settings.hide.premieres"];
+    }
+    if (hideShorts == null) {
+        hideShorts = settings["settings.hide.shorts"];
+    }
 
-        buildUI();
+    buildUI();
 
-        brwsr.storage.onChanged.addListener(storageChangeCallback);
-
-        intervalId = window.setInterval(function () {
-            if (hideWatched) {
-                try {
-                    removeWatchedAndAddButton();
-                } catch (e) {
-                    logError(e);
-                }
+    intervalId = window.setInterval(function () {
+        if (hideWatched) {
+            try {
+                removeWatchedAndAddButton();
+            } catch (e) {
+                logError(e);
             }
-        }, settings["settings.hide.watched.refresh.rate"]);
+        }
+    }, settings["settings.hide.watched.refresh.rate"]);
 
-        removeWatchedAndAddButton();
+    removeWatchedAndAddButton();
 
-    });
     log("Initializing subs page... DONE");
 }
 
@@ -132,6 +114,5 @@ function stopSubs() {
     log("Stopping subs page behaviour");
 
     removeUI();
-    brwsr.storage.onChanged.removeListener(storageChangeCallback);
     window.clearInterval(intervalId);
 }
