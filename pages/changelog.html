@@ -22,16 +22,15 @@
   installing or updating the extension to a new version.
 </p>
 
-<h2>What's new in version 0.17.4?</h2>
+<h2>What's new in version 0.17.5?</h2>
 <ul>
-  <li>Fix inline ads without link breaking functionality</li>
-  <li>Fix YT update breaking functionality (again, thanks YT)</li>
+  <li>Fix YT grid layout, where hidden videos were leaving blank spaces at the end of rows.</li>
 </ul>
 
 <h2>Contributor thank you</h2>
 <p>
-  I would like to thank <a href="https://github.com/ericfrazer">ericfrazer</a> for his contributions to the project. He swiftly fixed both of
-  these issues while I was too busy to look at it sooner. Thank you!
+  I would like to thank <a href="https://github.com/mocanew">Valentin Mocanu</a> for his contributions to the project.
+  He has helped resolved an issue that I was honestly stumped on, and I'm very grateful for his help.
 </p>
 
 <h2>Want to help?</h2>
@@ -48,6 +47,21 @@
 
 <h2>Complete changelog</h2>
 <dl>
+  <dt>v0.17.5</dt>
+  <dd>Fix YT grid layout, where hidden videos were leaving blank spaces at the end of rows.</dd>
+
+  <dt>v0.17.4</dt>
+  <dd>Fix inline ads without link breaking functionality.</dd>
+  <dd>Fix YT update breaking functionality (again, thanks YT).</dd>
+
+  <dt>v0.17.3</dt>
+  <dd>Fixed shorts not being marked as watched automatically upon viewing (if setting is enabled).</dd>
+  <dd>
+    Fixed YT UI update breaking the "Mark as watched" overlay on both the subscriptions and channel videos pages.<\br>
+    Not the prettiest fix, but it works for now. Since I don't have access to the old overlay, not sure
+    what the impact on that will be (most likely the button visible at all times, not just on hover).
+  </dd>
+
   <dt>v0.17.2</dt>
   <dd>Fixed issue where setting option for using YT's watched state to mark as watched to off was ignored.</dd>
   <dd>Removed support for legacy YouTube&trade; (pre-Polymer). Afaik it hasn't been used for a long time.</dd>
