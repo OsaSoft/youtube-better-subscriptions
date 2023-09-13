@@ -259,7 +259,7 @@ function removeWatchedAndAddButton() {
     }
 
     // if shorts shelf is empty, hide it
-    const gridElement = document.querySelector('ytd-two-column-browse-results-renderer[page-subtype="subscriptions"] ytd-rich-grid-renderer #contents');
+    const gridElement = document.querySelector('ytd-two-column-browse-results-renderer ytd-rich-grid-renderer #contents');
     if (gridElement && isRendered(gridElement)) {
         [...gridElement.querySelectorAll(':scope > ytd-rich-section-renderer')].forEach(richSectionElement => {
             const contents = richSectionElement.querySelector(':scope > #content > ytd-rich-shelf-renderer > #dismissible > #contents');
