@@ -14,6 +14,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
         
+      - name: Validate manifest.json
+        uses: cardinalby/schema-validator-action@v1
+        with:
+          file: manifest.json
+          schema: 'https://json.schemastore.org/webextension.json'
+
       - name: Pack extension ZIP
         uses: TheDoctor0/zip-release@v0.3.0
         with:
@@ -45,3 +51,30 @@ jobs:
           asset_path: ./yt-better-subscriptions-latest.zip
           asset_name: yt-better-subscriptions-${{ steps.get_version.outputs.VERSION }}.zip
           asset_content_type: application/zip
+
+      - name: Publish on Chrome Webstore
+        uses: benc-uk/workflow-dispatch@4c044c1613fabbe5250deadc65452d54c4ad4fc7 # pin@v1
+        if: "!contains(github.event.head_commit.message, '[skip chrome]')"
+        with:
+          workflow: publish-on-chrome-web-store
+          token: ${{ secrets.WORKFLOWS_TOKEN }}
+          inputs: '{ "tag": "${{ steps.get_version.outputs.VERSION }}" }'
+          wait-for-completion: false
+
+      - name: Publish on Firefox Add-ons
+        uses: benc-uk/workflow-dispatch@4c044c1613fabbe5250deadc65452d54c4ad4fc7 # pin@v1
+        if: "!contains(github.event.head_commit.message, '[skip firefox]')"
+        with:
+          workflow: publish-on-firefox-add-ons
+          token: ${{ secrets.WORKFLOWS_TOKEN }}
+          inputs: '{ "tag": "${{ steps.get_version.outputs.VERSION }}" }'
+          wait-for-completion: false
+
+      # - name: Publish on Edge Add-ons
+      #   uses: benc-uk/workflow-dispatch@4c044c1613fabbe5250deadc65452d54c4ad4fc7 # pin@v1
+      #   if: "!contains(github.event.head_commit.message, '[skip edge]')"
+      #   with:
+      #     workflow: publish-on-edge-add-ons
+      #     token: ${{ secrets.WORKFLOWS_TOKEN }}
+      #     inputs: '{ "tag": "${{ steps.get_version.outputs.VERSION }}" }'
+      #     wait-for-completion: false
