@@ -258,15 +258,10 @@ function removeWatchedAndAddButton() {
         }
     }
 
-    const gridElement = document.querySelector('ytd-two-column-browse-results-renderer[page-subtype="subscriptions"] ytd-rich-grid-renderer #contents');
+    // if shorts shelf is empty, hide it
+    const gridElement = document.querySelector('ytd-two-column-browse-results-renderer ytd-rich-grid-renderer #contents');
     if (gridElement && isRendered(gridElement)) {
-        gridElement.style.display = 'grid';
-        gridElement.style.gridTemplateColumns = 'repeat(var(--ytd-rich-grid-items-per-row), minmax(310px, 1fr))';
-        gridElement.style.maxWidth = '3150px';
-
         [...gridElement.querySelectorAll(':scope > ytd-rich-section-renderer')].forEach(richSectionElement => {
-            richSectionElement.style.gridColumn = '1 / -1';
-
             const contents = richSectionElement.querySelector(':scope > #content > ytd-rich-shelf-renderer > #dismissible > #contents');
 
             if (!contents) {
@@ -275,20 +270,6 @@ function removeWatchedAndAddButton() {
             if (![...contents.childNodes].some(child => isRendered(child))) {
                 richSectionElement.style.display = 'none';
             }
-        });
-
-        [...gridElement.querySelectorAll(':scope > ytd-rich-grid-row')].forEach(gridRow => {
-            gridRow.style.display = 'contents';
-
-            const contents = gridRow.querySelector('#contents')
-            if (!contents) {
-                return;
-            }
-            contents.style.display = 'contents';
-
-            [...contents.querySelectorAll(':scope > ytd-rich-item-renderer')].forEach(item => {
-                item.style.width = 'calc(100% - var(--ytd-rich-grid-item-margin))';
-            });
         });
     }
     log("Removing watched from feed and adding overlay... Done");
