@@ -6,6 +6,7 @@ function initExtension() {
         "video": "/watch",
         "short": "/shorts",
         "channel": "/videos",
+        "channelLive": "/streams",
         "home": ""
     });
 
@@ -33,7 +34,7 @@ function initExtension() {
                 default:
                     if (page.includes(PAGES.short)) {
                         onShortPage();
-                    } else if (page.includes(PAGES.channel) && settings["settings.hide.watched.support.channel"]) {
+                    } else if ((page.includes(PAGES.channel) || page.includes(PAGES.channelLive)) && settings["settings.hide.watched.support.channel"]) {
                         initSubs();
                     }
             }
