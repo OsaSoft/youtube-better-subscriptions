@@ -20,7 +20,6 @@
     "images/*"
   ],
   "permissions": [
-    "*://*.youtube.com/*",
     "storage",
     "unlimitedStorage"
   ],
