@@ -34,6 +34,10 @@ try {
 let watchedVideos = {};
 
 async function saveVideoOperation(videoOperation, now) {
+    if (watchedVideos[videoOperation]) {
+        return;
+    }
+
     now = now || Date.now();
 
     const operation = videoOperation.slice(0, 1);
