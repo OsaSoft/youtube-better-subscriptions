@@ -85,24 +85,31 @@ async function importVideos() {
 
     try {
         let parsed = JSON.parse(text);
+        let parsedVideos = 0;
 
-        if (Array.isArray(parsed)) {
-            // new format
-            watchedVideos.unshift(...parsed);
+        for (const videoIdOrOperation of Object.keys(parsed)) {
+            if (typeof parsed[videoIdOrOperation] !== 'number') {
+                continue;
+            }
+            parsedVideos++;
+
+            if (videoIdOrOperation.length === 11) {
+                // old format
+                watchVideo(videoIdOrOperation, parsed[videoIdOrOperation]);
+            }
+            else if (videoIdOrOperation.length === 12) {
+                // new format
+                saveVideoOperation(videoIdOrOperation, parsed[videoIdOrOperation]);
+            }
         }
-        else if (typeof parsed === 'object') {
-            // old format
-            const sortedKeys = (
-                Object.keys(parsed)
-                    .filter(key => typeof parsed[key] === 'number')
-                    .sort((key1, key2) => parsed[key1] - parsed[key2])
-            );
+        const syncedVideos = await syncWatchedVideos();
 
-            watchedVideos.unshift(...sortedKeys);
+        if (syncedVideos < parsedVideos) {
+            window.alert(`Imported ${parsedVideos} watched videos successfully. Only the most recent ${syncedVideos} watched videos have been synced.`);
         }
-        await saveWatchedVideos();
-
-        window.alert("Imported " + Object.keys(parsed).length + " watched videos successfully");
+        else {
+            window.alert(`Imported ${parsedVideos} watched videos successfully. All watched videos have been synced.`);
+        }
     } catch (e) {
         window.alert("Error parsing import file!");
     }
@@ -110,6 +117,8 @@ async function importVideos() {
 
 async function clearVideos() {
     if (window.confirm("This is a destructive operation and will remove all of your marked as watched videos! \nAre you sure?")) {
+        brwsr.storage.local.clear();
+
         await Promise.all(
             Object.keys((await brwsr.storage.sync.get(null)) || {}).map(key => {
                 if (key.indexOf(VIDEO_WATCH_KEY) === 0) {
@@ -117,5 +126,7 @@ async function clearVideos() {
                 }
             })
         );
+
+        await loadWatchedVideos();
     }
 }

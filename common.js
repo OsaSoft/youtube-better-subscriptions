@@ -31,7 +31,27 @@ try {
     }
 }
 
-const watchedVideos = [];
+let watchedVideos = {};
+
+async function saveVideoOperation(videoOperation, now) {
+    now = now || Date.now();
+
+    const operation = videoOperation.slice(0, 1);
+    const videoId = videoOperation.slice(1);
+
+    watchedVideos[videoOperation] = now;
+    brwsr.storage.local.set({[videoOperation]: now});
+
+    delete watchedVideos[(operation === 'w' ? 'n' : 'w') + videoId];
+    brwsr.storage.local.remove((operation === 'w' ? 'n' : 'w') + videoId);
+}
+
+async function watchVideo(videoId, now) {
+    saveVideoOperation('w' + videoId, now);
+}
+function unwatchVideo(videoId, now) {
+    saveVideoOperation('n' + videoId, now);
+}
 
 async function loadWatchedVideos() {
     const items = await brwsr.storage.sync.get(null);
@@ -46,62 +66,76 @@ async function loadWatchedVideos() {
         const watchedBatch = items[key];
         if (!Array.isArray(watchedBatch)) {
             console.error('Invalid watch history item', key);
+            continue;
         }
         batches[index] = watchedBatch;
     }
 
-    watchedVideos.splice(0, watchedVideos.length);
+    const operations = [];
     for (const batch of batches) {
-        watchedVideos.push(...batch);
+        operations.push(...batch);
     }
 
-    const oldItems = await brwsr.storage.local.get(null);
-    const sortedKeys = (
-        Object.keys(oldItems)
-            .filter(key => typeof oldItems[key] === 'number')
-            .sort((key1, key2) => oldItems[key2] - oldItems[key1])
-    );
-    if (sortedKeys.length) {
-        watchedVideos.unshift(...sortedKeys);
+    watchedVideos = (await brwsr.storage.local.get(null)) || {};
 
-        console.log('Migrated old format watch history', sortedKeys.length);
-        await brwsr.storage.local.remove(sortedKeys);
-        await saveWatchedVideos();
+    const now = Date.now() - operations.length;
+    for (const [index, operation] of operations.entries()) {
+        saveVideoOperation(operation, now + index);
+    }
+
+    // old format
+    const watchedVideoIds = Object.keys(watchedVideos).filter(key => key.length === 11);
+    if (watchedVideoIds.length > 0) {
+        for (const videoId of watchedVideoIds) {
+            saveVideoOperation('w' + videoId, watchedVideos[videoId]);
+        }
+        brwsr.storage.local.remove(watchedVideoIds);
+
+        await syncWatchedVideos();
+        console.log('Synced old format watch history');
     }
 }
 
 let lastSyncUpdate = Date.now();
 let saveTimeout;
-async function saveWatchedVideos() {
+async function syncWatchedVideos() {
     if (Date.now() - lastSyncUpdate < WATCHED_SYNC_THROTTLE) {
         clearTimeout(saveTimeout);
-        saveTimeout = setTimeout(saveWatchedVideos, WATCHED_SYNC_THROTTLE - (Date.now() - lastSyncUpdate));
+        saveTimeout = setTimeout(syncWatchedVideos, WATCHED_SYNC_THROTTLE - (Date.now() - lastSyncUpdate));
         return;
     }
     const batches = {};
     let currentBatch = [];
 
-    for (const video of watchedVideos) {
-        const key = VIDEO_WATCH_KEY + Object.keys(batches).length;
+    const sortedVideoOperations = (
+        Object.keys(watchedVideos)
+            .filter(key => key.length === 12 && typeof watchedVideos[key] === 'number')
+            .sort((key1, key2) => watchedVideos[key2] - watchedVideos[key1])
+    );
+
+    for (const videoOperation of sortedVideoOperations) {
+        const batchKey = VIDEO_WATCH_KEY + Object.keys(batches).length;
+
+        const potentialBatch = [...currentBatch, videoOperation];
         const potentialBatchSize = JSON.stringify({
-            [key]: [...currentBatch, video]
+            [batchKey]: potentialBatch
         }).length;
+
+        if (JSON.stringify({
+            ...batches,
+            [batchKey]: potentialBatch
+        }).length > 100000) {
+            // quota exhausted, older entries will be discarded
+            break;
+        }
 
         // theoretical max size is 8192, but it's safer to have some margin
         if (potentialBatchSize >= 8000) {
-            if (JSON.stringify({
-                ...batches,
-                [key]: currentBatch
-            }).length > 100000) {
-                // quota exhausted, older entries will be discarded
-                break;
-            }
-
-            batches[key] = currentBatch;
+            batches[batchKey] = currentBatch;
             currentBatch = [];
         }
 
-        currentBatch.push(video);
+        currentBatch.push(videoOperation);
     }
     if (currentBatch.length > 0) {
         batches[VIDEO_WATCH_KEY + Object.keys(batches).length] = currentBatch;
@@ -114,6 +148,8 @@ async function saveWatchedVideos() {
     catch (error) {
         console.error(error || (typeof runtime !== 'undefined' && runtime.lastError));
     }
+
+    return Object.values(batches).map(batch => batch.length).reduce((acc, batchLength) => acc + batchLength, 0);
 }
 
 brwsr.storage.onChanged.addListener((changes, areaName) => {

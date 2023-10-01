@@ -31,7 +31,7 @@ class Video {
     constructor(containingDiv) {
         this.containingDiv = containingDiv;
         this.videoId = getVideoId(containingDiv);
-        this.isStored = watchedVideos.includes(this.videoId);
+        this.isStored = watchedVideos['w' + this.videoId];
         this.buttonId = this.isStored ? MARK_UNWATCHED_BTN : MARK_WATCHED_BTN;
 
         log("Checking video " + this.videoId + " for premiere");
@@ -75,17 +75,14 @@ class Video {
         }
 
         this.isStored = true;
-        if (!watchedVideos.includes(this.videoId)) {
-            watchedVideos.unshift(this.videoId);
-            saveWatchedVideos();
-        }
+
+        watchVideo(this.videoId);
+        syncWatchedVideos();
     }
 
     markUnwatched() {
-        if (watchedVideos.includes(this.videoId)) {
-            watchedVideos.splice(watchedVideos.indexOf(this.videoId), 1);
+        unwatchVideo(this.videoId);
 
-            saveWatchedVideos();
-        }
+        syncWatchedVideos();
     }
 }
