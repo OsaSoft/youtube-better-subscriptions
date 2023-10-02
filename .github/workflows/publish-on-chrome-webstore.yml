@@ -80,7 +80,6 @@ jobs:
         with:
           workflow: ${{ github.workflow }}
           token: ${{ secrets.WORKFLOWS_TOKEN }}
-          wait-for-completion: false
           inputs: |
             {
               "attemptNumber": "${{ steps.getNextAttemptNumber.outputs.result }}",
