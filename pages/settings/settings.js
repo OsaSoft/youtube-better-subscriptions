@@ -55,9 +55,9 @@ function saveSettings() {
     }
 
     log("Saving values:" + JSON.stringify(values));
-    let storageVal = {};
-    storageVal[SETTINGS_KEY] = values;
-    getSyncStorage().set(storageVal);
+    brwsr.storage.sync.set({
+        [SETTINGS_KEY]: values
+    });
 }
 
 function setupButtons() {
@@ -67,16 +67,13 @@ function setupButtons() {
     document.getElementById("watched.clear").addEventListener("click", clearVideos);
 }
 
-function exportVideos() {
-    let videos = {};
-    getStorage().get(null, items => { //fill our map with watched videos
-        videos = items;
+async function exportVideos() {
+    await loadWatchedVideos();
 
-        download("[Better Subs] video export " + new Date() + ".json", JSON.stringify(videos), "application/json");
-    });
+    download("[Better Subs] video export " + new Date() + ".json", JSON.stringify(watchedVideos), "application/json");
 }
 
-function importVideos() {
+async function importVideos() {
     const file = document.getElementById("watched.import.file").files[0];
 
     if (!file) {
@@ -84,19 +81,52 @@ function importVideos() {
         return;
     }
 
-    file.text().then(text => {
-        try {
-            let parsed = JSON.parse(text);
-            getStorage().set(parsed);
-            window.alert("Imported " + Object.keys(parsed).length + " watched videos successfully");
-        } catch (e) {
-            window.alert("Error parsing import file!");
+    const text = await file.text();
+
+    try {
+        let parsed = JSON.parse(text);
+        let parsedVideos = 0;
+
+        for (const videoIdOrOperation of Object.keys(parsed)) {
+            if (typeof parsed[videoIdOrOperation] !== 'number') {
+                continue;
+            }
+            parsedVideos++;
+
+            if (videoIdOrOperation.length === 11) {
+                // old format
+                watchVideo(videoIdOrOperation, parsed[videoIdOrOperation]);
+            }
+            else if (videoIdOrOperation.length === 12) {
+                // new format
+                saveVideoOperation(videoIdOrOperation, parsed[videoIdOrOperation]);
+            }
         }
-    });
+        const syncedVideos = await syncWatchedVideos();
+
+        if (syncedVideos < parsedVideos) {
+            window.alert(`Imported ${parsedVideos} watched videos successfully. Only the most recent ${syncedVideos} watched videos have been synced.`);
+        }
+        else {
+            window.alert(`Imported ${parsedVideos} watched videos successfully. All watched videos have been synced.`);
+        }
+    } catch (e) {
+        window.alert("Error parsing import file!");
+    }
 }
 
-function clearVideos() {
+async function clearVideos() {
     if (window.confirm("This is a destructive operation and will remove all of your marked as watched videos! \nAre you sure?")) {
-        getStorage().clear();
+        brwsr.storage.local.clear();
+
+        await Promise.all(
+            Object.keys((await brwsr.storage.sync.get(null)) || {}).map(key => {
+                if (key.indexOf(VIDEO_WATCH_KEY) === 0) {
+                    brwsr.storage.sync.remove(key);
+                }
+            })
+        );
+
+        await loadWatchedVideos();
     }
 }

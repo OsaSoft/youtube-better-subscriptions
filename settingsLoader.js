@@ -4,7 +4,7 @@ let settingsLoadedCallbacks = [];
 
 let settingsLoaded = false;
 
-getSyncStorage().get(SETTINGS_KEY, items => {
+brwsr.storage.sync.get(SETTINGS_KEY, items => {
     log("Settings loaded:");
     log(items[SETTINGS_KEY]);
     settingsLoaded = true;

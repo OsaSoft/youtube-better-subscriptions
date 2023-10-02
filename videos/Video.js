@@ -31,7 +31,7 @@ class Video {
     constructor(containingDiv) {
         this.containingDiv = containingDiv;
         this.videoId = getVideoId(containingDiv);
-        this.isStored = this.videoId in storage;
+        this.isStored = watchedVideos['w' + this.videoId];
         this.buttonId = this.isStored ? MARK_UNWATCHED_BTN : MARK_WATCHED_BTN;
 
         log("Checking video " + this.videoId + " for premiere");
@@ -74,11 +74,15 @@ class Video {
             processSections();
         }
 
-        setVideoInStorage(this.videoId);
         this.isStored = true;
+
+        watchVideo(this.videoId);
+        syncWatchedVideos();
     }
 
     markUnwatched() {
-        getStorage().remove(this.videoId);
+        unwatchVideo(this.videoId);
+
+        syncWatchedVideos();
     }
 }
