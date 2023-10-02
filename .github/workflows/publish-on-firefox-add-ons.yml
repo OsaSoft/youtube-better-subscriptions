@@ -21,13 +21,18 @@ jobs:
           zipBall: false
           extract: false
           token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get zip filename
+        id: download
+        run: |
+          zipFilePath = ${{ fromJson(steps.download.outputs.downloaded_files)[0] }}
+          echo "zipFileName=${zipFilePath##*/}" >> $GITHUB_OUTPUT
 
       - name: Deploy to Firefox Addons
         id: addonsDeploy
         uses: cardinalby/webext-buildtools-firefox-addons-action@v1
         continue-on-error: true
         with:
-          zipFilePath: ${{ fromJson(steps.download.outputs.downloaded_files)[0] }}
+          zipFilePath: ${{ steps.download.outputs.zipFileName }}
           extensionId: ${{ secrets.FF_EXTENSION_ID }}
           jwtIssuer: ${{ secrets.FF_JWT_ISSUER }}
           jwtSecret: ${{ secrets.FF_JWT_SECRET }}
