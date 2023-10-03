@@ -59,7 +59,6 @@ jobs:
           workflow: publish-on-chrome-web-store
           token: ${{ secrets.WORKFLOWS_TOKEN }}
           inputs: '{ "tag": "${{ steps.get_version.outputs.VERSION }}" }'
-          wait-for-completion: false
 
       - name: Publish on Firefox Add-ons
         uses: benc-uk/workflow-dispatch@4c044c1613fabbe5250deadc65452d54c4ad4fc7 # pin@v1
@@ -68,7 +67,6 @@ jobs:
           workflow: publish-on-firefox-add-ons
           token: ${{ secrets.WORKFLOWS_TOKEN }}
           inputs: '{ "tag": "${{ steps.get_version.outputs.VERSION }}" }'
-          wait-for-completion: false
 
       # - name: Publish on Edge Add-ons
       #   uses: benc-uk/workflow-dispatch@4c044c1613fabbe5250deadc65452d54c4ad4fc7 # pin@v1
@@ -77,4 +75,3 @@ jobs:
       #     workflow: publish-on-edge-add-ons
       #     token: ${{ secrets.WORKFLOWS_TOKEN }}
       #     inputs: '{ "tag": "${{ steps.get_version.outputs.VERSION }}" }'
-      #     wait-for-completion: false
