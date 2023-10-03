@@ -3,6 +3,7 @@ let hideWatched = null;
 let hidePremieres = null;
 let hideShorts = null;
 let intervalId = null;
+let gridItemsPerRow = null;
 
 function isYouTubeWatched(item) {
     let ytWatchedPercentThreshold = settings["settings.mark.watched.youtube.watched"];
@@ -78,10 +79,19 @@ function getVideoTitle(item) {
     return item.querySelector("#video-title").title;
 }
 
+function updateGridColumnSize(ytGridColumnPercent) {
+    gridItemsPerRow = `${ytGridColumnPercent}`;
+    document.documentElement.style
+            .setProperty('--osasoft-better-subscriptions-thumb-items-per-row', gridItemsPerRow);
+
+    let gridSliderValueElement = document.getElementById(GRID_ITEMS_PER_ROW_VALUE);
+    if (gridSliderValueElement) {
+        gridSliderValueElement.innerText = gridItemsPerRow;
+    }
+}
+
 async function initSubs() {
     log("Initializing subs page...");
-
-    await loadWatchedVideos();
 
     if (hideWatched == null || !settings["settings.hide.watched.keep.state"]) {
         hideWatched = settings["settings.hide.watched.default"];
@@ -92,8 +102,15 @@ async function initSubs() {
     if (hideShorts == null) {
         hideShorts = settings["settings.hide.shorts"];
     }
+    if (gridItemsPerRow == null) {
+        let ytGridItemsPerRow = getComputedStyle(document.documentElement)
+                .getPropertyValue('--osasoft-better-subscriptions-thumb-items-per-row');
+        updateGridColumnSize(ytGridItemsPerRow);
+    }
 
     buildUI();
+
+    await loadWatchedVideos();
 
     intervalId = window.setInterval(function () {
         if (hideWatched) {
