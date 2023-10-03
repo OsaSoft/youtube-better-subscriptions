@@ -15,7 +15,7 @@ jobs:
       - uses: robinraju/release-downloader@v1.8
         id: download
         with:
-          tag: ${{ github.event.inputs.tag }}
+          tag: v${{ github.event.inputs.tag }}
           fileName: yt-better-subscriptions-*.zip
           tarBall: false
           zipBall: false
