@@ -2,7 +2,8 @@ const HIDE_WATCHED_TOGGLE = PREFIX + "hide-watched-toggle";
 const HIDE_WATCHED_LABEL = PREFIX + "hide-watched-toggle-label";
 const MARK_ALL_WATCHED_BTN = PREFIX + "subs-grid-menu-mark-all";
 const SETTINGS_BTN = PREFIX + "subs-grid-menu-settings";
-const GRID_COLUMN_SIZE_SLIDER = PREFIX + "subs-grid-menu-grid-column-size-slider";
+const GRID_ITEMS_PER_ROW = PREFIX + "subs-grid-menu-grid-column-size-slider";
+const GRID_ITEMS_PER_ROW_VALUE = PREFIX + "subs-grid-menu-grid-column-size-slider-value";
 const MARK_WATCHED_BTN = PREFIX + "mark-watched";
 const MARK_UNWATCHED_BTN = PREFIX + "mark-unwatched";
 const METADATA_LINE = PREFIX + "metadata-line";
@@ -70,24 +71,30 @@ function addSettingsButton() {
 }
 
 function addThumbSizeSlider() {
-    if (gridColumnSize) {
+    if (gridItemsPerRow) {
         let sliderContainer = buildMenuButtonContainer();
-        sliderContainer.setAttribute("id", GRID_COLUMN_SIZE_SLIDER)
+        sliderContainer.setAttribute("id", GRID_ITEMS_PER_ROW);
 
         let slider = document.createElement("input");
         slider.setAttribute("type", "range");
-        slider.setAttribute("min", "5");
-        slider.setAttribute("max", "60");
-        // slider.setAttribute("step", "5");
-        slider.setAttribute("value", gridColumnSize.slice(0,-1));
+        slider.setAttribute("min", "1");
+        slider.setAttribute("max", "20");
+        slider.setAttribute("value", gridItemsPerRow);
         slider.classList.add("subs-grid-menu-thumb-size-slider");
 
         slider.addEventListener("input", (event) => {
             updateGridColumnSize(event.target.value);
         });
 
-        sliderContainer.appendChild(document.createTextNode("(BETA) Thumbnail size")); //TODO: translations
+        let sliderValue = document.createElement("span");
+        sliderValue.setAttribute("id", GRID_ITEMS_PER_ROW_VALUE);
+        sliderValue.innerText  = gridItemsPerRow;
+
+        sliderContainer.appendChild(document.createTextNode("(BETA) Videos per row: "));
+        sliderContainer.appendChild(sliderValue);
+
         sliderContainer.appendChild(slider);
+
         addElementToMenuUI(sliderContainer);
     }
 }

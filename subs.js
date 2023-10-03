@@ -3,7 +3,7 @@ let hideWatched = null;
 let hidePremieres = null;
 let hideShorts = null;
 let intervalId = null;
-let gridColumnSize = null;
+let gridItemsPerRow = null;
 
 function isYouTubeWatched(item) {
     let ytWatchedPercentThreshold = settings["settings.mark.watched.youtube.watched"];
@@ -80,9 +80,14 @@ function getVideoTitle(item) {
 }
 
 function updateGridColumnSize(ytGridColumnPercent) {
-    gridColumnSize = `${ytGridColumnPercent}%`;
+    gridItemsPerRow = `${ytGridColumnPercent}`;
     document.documentElement.style
-            .setProperty('--osasoft-better-subscriptions-thumb-column-size', gridColumnSize);
+            .setProperty('--osasoft-better-subscriptions-thumb-items-per-row', gridItemsPerRow);
+
+    let gridSliderValueElement = document.getElementById(GRID_ITEMS_PER_ROW_VALUE);
+    if (gridSliderValueElement) {
+        gridSliderValueElement.innerText = gridItemsPerRow;
+    }
 }
 
 async function initSubs() {
@@ -97,10 +102,10 @@ async function initSubs() {
     if (hideShorts == null) {
         hideShorts = settings["settings.hide.shorts"];
     }
-    if (gridColumnSize == null) {
+    if (gridItemsPerRow == null) {
         let ytGridItemsPerRow = getComputedStyle(document.documentElement)
-                .getPropertyValue('--ytd-rich-grid-items-per-row');
-        updateGridColumnSize(100 / ytGridItemsPerRow);
+                .getPropertyValue('--osasoft-better-subscriptions-thumb-items-per-row');
+        updateGridColumnSize(ytGridItemsPerRow);
     }
 
     buildUI();

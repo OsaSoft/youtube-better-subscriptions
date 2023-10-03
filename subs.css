@@ -1,3 +1,7 @@
+:root {
+  --osasoft-better-subscriptions-thumb-items-per-row: var(--ytd-rich-grid-items-per-row);
+}
+
 .subs-btn-settings {
   height: 24px;
   padding: 0 10pt !important;
@@ -91,7 +95,7 @@ ytd-grid-video-renderer.style-scope.ytd-grid-renderer:hover .subs-btn-mark-watch
 
 ytd-two-column-browse-results-renderer > #primary > ytd-rich-grid-renderer > #contents {
   display: grid;
-  grid-template-columns: repeat(auto-fill, var(--osasoft-better-subscriptions-thumb-column-size, 25%));
+  grid-template-columns: repeat(var(--osasoft-better-subscriptions-thumb-items-per-row), 1fr);
   max-width: var(--ytd-rich-grid-content-max-width);
   width: calc(100% - 48px);
 }
