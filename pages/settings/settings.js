@@ -120,7 +120,7 @@ async function clearVideos() {
         brwsr.storage.local.clear();
 
         await Promise.all(
-            Object.keys((await brwsr.storage.sync.get(null)) || {}).map(key => {
+            Object.keys((await syncStorageGet(null)) || {}).map(key => {
                 if (key.indexOf(VIDEO_WATCH_KEY) === 0) {
                     brwsr.storage.sync.remove(key);
                 }

@@ -33,6 +33,17 @@ try {
 
 let watchedVideos = {};
 
+async function syncStorageGet(keys) {
+    return new Promise((resolve) => {
+        brwsr.storage.sync.get(keys, resolve);
+    });
+}
+async function localStorageGet(keys) {
+    return new Promise((resolve) => {
+        brwsr.storage.local.get(keys, resolve);
+    });
+}
+
 async function saveVideoOperation(videoOperation, now) {
     if (watchedVideos[videoOperation]) {
         return;
@@ -58,7 +69,7 @@ function unwatchVideo(videoId, now) {
 }
 
 async function loadWatchedVideos() {
-    const items = await brwsr.storage.sync.get(null);
+    const items = await syncStorageGet(null);
     const batches = [];
 
     for (const key in items) {
@@ -80,7 +91,7 @@ async function loadWatchedVideos() {
         operations.push(...batch);
     }
 
-    watchedVideos = (await brwsr.storage.local.get(null)) || {};
+    watchedVideos = (await localStorageGet(null)) || {};
 
     const now = Date.now() - operations.length;
     for (const [index, operation] of operations.entries()) {
@@ -146,7 +157,9 @@ async function syncWatchedVideos() {
     }
 
     try {
-        await brwsr.storage.sync.set(batches);
+        await new Promise(resolve => {
+            brwsr.storage.sync.set(batches, resolve);
+        });
         lastSyncUpdate = Date.now();
     }
     catch (error) {
