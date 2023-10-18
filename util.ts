@@ -1,23 +1,15 @@
+export const PREFIX = 'osasoft-better-subscriptions_';
+
 const LOG_HEADER = "[YT-Better-Subs] ";
 
 let printDate = false;
 
-function isLogEnabled() {
-    return settings["settings.log.enabled"];
-}
-
-function log(content) {
-    if (isLogEnabled()) {
-        console.log(prepareMessage(content));
-    }
-}
-
-function logError(error) {
+export function logError(error: Error) {
     console.error(prepareMessage("ERROR! "), error.message);
     console.error(error.stack.substring(0, 1000));
 }
 
-function prepareMessage(content = null) {
+export function prepareMessage(content = null) {
     let message = LOG_HEADER;
     if (printDate) message += new Date().toTimeString() + ": ";
     if (content != null) message += (typeof content === 'object') ? JSON.stringify(content) : content;
@@ -37,7 +29,7 @@ function download(filename, content, applicationType = "text/plain") {
 
     document.body.removeChild(element);
 }
-function isRendered(domObj) {
+export function isRendered(domObj) {
     if (domObj == document.body) {
         return true;
     }
@@ -48,3 +40,4 @@ function isRendered(domObj) {
     }
     return false;
 }
+
