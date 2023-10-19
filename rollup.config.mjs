@@ -44,4 +44,20 @@ export default [
             }),
         ],
     },
+    {
+        input: {
+            settings: 'pages/settings/settings.ts',
+        },
+        output: {
+            dir: 'dist/pages/settings',
+            format: 'cjs',
+            sourcemap: true,
+        },
+        plugins: [
+            typescript({
+                outDir: 'dist/pages/settings',
+                tsconfig: './tsconfig.json',
+            }),
+        ],
+    },
 ];
