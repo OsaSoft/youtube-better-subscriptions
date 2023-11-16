@@ -25,7 +25,8 @@
     "zip": "npm run zip:firefox && npm run zip:chrome",
     "-----": "",
     "watch:firefox": "npm run compile:firefox -- --watch",
-    "watch:chrome": "npm run compile:chrome -- --watch"
+    "watch:chrome": "npm run compile:chrome -- --watch",
+    "preinstall": "only-allow pnpm"
   },
   "keywords": [],
   "author": "Oscar Hernández",
@@ -41,6 +42,7 @@
     "eslint-plugin-import": "^2.29.0",
     "eslint-plugin-import-newlines": "^1.3.4",
     "eslint-plugin-unicorn": "^49.0.0",
+    "only-allow": "^1.2.1",
     "query-string": "^8.1.0",
     "rimraf": "^5.0.5",
     "rollup": "^4.1.4",
