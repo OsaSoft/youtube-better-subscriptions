@@ -6,6 +6,8 @@
     "build:firefox": "npm run clean:firefox && npm run compile:firefox && npm run zip:firefox",
     "build:chrome": "npm run clean:chrome && npm run compile:chrome && npm run zip:chrome",
     "build": "npm run build:firefox && npm run build:chrome",
+    "------": "",
+    "lint": "eslint ./",
     "----": "",
     "clean:firefox": "rimraf dist-firefox/* YT-Better-Subs-firefox.zip",
     "clean:chrome": "rimraf dist-chrome/* YT-Better-Subs-chrome.zip",

@@ -253,7 +253,6 @@ function applyUIToVideos() {
         }
     }
 
-    // todo: doesn't work
     // if shorts shelf is empty, hide it
     const gridElement = document.querySelector('ytd-two-column-browse-results-renderer ytd-rich-grid-renderer #contents');
     if (gridElement && isRendered(gridElement)) {

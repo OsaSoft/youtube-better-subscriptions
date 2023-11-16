@@ -25,6 +25,11 @@ module.exports = {
         '@typescript-eslint',
         'import-newlines',
     ],
+    ignorePatterns: [
+        'dist-firefox',
+        'dist-chrome',
+        'dist',
+    ],
     overrides: [
         {
             files: ['.eslintrc.js'],
