@@ -11,7 +11,7 @@ export class Video extends BaseVideo {
     }
 
     hasButton() {
-        return !!this.contentDiv.querySelector('#' + this.buttonId);
+        return !!this.contentDiv.querySelector(`#${this.buttonId}`);
     }
 
     addButton() {

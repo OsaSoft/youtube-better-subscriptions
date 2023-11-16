@@ -6,16 +6,16 @@ import {sectionContentsQuery, sectionDismissableQuery, sectionTitleQuery, sectio
 import {getSettings} from './settings';
 import {Video} from './videos/SubscriptionVideo';
 
-export const HIDE_WATCHED_TOGGLE = PREFIX + 'hide-watched-toggle';
-export const HIDE_WATCHED_LABEL = PREFIX + 'hide-watched-toggle-label';
-export const MARK_ALL_WATCHED_BTN = PREFIX + 'subs-grid-menu-mark-all';
-export const SETTINGS_BTN = PREFIX + 'subs-grid-menu-settings';
-export const MARK_WATCHED_BTN = PREFIX + 'mark-watched';
-export const MARK_UNWATCHED_BTN = PREFIX + 'mark-unwatched';
-export const METADATA_LINE = PREFIX + 'metadata-line';
-export const COLLAPSE_SECTION_CHECKBOX = PREFIX + 'collapse-section';
-export const COLLAPSE_CLASS = PREFIX + 'collapse-section';
-export const HIDDEN_CLASS = PREFIX + 'hidden';
+export const HIDE_WATCHED_TOGGLE = `${PREFIX}hide-watched-toggle`;
+export const HIDE_WATCHED_LABEL = `${PREFIX}hide-watched-toggle-label`;
+export const MARK_ALL_WATCHED_BTN = `${PREFIX}subs-grid-menu-mark-all`;
+export const SETTINGS_BTN = `${PREFIX}subs-grid-menu-settings`;
+export const MARK_WATCHED_BTN = `${PREFIX}mark-watched`;
+export const MARK_UNWATCHED_BTN = `${PREFIX}mark-unwatched`;
+export const METADATA_LINE = `${PREFIX}metadata-line`;
+export const COLLAPSE_SECTION_CHECKBOX = `${PREFIX}collapse-section`;
+export const COLLAPSE_CLASS = `${PREFIX}collapse-section`;
+export const HIDDEN_CLASS = `${PREFIX}hidden`;
 
 let activelyHidingWatchedVideos = null;
 
@@ -168,7 +168,7 @@ let collapsibleIdNum = 0;
 function addCollapsibleBtnToSection(sectionHeader: HTMLElement) {
     try {
         // only add if doesnt have it already
-        if (sectionHeader.parentNode.querySelector('.' + COLLAPSE_CLASS)) {
+        if (sectionHeader.parentNode.querySelector(`.${COLLAPSE_CLASS}`)) {
             return;
         }
 

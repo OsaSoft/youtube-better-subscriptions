@@ -75,7 +75,7 @@ function saveSettings() {
         }
     }
 
-    log('Saving values:' + JSON.stringify(values));
+    log(`Saving values: ${JSON.stringify(values)}`);
     brwsr.storage.sync.set({
         [SETTINGS_KEY]: values,
     });

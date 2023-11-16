@@ -23,7 +23,7 @@ export function prepareMessage(content = null) {
 
 export function download(filename: string, content: string, applicationType = 'text/plain') {
     const element = document.createElement('a');
-    element.setAttribute('href', 'data:' + applicationType + ';charset=utf-8,' + encodeURIComponent(content));
+    element.setAttribute('href', `data:${applicationType};charset=utf-8,${encodeURIComponent(content)}`);
     element.setAttribute('download', filename);
 
     element.style.display = 'none';
