@@ -15,7 +15,7 @@ export function isVideoIdWatched(videoId: string): boolean {
     return !!localWatchHistory['w' + videoId];
 }
 
-export function applyLocalVideoOperation(operation: 'w' | 'n', videoId: string, now?:number) {
+export function applyLocalVideoOperation(operation: 'w' | 'n', videoId: string, now?: number) {
     if (operation !== 'w' && operation !== 'n') {
         return;
     }

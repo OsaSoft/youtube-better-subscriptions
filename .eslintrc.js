@@ -104,6 +104,7 @@ module.exports = {
         '@typescript-eslint/semi': ['error', 'always'],
         'object-curly-spacing': 'off',
         '@typescript-eslint/object-curly-spacing': ['error', 'never'],
+        '@typescript-eslint/type-annotation-spacing': 'error',
 
         'import/named': 'off',
         'import/order': [
