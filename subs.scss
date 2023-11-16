@@ -91,25 +91,34 @@ ytd-grid-video-renderer.style-scope.ytd-grid-renderer:hover .subs-btn-mark-watch
   min-width: auto !important;
 }
 
-ytd-two-column-browse-results-renderer > #primary > ytd-rich-grid-renderer > #contents {
-  display: grid;
-  grid-template-columns: repeat(var(--ytd-rich-grid-items-per-row), 1fr);
-  max-width: var(--ytd-rich-grid-content-max-width);
-  width: calc(100% - 48px);
-}
-ytd-two-column-browse-results-renderer[page-subtype="subscriptions"] > #primary > ytd-rich-grid-renderer > #contents {
-  width: calc(100% - 32px);
-}
-ytd-two-column-browse-results-renderer[page-subtype="subscriptions"] #content.ytd-rich-section-renderer {
-  margin: 0 8px;
-}
-ytd-two-column-browse-results-renderer > #primary > ytd-rich-grid-renderer > #contents > ytd-rich-section-renderer {
-  grid-column: 1 / -1;
-}
-ytd-two-column-browse-results-renderer > #primary > ytd-rich-grid-renderer > #contents > ytd-rich-grid-row,
-ytd-two-column-browse-results-renderer > #primary > ytd-rich-grid-renderer > #contents > ytd-rich-grid-row > #contents {
-  display: contents;
-}
-ytd-two-column-browse-results-renderer > #primary > ytd-rich-grid-renderer > #contents > ytd-rich-grid-row > #contents > ytd-rich-item-renderer {
-  width: calc(100% - var(--ytd-rich-grid-item-margin));
+ytd-two-column-browse-results-renderer {
+  &[page-subtype="subscriptions"] {
+    > #primary > ytd-rich-grid-renderer > #contents {
+      width: calc(100% - 32px);
+    }
+    #content.ytd-rich-section-renderer {
+      margin: 0 8px;
+    }
+  }
+  > #primary {
+    > ytd-rich-grid-renderer {
+      > #contents {
+        display: grid;
+        grid-template-columns: repeat(var(--ytd-rich-grid-items-per-row), 1fr);
+        max-width: var(--ytd-rich-grid-content-max-width);
+        width: calc(100% - 48px);
+
+        > ytd-rich-section-renderer {
+          grid-column: 1 / -1;
+        }
+        > ytd-rich-grid-row,
+        > ytd-rich-grid-row > #contents {
+          display: contents;
+        }
+        > ytd-rich-grid-row > #contents > ytd-rich-item-renderer {
+          width: calc(100% - var(--ytd-rich-grid-item-margin));
+        }
+      }
+    }
+  }
 }
