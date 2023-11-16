@@ -6,6 +6,7 @@
     "build:firefox": "npm run clean:firefox && npm run compile:firefox && npm run zip:firefox",
     "build:chrome": "npm run clean:chrome && npm run compile:chrome && npm run zip:chrome",
     "build": "npm run build:firefox && npm run build:chrome",
+    "----": "",
     "clean:firefox": "rimraf dist-firefox/* YT-Better-Subs-firefox.zip",
     "clean:chrome": "rimraf dist-chrome/* YT-Better-Subs-chrome.zip",
     "clean": "npm run clean:firefox && npm run clean:chrome",
@@ -14,7 +15,10 @@
     "compile": "npm run compile:firefox && npm run compile:chrome",
     "zip:firefox": "jszip-cli add 'dist-firefox/*' --output YT-Better-Subs-firefox.zip",
     "zip:chrome": "jszip-cli add 'dist-chrome/*' --output YT-Better-Subs-chrome.zip",
-    "zip": "npm run zip:firefox && npm run zip:chrome"
+    "zip": "npm run zip:firefox && npm run zip:chrome",
+    "-----": "",
+    "watch:firefox": "npm run compile:firefox -- --watch",
+    "watch:chrome": "npm run compile:chrome -- --watch"
   },
   "keywords": [],
   "author": "Oscar Hernández",
