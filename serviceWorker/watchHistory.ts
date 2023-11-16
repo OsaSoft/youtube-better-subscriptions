@@ -8,9 +8,18 @@ const VIDEO_WATCH_KEY = 'vw_';
 const WATCHED_SYNC_THROTTLE = 1000;
 
 let watchedVideos: Record<string, number> = {};
+let loadedWatchHistory = false;
 
 export function saveVideoOperation(operation: 'w' | 'n', videoId: string, now?: number) {
     if (operation !== 'w' && operation !== 'n') {
+        return;
+    }
+
+    if (!loadedWatchHistory) {
+        setTimeout(() => {
+            saveVideoOperation(operation, videoId, now || Date.now());
+        }, 500);
+
         return;
     }
 
@@ -58,6 +67,7 @@ export async function loadWatchedVideos() {
     }
 
     watchedVideos = (await brwsr.storage.local.get(null)) || {};
+    loadedWatchHistory = true;
 
     const now = Date.now() - operations.length;
     for (const [index, operation] of operations.entries()) {
@@ -101,7 +111,7 @@ export function getWatchedVideosHistory() {
 let lastSyncUpdate = Date.now();
 let syncUpdateTimeout: ReturnType<typeof setTimeout>;
 async function syncWatchedVideos() {
-    if (Date.now() - lastSyncUpdate < WATCHED_SYNC_THROTTLE) {
+    if (!loadedWatchHistory || Date.now() - lastSyncUpdate < WATCHED_SYNC_THROTTLE) {
         clearTimeout(syncUpdateTimeout);
         syncUpdateTimeout = setTimeout(syncWatchedVideos, WATCHED_SYNC_THROTTLE - (Date.now() - lastSyncUpdate));
         return;
