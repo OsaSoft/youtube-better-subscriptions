@@ -10,19 +10,19 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - uses: robinraju/release-downloader@v1.8
         id: download
         with:
           tag: v${{ github.event.inputs.tag }}
-          fileName: yt-better-subscriptions-*.zip
+          fileName: yt-better-subscriptions-firefox-*.zip
           tarBall: false
           zipBall: false
           extract: false
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Get zip filename
-        id: download
+        id: zip
         run: |
           zipFilePath = ${{ fromJson(steps.download.outputs.downloaded_files)[0] }}
           echo "zipFileName=${zipFilePath##*/}" >> $GITHUB_OUTPUT
@@ -32,7 +32,7 @@ jobs:
         uses: cardinalby/webext-buildtools-firefox-addons-action@v1
         continue-on-error: true
         with:
-          zipFilePath: ${{ steps.download.outputs.zipFileName }}
+          zipFilePath: ${{ steps.zip.outputs.zipFileName }}
           extensionId: ${{ secrets.FF_EXTENSION_ID }}
           jwtIssuer: ${{ secrets.FF_JWT_ISSUER }}
           jwtSecret: ${{ secrets.FF_JWT_SECRET }}

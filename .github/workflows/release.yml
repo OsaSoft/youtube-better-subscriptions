@@ -11,21 +11,16 @@ jobs:
     name: Upload Release Asset
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-        
+      - uses: actions/checkout@v3
+      - run: pnpm install
+
       - name: Validate manifest.json
         uses: cardinalby/schema-validator-action@v1
         with:
-          file: manifest.json
+          file: manifest.firefox.json
           schema: 'https://json.schemastore.org/webextension.json'
+      - run: npm run build
 
-      - name: Pack extension ZIP
-        uses: TheDoctor0/zip-release@v0.3.0
-        with:
-          filename: yt-better-subscriptions-latest.zip
-          exclusions: '*.git* .editorconfig chrome_promo_tiles'
-          
       - name: Get the version
         id: get_version
         run: echo "VERSION=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_OUTPUT
@@ -48,8 +43,18 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: ./yt-better-subscriptions-latest.zip
-          asset_name: yt-better-subscriptions-${{ steps.get_version.outputs.VERSION }}.zip
+          asset_path: ./YT-Better-Subs-chrome.zip
+          asset_name: yt-better-subscriptions-chrome-${{ steps.get_version.outputs.VERSION }}.zip
+          asset_content_type: application/zip
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: ./YT-Better-Subs-firefox.zip
+          asset_name: yt-better-subscriptions-firefox-${{ steps.get_version.outputs.VERSION }}.zip
           asset_content_type: application/zip
 
       - name: Publish on Chrome Webstore
