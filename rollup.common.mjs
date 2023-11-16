@@ -26,10 +26,11 @@ export default function getRollUpConfig(browser) {
                 copy({
                     targets: [
                         {src: 'images', dest: `dist-${browser}`},
-                        {src: 'pages', dest: `dist-${browser}`},
+                        {src: 'pages/**/*.html', dest: `dist-${browser}/pages`},
                         {src: 'icons', dest: `dist-${browser}`},
                         {src: `manifest.${browser}.json`, dest: `dist-${browser}`, rename: 'manifest.json'},
                     ],
+                    flatten: false,
                 }),
             ],
         },
