@@ -19,6 +19,7 @@
     "include": [
         "*.ts",
         "serviceWorker/*.ts",
-        "contentScript/*.ts"
+        "contentScript/*.ts",
+        "pages/**/*.ts"
     ]
 }

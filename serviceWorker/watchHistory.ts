@@ -112,6 +112,13 @@ export async function getWatchedVideosHistory() {
     return watchedVideos;
 }
 
+export async function deleteWatchHistory() {
+    watchedVideos = {};
+    loadedWatchHistory = true;
+
+    await syncWatchedVideos();
+}
+
 let lastSyncUpdate = Date.now();
 let syncUpdateTimeout: ReturnType<typeof setTimeout>;
 export async function syncWatchedVideos() {

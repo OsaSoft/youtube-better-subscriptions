@@ -1,31 +1,31 @@
 import brwsr from '../../browser';
-import {getPort, log, setLocalWatchHistory} from '../../contentScript/common';
-import {getSettings, setLocalSettings} from '../../contentScript/settings';
-import {logError} from '../../util';
+import {log} from '../../contentScript/common';
+import {SETTINGS_KEY, getSettings, loadSettings} from '../../serviceWorker/settings';
+import {
+    deleteWatchHistory,
+    getWatchedVideosHistory,
+    loadWatchedVideos,
+    saveVideoOperation,
+    syncWatchedVideos,
+} from '../../serviceWorker/watchHistory';
+import {download, logError} from '../../util';
 
 log('Initializing settings page...');
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('settings-save')?.addEventListener('click', saveSettings);
     document.getElementById('watched.export')?.addEventListener('click', exportVideos);
     document.getElementById('watched.import')?.addEventListener('click', importVideos);
     document.getElementById('watched.clear')?.addEventListener('click', clearVideos);
 
-    getPort().onMessage.addListener((message) => {
-        if (message.type === 'settings') {
-            setLocalSettings(message.settings);
+    await Promise.all([
+        loadSettings(),
+        loadWatchedVideos(),
+    ]);
 
-            hideSpinners();
-            showSettings();
-            updateSettings();
-        }
-        else if (message.type === 'watchHistory') {
-            setLocalWatchHistory(message.watchHistory);
-        }
-    });
-
-    getPort().postMessage({type: 'getSettings'});
-    getPort().postMessage({type: 'getWatchHistory'});
+    hideSpinners();
+    showSettings();
+    updateSettings();
 });
 
 
@@ -33,7 +33,7 @@ function updateSettings() {
     const settings = getSettings();
 
     for (const key in settings) {
-        const elem = document.getElementById(key);
+        const elem = document.getElementById(key) as HTMLInputElement;
         if (elem) {
             if (elem.matches('input[type="checkbox"]')) {
                 elem.checked = settings[key];
@@ -43,10 +43,7 @@ function updateSettings() {
             }
         }
         else {
-            logError({
-                'message': `Updating setting #${key} returned ${elem}`,
-                'stack': 'settings.js:updateSettings',
-            });
+            logError(new Error(`Updating setting #${key} returned ${elem}`));
         }
     }
 }
@@ -66,7 +63,8 @@ function hideSpinners() {
 function saveSettings() {
     const values = {};
 
-    for (const elem of document.querySelectorAll('input[id^=\'settings.\']')) {
+    const settingsElems = document.querySelectorAll('input[id^=\'settings.\']') as NodeListOf<HTMLInputElement>;
+    for (const elem of settingsElems) {
         if (elem.matches('input[type="checkbox"]')) {
             values[elem.id] = elem.checked;
         }
@@ -82,13 +80,16 @@ function saveSettings() {
 }
 
 async function exportVideos() {
+    // get latest watch history
     await loadWatchedVideos();
 
-    download('[Better Subs] video export ' + new Date() + '.json', JSON.stringify(watchedVideos), 'application/json');
+    const watchHistory = await getWatchedVideosHistory();
+
+    download(`[Better Subs] video export ${new Date()}.json`, JSON.stringify(watchHistory), 'application/json');
 }
 
 async function importVideos() {
-    const file = document.getElementById('watched.import.file').files[0];
+    const file = (document.getElementById('watched.import.file') as HTMLInputElement).files[0];
 
     if (!file) {
         window.alert('No file selected!');
@@ -109,11 +110,11 @@ async function importVideos() {
 
             if (videoIdOrOperation.length === 11) {
                 // old format
-                watchVideo(videoIdOrOperation, parsed[videoIdOrOperation]);
+                saveVideoOperation('w', videoIdOrOperation, parsed[videoIdOrOperation]);
             }
             else if (videoIdOrOperation.length === 12) {
                 // new format
-                saveVideoOperation(videoIdOrOperation, parsed[videoIdOrOperation]);
+                saveVideoOperation(videoIdOrOperation[0] as 'w' | 'n', videoIdOrOperation.slice(1), parsed[videoIdOrOperation]);
             }
         }
         const syncedVideos = await syncWatchedVideos();
@@ -131,17 +132,7 @@ async function importVideos() {
 }
 
 async function clearVideos() {
-    if (window.confirm('This is a destructive operation and will remove all of your marked as watched videos! \nAre you sure?')) {
-        brwsr.storage.local.clear();
-
-        await Promise.all(
-            Object.keys((await syncStorageGet(null)) || {}).map(key => {
-                if (key.indexOf(VIDEO_WATCH_KEY) === 0) {
-                    brwsr.storage.sync.remove(key);
-                }
-            }),
-        );
-
-        await loadWatchedVideos();
+    if (window.confirm('This is a DESTRUCTIVE and IMMEDIATE operation that will remove all of your marked as watched videos! \nAre you sure?')) {
+        await deleteWatchHistory();
     }
 }

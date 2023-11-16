@@ -17,7 +17,7 @@ export function prepareMessage(content = null) {
     return message;
 }
 
-function download(filename, content, applicationType = "text/plain") {
+export function download(filename, content, applicationType = "text/plain") {
     let element = document.createElement('a');
     element.setAttribute('href', 'data:' + applicationType + ';charset=utf-8,' + encodeURIComponent(content));
     element.setAttribute('download', filename);
@@ -29,6 +29,7 @@ function download(filename, content, applicationType = "text/plain") {
 
     document.body.removeChild(element);
 }
+
 export function isRendered(domObj) {
     if (domObj == document.body) {
         return true;
