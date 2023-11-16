@@ -17,17 +17,17 @@ brwsr.runtime.onConnect.addListener((port: TypedPort<IContentScriptToServiceWork
         return;
     }
 
-    port.onMessage.addListener((payload) => {
+    port.onMessage.addListener(async (payload) => {
         if (payload.type === 'getSettings') {
             port.postMessage({
                 type: 'settings',
-                settings: getSettings(),
+                settings: await getSettings(),
             });
         }
         else if (payload.type === 'getWatchHistory') {
             port.postMessage({
                 type: 'watchHistory',
-                watchHistory: getWatchedVideosHistory(),
+                watchHistory: await getWatchedVideosHistory(),
             });
         }
         else if (payload.type === 'saveVideoOperation') {

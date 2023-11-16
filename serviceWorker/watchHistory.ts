@@ -104,13 +104,17 @@ async function onStorageChanged(changes: browser.storage.ChangeDict, areaName: b
     }
 }
 
-export function getWatchedVideosHistory() {
+export async function getWatchedVideosHistory() {
+    while (!loadedWatchHistory) {
+        await new Promise(resolve => setTimeout(resolve, 500));
+    }
+
     return watchedVideos;
 }
 
 let lastSyncUpdate = Date.now();
 let syncUpdateTimeout: ReturnType<typeof setTimeout>;
-async function syncWatchedVideos() {
+export async function syncWatchedVideos() {
     if (!loadedWatchHistory || Date.now() - lastSyncUpdate < WATCHED_SYNC_THROTTLE) {
         clearTimeout(syncUpdateTimeout);
         syncUpdateTimeout = setTimeout(syncWatchedVideos, WATCHED_SYNC_THROTTLE - (Date.now() - lastSyncUpdate));

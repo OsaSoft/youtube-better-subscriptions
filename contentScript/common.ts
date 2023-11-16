@@ -5,15 +5,26 @@ import {PREFIX, prepareMessage} from '../util';
 import {getSettings} from './settings';
 
 let localWatchHistory: Record<string, number> = {};
+let loadedWatchHistory = false;
+
 export function setLocalWatchHistory(newWatchHistory: typeof localWatchHistory): void {
     localWatchHistory = newWatchHistory;
+    loadedWatchHistory = true;
 }
 export function isVideoIdWatched(videoId: string): boolean {
     return !!localWatchHistory['w' + videoId];
 }
 
-function applyLocalVideoOperation(operation: 'w' | 'n', videoId: string) {
+export function applyLocalVideoOperation(operation: 'w' | 'n', videoId: string, now?:number) {
     if (operation !== 'w' && operation !== 'n') {
+        return;
+    }
+
+    if (!loadedWatchHistory) {
+        setTimeout(() => {
+            applyLocalVideoOperation(operation, videoId, now || Date.now());
+        }, 500);
+
         return;
     }
 
@@ -22,7 +33,7 @@ function applyLocalVideoOperation(operation: 'w' | 'n', videoId: string) {
         return;
     }
 
-    const now = Date.now();
+    now = now || Date.now();
 
     localWatchHistory[videoOperation] = now;
     delete localWatchHistory[(operation === 'w' ? 'n' : 'w') + videoId];
