@@ -156,7 +156,7 @@ export async function syncWatchedVideos() {
         if (JSON.stringify({
             ...batches,
             [batchKey]: potentialBatch,
-        }).length > 100_000) {
+        }).length > 99_000) {
             // quota exhausted, older entries will be discarded
             break;
         }
