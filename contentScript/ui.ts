@@ -1,7 +1,6 @@
-import brwsr from '../browser';
 import {PREFIX, isRendered, logError} from '../util';
 
-import {log} from './common';
+import {getPort, log} from './common';
 import {sectionContentsQuery, sectionDismissableQuery, sectionTitleQuery, sectionsQuery, vidQuery} from './queries';
 import {getSettings} from './settings';
 import {Video} from './videos/SubscriptionVideo';
@@ -367,7 +366,7 @@ function addSettingsButton() {
     const settingsButton = buildMenuButtonContainer();
     settingsButton.classList.add('subs-btn-settings');
     settingsButton.setAttribute('id', SETTINGS_BTN);
-    settingsButton.addEventListener('click', () => brwsr.runtime.sendMessage({'action': 'openOptionsPage'}));
+    settingsButton.addEventListener('click', () => getPort().postMessage({type: 'openOptionsPage'}));
 
     addElementToMenuUI(settingsButton);
 }
