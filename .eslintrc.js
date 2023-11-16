@@ -32,7 +32,7 @@ module.exports = {
     ],
     overrides: [
         {
-            files: ['.eslintrc.js'],
+            files: ['.eslintrc.js', 'stylelint.config.js'],
             env: {
                 'node': true,
             },

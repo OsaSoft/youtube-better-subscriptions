@@ -1,0 +1,40 @@
+name: ReviewDog
+on:
+  - pull_request
+jobs:
+  eslint:
+    runs-on: ubuntu-latest
+    name: eslint
+    steps:
+      - uses: actions/checkout@v3
+      - run: pnpm install
+
+      - uses: reviewdog/action-setup@v1
+      - run: "npm run --silent lint:eslint:reviewdog | jq '{source, diagnostics:[.diagnostics[] | {message, location, severity, original_output, code: {value:.code.value}}]}' | reviewdog -f=rdjson -reporter=github-pr-check -name='eslint'"
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REVIEWDOG_TOKEN: ${{ secrets.REVIEWDOG_TOKEN }}
+  typescript:
+    runs-on: ubuntu-latest
+    name: typescript
+    steps:
+      - uses: actions/checkout@v3
+      - run: pnpm install
+
+      - uses: reviewdog/action-setup@v1
+      - run: npm run --silent lint:typescript | reviewdog -f=tsc -reporter=github-pr-check -name="typescript"
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REVIEWDOG_TOKEN: ${{ secrets.REVIEWDOG_TOKEN }}
+  stylelint:
+    runs-on: ubuntu-latest
+    name: stylelint
+    steps:
+      - uses: actions/checkout@v3
+      - run: pnpm install
+
+      - uses: reviewdog/action-setup@v1
+      - run: "npm run --silent lint:stylelint:reviewdog | jq -r '.[] | {source: .source, warnings:.warnings[]} | \"\\(.source):\\(.warnings.line):\\(.warnings.column):\\(.warnings.severity): \\(.warnings.text)\"' | reviewdog -efm='%f:%l:%c:%t%*[^:]: %m' -reporter=github-pr-check -name='stylelint'"
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REVIEWDOG_TOKEN: ${{ secrets.REVIEWDOG_TOKEN }}
