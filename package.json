@@ -3,13 +3,24 @@
   "version": "0.0.1",
   "description": "This plugin aims to make navigating YouTube's subscription grid easier by allowing users to hide watched videos.",
   "scripts": {
-    "build": "npm run clean && rollup -c rollup.config.mjs",
-    "clean": "rimraf dist/*"
+    "build:firefox": "npm run clean:firefox && npm run compile:firefox && npm run zip:firefox",
+    "build:chrome": "npm run clean:chrome && npm run compile:chrome && npm run zip:chrome",
+    "build": "npm run build:firefox && npm run build:chrome",
+    "clean:firefox": "rimraf dist-firefox/* YT-Better-Subs-firefox.zip",
+    "clean:chrome": "rimraf dist-chrome/* YT-Better-Subs-chrome.zip",
+    "clean": "npm run clean:firefox && npm run clean:chrome",
+    "compile:firefox": "rollup -c rollup.firefox.mjs",
+    "compile:chrome": "rollup -c rollup.chrome.mjs",
+    "compile": "npm run compile:firefox && npm run compile:chrome",
+    "zip:firefox": "jszip-cli add 'dist-firefox/*' --output YT-Better-Subs-firefox.zip",
+    "zip:chrome": "jszip-cli add 'dist-chrome/*' --output YT-Better-Subs-chrome.zip",
+    "zip": "npm run zip:firefox && npm run zip:chrome"
   },
   "keywords": [],
   "author": "Oscar Hernández",
   "license": "GPL-3.0",
   "devDependencies": {
+    "@ffflorian/jszip-cli": "^3.5.0",
     "@rollup/plugin-typescript": "^11.1.5",
     "@types/chrome": "^0.0.251",
     "@typescript-eslint/eslint-plugin": "^6.11.0",
