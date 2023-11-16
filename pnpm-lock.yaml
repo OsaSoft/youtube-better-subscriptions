@@ -75,8 +75,8 @@ devDependencies:
     specifier: ^2.2.1
     version: 2.2.1(stylelint@14.16.1)
   stylelint-no-unsupported-browser-features:
-    specifier: ^7.0.0
-    version: 7.0.0(stylelint@14.16.1)
+    specifier: ^5.0.3
+    version: 5.0.4(stylelint@14.16.1)
   stylelint-order:
     specifier: ^6.0.3
     version: 6.0.3(stylelint@14.16.1)
@@ -883,9 +883,8 @@ packages:
       escape-string-regexp: 1.0.5
     dev: true
 
-  /cliui@8.0.1:
-    resolution: {integrity: sha512-BSeNnyus75C4//NQ9gQt1/csTXyo/8Sb+afLAkzAptFuMsod9HFokGNudZpi/oQV73hnVK+sR+5PVRMd+Dr7YQ==}
-    engines: {node: '>=12'}
+  /cliui@7.0.4:
+    resolution: {integrity: sha512-OcRE68cOsVMXp1Yvonl/fzkQOyjLSu/8bhPDfQt0e0/Eb283TKP20Fs2MqoPsr9SwA595rRCA+QMzYc9nBP+JQ==}
     dependencies:
       string-width: 4.2.3
       strip-ansi: 6.0.1
@@ -1013,6 +1012,16 @@ packages:
     resolution: {integrity: sha512-9Bj8tZ0jWbAM3u/U6m/boAzAwLPwtjzFvwivr2piSvyVa3K3rChJzQy4RIHkNkKiZCHrEMWDJWtTR8UyVhdDnQ==}
     dev: true
 
+  /css-rule-stream@1.1.0:
+    resolution: {integrity: sha512-qiio/Zkr8I19jh/XuzEkK8OKDQRTrEYaRyIHy4Bwh/tPUe0w8GcQs7r6x24Yc9lT+FbnZFYULxEIXCmaymguUQ==}
+    hasBin: true
+    dependencies:
+      css-tokenize: 1.0.1
+      duplexer2: 0.0.2
+      ldjson-stream: 1.2.1
+      through2: 0.6.5
+    dev: true
+
   /css-system-font-keywords@1.0.0:
     resolution: {integrity: sha512-1umTtVd/fXS25ftfjB71eASCrYhilmEsvDEI6wG/QplnmlfmVM5HkZ/ZX46DT5K3eblFPgLUHt5BRCb0YXkSFA==}
     dev: true
@@ -1122,29 +1131,27 @@ packages:
       esutils: 2.0.3
     dev: true
 
-  /doiuse@6.0.2:
-    resolution: {integrity: sha512-eBTs23NOX+EAYPr4RbCR6J4DRW/TML3uMo37y0X1whlkersDYFCk9HmCl09KX98cis22VKsV1QaxfVNauJ3NBw==}
-    engines: {node: '>=16'}
+  /doiuse@4.4.1:
+    resolution: {integrity: sha512-TUpr1/YNg20IB09tZmwGCTsTQoxj8jUld/hUZprZMj8vj0VpAJySXEWCr8WMvqvgzk0/kG/FxeSMGKode4UjPg==}
+    engines: {node: '>=10'}
     hasBin: true
     dependencies:
       browserslist: 4.22.1
       caniuse-lite: 1.0.30001562
-      css-tokenize: 1.0.1
-      duplexify: 4.1.2
+      css-rule-stream: 1.1.0
+      duplexer2: 0.0.2
       ldjson-stream: 1.2.1
       multimatch: 5.0.0
       postcss: 8.4.31
       source-map: 0.7.4
-      yargs: 17.7.2
+      through2: 4.0.2
+      yargs: 16.2.0
     dev: true
 
-  /duplexify@4.1.2:
-    resolution: {integrity: sha512-fz3OjcNCHmRP12MJoZMPglx8m4rrFP8rovnk4vT8Fs+aonZoCwGg10dSsQsfP/E62eZcPTMSMP6686fu9Qlqtw==}
+  /duplexer2@0.0.2:
+    resolution: {integrity: sha512-+AWBwjGadtksxjOQSFDhPNQbed7icNXApT4+2BNpsXzcCBiInq2H9XW0O8sfHFaPmnQRs7cg/P0fAr2IWQSW0g==}
     dependencies:
-      end-of-stream: 1.4.4
-      inherits: 2.0.4
-      readable-stream: 3.6.2
-      stream-shift: 1.0.1
+      readable-stream: 1.1.14
     dev: true
 
   /eastasianwidth@0.2.0:
@@ -1161,12 +1168,6 @@ packages:
 
   /emoji-regex@9.2.2:
     resolution: {integrity: sha512-L18DaJsXSUk2+42pv8mLs5jJT2hqFkFE4j21wOmgbUqsZ2hL72NsUU785g9RXgo3s0ZNgVl42TiHp3ZtOv/Vyg==}
-    dev: true
-
-  /end-of-stream@1.4.4:
-    resolution: {integrity: sha512-+uw1inIHVPQoaVuHzRyXd21icM+cnt4CzD5rW+NC1wjOUSTOs+Te7FOv7AhN7vS9x/oIyhLP5PR1H+phQAHu5Q==}
-    dependencies:
-      once: 1.4.0
     dev: true
 
   /enhanced-resolve@5.15.0:
@@ -3045,10 +3046,6 @@ packages:
       through2: 0.6.5
     dev: true
 
-  /stream-shift@1.0.1:
-    resolution: {integrity: sha512-AiisoFqQ0vbGcZgQPY1cdP2I76glaVA/RauYR4G4thNFgkTqr90yXTo4LYX60Jl+sIlPNHHdGSwo01AvbKUSVQ==}
-    dev: true
-
   /string-width@4.2.3:
     resolution: {integrity: sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==}
     engines: {node: '>=8'}
@@ -3215,13 +3212,13 @@ packages:
       stylelint: 14.16.1
     dev: true
 
-  /stylelint-no-unsupported-browser-features@7.0.0(stylelint@14.16.1):
-    resolution: {integrity: sha512-O5VYlBhr+lpJ6jeTJSy+SMbHJhW5h5EJxsoicYcTi/07m45V/CF1mQidwRQLjv8y9BFQMpioWz60O89IkmbaNw==}
-    engines: {node: '>=16'}
+  /stylelint-no-unsupported-browser-features@5.0.4(stylelint@14.16.1):
+    resolution: {integrity: sha512-05DeIsWv262DXTSWhbQURDOxno9Tsu81sNnOpG1gD39WT+NNsEjhR2BQvwvNpZ/J/lS8vHxjhHULU2OGKSswvA==}
+    engines: {node: '>=12'}
     peerDependencies:
-      stylelint: ^14.0.0||^15.0.0
+      stylelint: '>=13.0.0'
     dependencies:
-      doiuse: 6.0.2
+      doiuse: 4.4.1
       lodash: 4.17.21
       postcss: 8.4.31
       stylelint: 14.16.1
@@ -3352,6 +3349,12 @@ packages:
     dependencies:
       readable-stream: 1.0.34
       xtend: 4.0.2
+    dev: true
+
+  /through2@4.0.2:
+    resolution: {integrity: sha512-iOqSav00cVxEEICeD7TjLB1sueEL+81Wpzp2bY17uZjZN0pWZPuo4suZ/61VujxmqSGFfgOcNuTZ85QJwNZQpw==}
+    dependencies:
+      readable-stream: 3.6.2
     dev: true
 
   /to-regex-range@5.0.1:
@@ -3612,22 +3615,17 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /yargs-parser@21.1.1:
-    resolution: {integrity: sha512-tVpsJW7DdjecAiFpbIB1e3qxIQsE6NoPc5/eTdrbbIC4h0LVsWhnoa3g+m2HclBIujHzsxZ4VJVA+GUuc2/LBw==}
-    engines: {node: '>=12'}
-    dev: true
-
-  /yargs@17.7.2:
-    resolution: {integrity: sha512-7dSzzRQ++CKnNI/krKnYRV7JKKPUXMEh61soaHKg9mrWEhzFWhFnxPxGl+69cD1Ou63C13NUPCnmIcrvqCuM6w==}
-    engines: {node: '>=12'}
+  /yargs@16.2.0:
+    resolution: {integrity: sha512-D1mvvtDG0L5ft/jGWkLpG1+m0eQxOfaBvTNELraWj22wSVUMWxZUvYgJYcKh6jGGIkJFhH4IZPQhR4TKpc8mBw==}
+    engines: {node: '>=10'}
     dependencies:
-      cliui: 8.0.1
+      cliui: 7.0.4
       escalade: 3.1.1
       get-caller-file: 2.0.5
       require-directory: 2.1.1
       string-width: 4.2.3
       y18n: 5.0.8
-      yargs-parser: 21.1.1
+      yargs-parser: 20.2.9
     dev: true
 
   /yocto-queue@0.1.0:
