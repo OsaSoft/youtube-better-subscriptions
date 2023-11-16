@@ -10,6 +10,8 @@ import {
 } from '../../serviceWorker/watchHistory';
 import {download, logError} from '../../util';
 
+import './settings.scss';
+
 log('Initializing settings page...');
 
 document.addEventListener('DOMContentLoaded', async () => {

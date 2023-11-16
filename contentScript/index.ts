@@ -5,6 +5,8 @@ import {vidQuery} from './queries';
 import {getSettings} from './settings';
 import {destroyUI, initUI} from './ui';
 
+import '../subs.scss';
+
 const PAGES = Object.freeze({
     'subscriptions': '/feed/subscriptions',
     'video': '/watch',
@@ -86,7 +88,7 @@ export async function startExtension() {
         const pageChangeObserver = new MutationObserver((mutations) => {
             for (const mutationRecord of mutations) {
                 //is page fully loaded?
-                if (mutationRecord.target.attributes['aria-valuenow'].value === '100') {
+                if ((mutationRecord.target as HTMLElement).attributes['aria-valuenow'].value === '100') {
                     handlePageChange();
                 }
             }

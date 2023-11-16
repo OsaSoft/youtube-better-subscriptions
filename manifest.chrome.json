@@ -30,7 +30,6 @@
         "contentScript.js"
       ],
       "css": [
-        "common.css",
         "subs.css"
       ],
       "run_at": "document_end"

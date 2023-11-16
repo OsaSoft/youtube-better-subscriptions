@@ -15,7 +15,7 @@ export class Video extends BaseVideo {
     }
 
     addButton() {
-        const buttonContainer = this.contentDiv.firstChild;
+        const buttonContainer = this.contentDiv.firstChild as HTMLElement;
         // stored = false - build "Mark as watched"
         // stored = true  - build "Mark as unwatched"
         const markButton = buildMarkWatchedButton(buttonContainer, this.containingDiv, this.videoId, !this.isStored);

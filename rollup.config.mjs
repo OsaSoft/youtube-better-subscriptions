@@ -1,5 +1,6 @@
 import typescript from '@rollup/plugin-typescript';
 import copy from 'rollup-plugin-copy';
+import scss from 'rollup-plugin-scss';
 
 /** @type {import('rollup').RollupOptions} */
 export default [
@@ -13,13 +14,16 @@ export default [
             sourcemap: true,
         },
         plugins: [
+            scss({
+                fileName: 'subs.css',
+                sourceMap: true,
+            }),
             typescript({
                 outDir: 'dist',
                 tsconfig: './tsconfig.json',
             }),
             copy({
                 targets: [
-                    {src: '*.css', dest: 'dist'},
                     {src: 'images', dest: 'dist'},
                     {src: 'pages', dest: 'dist'},
                     {src: 'icons', dest: 'dist'},
@@ -54,6 +58,10 @@ export default [
             sourcemap: true,
         },
         plugins: [
+            scss({
+                fileName: 'settings.css',
+                sourceMap: true,
+            }),
             typescript({
                 outDir: 'dist/pages/settings',
                 tsconfig: './tsconfig.json',

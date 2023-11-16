@@ -265,7 +265,7 @@ function applyUIToVideos() {
                 continue;
             }
             if (![...contents.childNodes].some(child => isRendered(child))) {
-                richSectionElement.style.display = 'none';
+                (richSectionElement as HTMLElement).style.display = 'none';
             }
         }
     }
