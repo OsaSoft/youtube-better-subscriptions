@@ -45,7 +45,7 @@ export class BaseVideo {
 
         log(`Checking video ${this.videoId} for short`);
         const videoHref = containingDiv.querySelectorAll('a')[0].getAttribute('href');
-        if (!videoHref) {
+        if (videoHref) {
             this.isShort = (videoHref.includes('shorts') || videoHref.includes('adurl'));
         }
         else {
