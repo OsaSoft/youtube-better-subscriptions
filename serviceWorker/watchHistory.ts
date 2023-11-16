@@ -116,6 +116,12 @@ export async function deleteWatchHistory() {
     watchedVideos = {};
     loadedWatchHistory = true;
 
+    for (const key of Object.keys(await brwsr.storage.sync.get(null))) {
+        if (key.startsWith(VIDEO_WATCH_KEY)) {
+            brwsr.storage.sync.remove(key);
+        }
+    }
+
     await syncWatchedVideos();
 }
 

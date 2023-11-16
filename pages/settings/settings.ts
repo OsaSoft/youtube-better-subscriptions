@@ -98,7 +98,10 @@ async function importVideos() {
         return;
     }
 
-    const text = await file.text();
+    const [text] = await Promise.all([
+        file.text(),
+        loadWatchedVideos(),
+    ]);
 
     try {
         const parsed = JSON.parse(text);
