@@ -1,6 +1,13 @@
 import typescript from '@rollup/plugin-typescript';
+import autoprefixer from 'autoprefixer';
+import postcss from 'postcss';
 import copy from 'rollup-plugin-copy';
 import scss from 'rollup-plugin-scss';
+
+const scssSettings = {
+    sourceMap: true,
+    processor: () => postcss([autoprefixer({})]),
+};
 
 /** @type {import('rollup').RollupOptions} */
 export default function getRollUpConfig(browser) {
@@ -16,8 +23,8 @@ export default function getRollUpConfig(browser) {
             },
             plugins: [
                 scss({
+                    ...scssSettings,
                     fileName: 'subs.css',
-                    sourceMap: true,
                 }),
                 typescript({
                     outDir: `dist-${browser}`,
@@ -61,8 +68,8 @@ export default function getRollUpConfig(browser) {
             },
             plugins: [
                 scss({
+                    ...scssSettings,
                     fileName: 'settings.css',
-                    sourceMap: true,
                 }),
                 typescript({
                     outDir: `dist-${browser}/pages/settings`,
