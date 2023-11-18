@@ -1,0 +1,10 @@
+# Browsers that we support
+
+last 4 versions
+firefox 68
+chrome 75
+> 1%
+not ie < 12
+not dead
+not kaios >= 0
+not op_mini all

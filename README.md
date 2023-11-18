@@ -14,6 +14,9 @@ The icon for the settings Button is taken based on: https://commons.wikimedia.or
 The addon as a whole is still licensed under the GPLv3
 
 ## Contribution guidelines
-- Please follow code style conventions set across the project. Ie, use `let` instead of `var`, use proper opening and closing curly braces for `if`s, etc
-  - If your IDE doesnt automatically apply settings from .editorconfig, please take care that you indent using spaces, not tabs.
+
+- install [pnpm](https://pnpm.io/motivation): `npm install --global pnpm`
+- install dependencies: `pnpm install`
 - Branch off and create Pull Requests from the master branch
+- make sure `npm run lint` reports no additional errors compared to master branch
+- make sure `npm run build` runs successfully

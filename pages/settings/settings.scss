@@ -1,0 +1,19 @@
+@import '../../common';
+
+body {
+    margin: 0;
+    font-size: 12px;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+h4 {
+    padding: 10px;
+}
+.settings__container {
+    max-width: 800px;
+    padding: 0 10px;
+    margin: 0 auto;
+    background-color: rgb(244, 246, 255);
+}
+button#watched\.clear {
+    color: rgb(255, 0, 0) !important;
+}

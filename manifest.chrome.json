@@ -1,0 +1,45 @@
+{
+  "description": "Make navigating YouTube's subscription grid easier by hiding watched videos",
+  "short_name": "Better Subs",
+  "manifest_version": 3,
+  "name": "Better Subscriptions for YouTube™",
+  "version": "0.19.1",
+  "icons": {
+    "48": "icons/ic_video_library_black_48dp_1x.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "images/*"
+      ],
+      "matches": [
+        "*://*.youtube.com/*"
+      ]
+    }
+  ],
+  "permissions": [
+    "storage",
+    "unlimitedStorage"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.youtube.com/*"
+      ],
+      "js": [
+        "contentScript.js"
+      ],
+      "css": [
+        "subs.css"
+      ],
+      "run_at": "document_end"
+    }
+  ],
+  "background": {
+    "service_worker": "serviceWorker.js"
+  },
+  "options_ui": {
+    "page": "pages/settings/settings.html",
+    "open_in_tab": true
+  }
+}

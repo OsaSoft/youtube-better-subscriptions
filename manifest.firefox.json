@@ -30,27 +30,17 @@
         "*://*.youtube.com/*"
       ],
       "js": [
-        "util.js",
-        "common.js",
-        "settingsLoader.js",
-        "queries.js",
-        "videos/Video.js",
-        "videos/SubscriptionsVideo.js",
-        "subs-ui.js",
-        "subs.js",
-        "vid.js",
-        "pageHandler.js"
+        "contentScript.js"
       ],
       "css": [
-        "common.css",
         "subs.css"
-      ]
+      ],
+      "run_at": "document_end"
     }
   ],
   "background": {
-    "scripts": [
-      "pages/background.js"
-    ]
+    "scripts": ["serviceWorker.js"],
+    "persistent": true
   },
   "options_ui": {
     "page": "pages/settings/settings.html",

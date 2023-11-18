@@ -39,18 +39,19 @@ jobs:
               return attempt < max ? attempt + 1 : '';
             }
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - uses: robinraju/release-downloader@v1.8
+        id: download
         with:
           tag: v${{ github.event.inputs.tag }}
-          fileName: yt-better-subscriptions-*.zip
+          fileName: yt-better-subscriptions-chrome-*.zip
           tarBall: false
           zipBall: false
           extract: false
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Get zip filename
-        id: download
+        id: zip
         run: |
           zipFilePath = ${{ fromJson(steps.download.outputs.downloaded_files)[0] }}
           echo "zipFileName=${zipFilePath##*/}" >> $GITHUB_OUTPUT
@@ -68,7 +69,7 @@ jobs:
         continue-on-error: true
         uses: cardinalby/webext-buildtools-chrome-webstore-upload-action@v1
         with:
-          zipFilePath: ${{ steps.download.outputs.zipFileName }}
+          zipFilePath: ${{ steps.zip.outputs.zipFileName }}
           extensionId: ${{ secrets.G_EXTENSION_ID }}
           apiAccessToken: ${{ steps.fetchAccessToken.outputs.accessToken }}
           waitForUploadCheckCount: 10
