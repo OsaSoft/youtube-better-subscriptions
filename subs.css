@@ -90,7 +90,6 @@ ytd-grid-video-renderer.style-scope.ytd-grid-renderer:hover .subs-btn-mark-watch
 }
 
 ytd-two-column-browse-results-renderer > #primary > ytd-rich-grid-renderer > #contents {
-  display: grid;
   grid-template-columns: repeat(var(--ytd-rich-grid-items-per-row), 1fr);
   max-width: var(--ytd-rich-grid-content-max-width);
   width: calc(100% - 48px);
