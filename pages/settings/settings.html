@@ -37,6 +37,9 @@
       <input id="settings.hide.watched.label" type="checkbox"/>
       <label for="settings.hide.watched.label">Show "Hide Watched" label</label><br/>
 
+      <input id="settings.hide.older.label" type="checkbox"/>
+      <label for="settings.hide.older.label">Show "Hide Older" label</label><br/>
+
       <input id="settings.hide.watched.all.label" type="checkbox"/>
       <label for="settings.hide.watched.all.label">Show "Mark all as watched" label</label><br/>
 
@@ -46,6 +49,9 @@
 
       <input id="settings.hide.watched.default" type="checkbox"/>
       <label for="settings.hide.watched.default">Hide watched default state</label><br/>
+
+      <input id="settings.hide.older.default" type="checkbox"/>
+      <label for="settings.hide.older.default">Hide older default state</label><br/>
 
       <input id="settings.hide.watched.keep.state" type="checkbox"/>
       <label for="settings.hide.watched.keep.state">
@@ -70,8 +76,16 @@
 
       <label for="settings.hide.watched.refresh.rate">Refresh rate for feed clearing (milliseconds)</label>
       <input id="settings.hide.watched.refresh.rate" type="number"/><br/>
-      <label for="settings.hide.watched.refresh.rate">(currently works only in "hide watched" state)</label>
+      <label for="settings.hide.watched.refresh.rate">(currently works only in "hide watched" state)</label><br/>
+      <br/>
 
+      <label for="settings.hide.older.cutoff">Hide videos older than</label>
+      <select id="settings.hide.older.cutoff">
+        <option value="Today">Today</option>
+        <option value="1 Week">1 Week</option>
+        <option value="2 Weeks">2 Weeks</option>
+        <option value="1 Month">1 Month</option>
+      </select>
     </form>
   </div>
 

@@ -46,7 +46,7 @@ function hideSpinners() {
 function saveSettings() {
     let values = {};
 
-    for (let elem of document.querySelectorAll("input[id^='settings.']")) {
+    for (let elem of document.querySelectorAll("input[id^='settings.'], select[id^='settings.']")) {
         if (elem.matches('input[type="checkbox"]')) {
             values[elem.id] = elem.checked;
         } else {

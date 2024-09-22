@@ -2,9 +2,11 @@ const PREFIX = "osasoft-better-subscriptions_";
 
 const DEFAULT_SETTINGS = {
     "settings.hide.watched.label": true,
+    "settings.hide.older.label": true,
     "settings.hide.watched.all.label": true,
     "settings.hide.watched.ui.stick.right": false,
     "settings.hide.watched.default": true,
+    "settings.hide.older.default": true,
     "settings.hide.watched.keep.state": true,
     "settings.hide.watched.refresh.rate": 3000,
     "settings.mark.watched.youtube.watched": false,
@@ -14,6 +16,7 @@ const DEFAULT_SETTINGS = {
     "settings.hide.watched.auto.store": true,
     "settings.hide.premieres": false,
     "settings.hide.shorts": false,
+    "settings.hide.older.cutoff":"2 Weeks"
 };
 
 const SETTINGS_KEY = "settings";
