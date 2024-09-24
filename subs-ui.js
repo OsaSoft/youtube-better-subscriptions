@@ -253,6 +253,10 @@ function removeWatchedAndAddButton() {
             hiddenCount++;
         }
 
+        if (vid.isOld) {
+            vid.hideOlder();
+        }
+
         // does it already have any button?
         if (!vid.hasButton()) {
             vid.addButton();
