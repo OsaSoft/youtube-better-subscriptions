@@ -6,7 +6,7 @@ const DEFAULT_SETTINGS = {
     "settings.hide.watched.all.label": true,
     "settings.hide.watched.ui.stick.right": false,
     "settings.hide.watched.default": true,
-    "settings.hide.older.default": true,
+    "settings.hide.older.default": false,
     "settings.hide.watched.keep.state": true,
     "settings.hide.watched.refresh.rate": 3000,
     "settings.mark.watched.youtube.watched": false,
