@@ -100,6 +100,16 @@ class Video {
         this.containingDiv.classList.add(HIDDEN_CLASS);
     }
 
+    hideOlder() {
+        older.push(this.containingDiv);
+        // if on chronological page, take up space to prevent layout shift
+        this.containingDiv.style.visibility = 'hidden';
+        this.containingDiv.classList.add(OLDER_CLASS);
+        // otherwise if on home page, hide and allow continuation of home page feed
+        if (getCurrentPage() == PAGES.home) this.containingDiv.style.display = 'none';
+        // TODO: support setting toggle for hide behavior on various other pages, like channel pages
+    }
+
     markWatched() {
         changeMarkWatchedToMarkUnwatched(this.containingDiv);
 

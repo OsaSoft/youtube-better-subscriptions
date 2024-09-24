@@ -8,6 +8,7 @@ const METADATA_LINE = PREFIX + "metadata-line";
 const COLLAPSE_SECTION_CHECKBOX = PREFIX + "collapse-section";
 
 const HIDDEN_CLASS = PREFIX + "hidden";
+const OLDER_CLASS = PREFIX + "older";
 const COLLAPSE_CLASS = PREFIX + "collapse-section";
 
 let addedElems = [];
