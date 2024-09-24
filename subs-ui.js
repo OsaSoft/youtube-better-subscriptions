@@ -18,6 +18,7 @@ function showWatched() {
 
     for (let item of hidden) {
         item.style.display = '';
+        item.style.visibility = '';
         item.classList.remove(HIDDEN_CLASS);
     }
     hidden = [];
@@ -237,11 +238,14 @@ function removeWatchedAndAddButton() {
 
     let els = document.querySelectorAll(vidQuery());
 
-    let hiddenCount = 0;
+    let haveHidden = false;
 
     for (let item of els) {
         let vid = new SubscriptionVideo(item);
 
+        if (hideOlder && vid.isOlder){
+            vid.hideOlder();
+        }
         if (!vid.isStored && isYouTubeWatched(item)) {
             vid.markWatched();
         } else if (
@@ -250,11 +254,7 @@ function removeWatchedAndAddButton() {
             (hideShorts && vid.isShort)
         ) {
             vid.hide();
-            hiddenCount++;
-        }
-
-        if (vid.isOld) {
-            vid.hideOlder();
+            haveHidden = true;
         }
 
         // does it already have any button?
@@ -280,7 +280,7 @@ function removeWatchedAndAddButton() {
     log("Removing watched from feed and adding overlay... Done");
 
     // if we hid any videos, see if sections need changing, or videos loading
-    if (hiddenCount > 0) {
+    if (haveHidden) {
         processSections();
         loadMoreVideos();
     }
@@ -301,5 +301,11 @@ function removeUI() {
         item.style.display = '';
         item.classList.remove(HIDDEN_CLASS);
     }
+    for (let item of older) {
+        item.style.display = '';
+        item.style.visibility = '';
+        item.classList.remove(OLDER_CLASS);
+    }
     hidden = [];
+    older = [];
 }
