@@ -22,3 +22,7 @@ function sectionDismissableQuery() {
 function sectionContentsQuery() {
     return "#contents";
 }
+
+function fuzzyDateQuery() {
+    return '#metadata-line>span';
+}

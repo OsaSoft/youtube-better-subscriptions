@@ -15,6 +15,16 @@ function getVideoId(item) {
     }
 }
 
+function getVideoFuzzyDate(item) {
+    let videoFuzzyDate = item.querySelectorAll(fuzzyDateQuery())[1];
+    if (videoFuzzyDate != null) {
+        return videoFuzzyDate.innerText;
+    }
+    else {
+        log("Unable to determine video date")
+    }
+}
+
 function changeMarkWatchedToMarkUnwatched(item) {
     // find Mark as watched button and change it to Unmark as watched
     let metaDataLine = item.querySelector("#" + METADATA_LINE);
@@ -33,6 +43,7 @@ class Video {
         this.videoId = getVideoId(containingDiv);
         this.isStored = watchedVideos['w' + this.videoId];
         this.buttonId = this.isStored ? MARK_UNWATCHED_BTN : MARK_WATCHED_BTN;
+        this.fuzzyDate = getVideoFuzzyDate(containingDiv);
 
         log("Checking video " + this.videoId + " for premiere");
         let thumbOverlay = containingDiv.querySelector("ytd-thumbnail-overlay-time-status-renderer");
