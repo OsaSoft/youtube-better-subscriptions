@@ -1,15 +1,15 @@
 settingsLoadedCallbacks.push(initExtension);
 
-function initExtension() {
-    const PAGES = Object.freeze({
-        "subscriptions": "/feed/subscriptions",
-        "video": "/watch",
-        "short": "/shorts",
-        "channel": "/videos",
-        "channelLive": "/streams",
-        "home": ""
-    });
+const PAGES = Object.freeze({
+    "subscriptions": "/feed/subscriptions",
+    "video": "/watch",
+    "short": "/shorts",
+    "channel": "/videos",
+    "channelLive": "/streams",
+    "home": ""
+});
 
+function initExtension() {
     async function handlePageChange() {
         //remove trailing /
         let page = getCurrentPage();
