@@ -61,6 +61,29 @@ class Video {
             log("Video URL is null - ad.");
             this.isShort = true;
         }
+        log('video ' + this.videoId + " associated with date " + this.fuzzyDate)
+        if (this.fuzzyDate != null) {
+            this.isOlder = false;
+            log(this.fuzzyDate)
+            if (this.fuzzyDate.includes("month") || this.fuzzyDate.includes("year")) {
+                this.isOlder = true;
+            }
+            else if (this.fuzzyDate.includes("weeks") && hideOlderCutoff != "1 Month") {
+                this.isOlder = true;
+            }
+            else if (this.fuzzyDate.includes("day")) {
+                if (hideOlderCutoff == "Today") {
+                    this.isOlder = true;
+                }
+                else if (hideOlderCutoff == "1 Week" && Number(this.fuzzyDate.split(" ")[0]) >= 7) {
+                    this.isOlder = true;
+                }
+            }
+        }
+        else{
+            this.isOlder = null;
+        }
+        log(`isOlder: ${this.isOlder} based on cutoff: ${hideOlderCutoff}`)
     }
 
     hasButton() {
