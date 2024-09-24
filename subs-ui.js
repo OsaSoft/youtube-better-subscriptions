@@ -1,5 +1,7 @@
 const HIDE_WATCHED_TOGGLE = PREFIX + "hide-watched-toggle";
 const HIDE_WATCHED_LABEL = PREFIX + "hide-watched-toggle-label";
+const HIDE_OLDER_TOGGLE = PREFIX + "hide-older-toggle";
+const HIDE_OLDER_LABEL = PREFIX + "hide-older-toggle-label";
 const MARK_ALL_WATCHED_BTN = PREFIX + "subs-grid-menu-mark-all";
 const SETTINGS_BTN = PREFIX + "subs-grid-menu-settings";
 const MARK_WATCHED_BTN = PREFIX + "mark-watched";
@@ -26,15 +28,29 @@ function showWatched() {
     processSections();
 }
 
+
+function showOlder() {
+    log("Showing older videos");
+
+    for (let item of older) {
+        item.style.display = '';
+        item.style.visibility = '';
+        item.classList.remove(OLDER_CLASS);
+    }
+    older = [];
+}
+
+
 function buildUI() {
     log("Building subs UI");
 
     addHideWatchedCheckbox();
+    addHideOlderCheckbox();
     addHideAllMenuButton();
     addSettingsButton();
 
     if (settings["settings.hide.watched.ui.stick.right"])
-        addedElems[0].after(...addedElems)
+        addedElems[0].after(...addedElems);
 }
 
 function buildMenuButtonContainer() {
@@ -43,7 +59,6 @@ function buildMenuButtonContainer() {
     menuButtonContainer.classList.add("yt-simple-endpoint");
     menuButtonContainer.classList.add("style-scope");
     menuButtonContainer.classList.add("ytd-compact-link-renderer");
-
     menuButtonContainer.classList.add("subs-grid-menu-item");
 
     return menuButtonContainer;
@@ -123,6 +138,46 @@ function addHideWatchedCheckbox() {
     let messenger = document.getElementById(HIDE_WATCHED_TOGGLE);
     messenger.addEventListener("click", hideWatchedChanged);
 }
+
+function addHideOlderCheckbox() {
+    if (settings["settings.hide.older.label"]) {
+        deleteOldButton(HIDE_OLDER_LABEL);
+
+        let hideOlderLabel = buildMenuButtonContainer();
+        hideOlderLabel.setAttribute("id", HIDE_OLDER_LABEL);
+        hideOlderLabel.appendChild(document.createTextNode("Hide older"));
+        addElementToMenuUI(hideOlderLabel);
+
+        let messenger = document.getElementById(HIDE_OLDER_LABEL);
+        messenger.addEventListener("click", hideOlderChanged);
+    }
+
+    deleteOldButton(HIDE_OLDER_TOGGLE);
+
+    let toggleContainer = document.createElement("div");
+    toggleContainer.setAttribute("id", HIDE_OLDER_TOGGLE);
+    toggleContainer.classList.add("toggle-container", "style-scope", "tp-yt-paper-toggle-button");
+    if (hideOlder) {
+        toggleContainer.classList.add("subs-btn-hide-older-checked");
+    } else {
+        toggleContainer.classList.add("subs-btn-hide-older-unchecked");
+    }
+
+    let toggleBar = document.createElement("div");
+    toggleBar.classList.add("toggle-bar", "style-scope", "tp-yt-paper-toggle-button");
+    let toggleButton = document.createElement("div");
+    toggleButton.classList.add("toggle-button", "style-scope", "tp-yt-paper-toggle-button");
+
+    toggleContainer.appendChild(toggleBar);
+    toggleContainer.appendChild(toggleButton);
+
+    addElementToMenuUI(toggleContainer);
+
+    let messenger = document.getElementById(HIDE_OLDER_TOGGLE);
+    messenger.addEventListener("click", hideOlderChanged);
+
+}
+
 
 function addElementToMenuUI(element) {
     log("Adding element to menu UI");
