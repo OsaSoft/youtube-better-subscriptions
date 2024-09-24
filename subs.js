@@ -1,7 +1,10 @@
 let hidden = [];
+let older = [];
 let hideWatched = null;
 let hidePremieres = null;
 let hideShorts = null;
+let hideOlder = null;
+let hideOlderCutoff = null;
 let intervalId = null;
 
 function isYouTubeWatched(item) {
@@ -91,6 +94,12 @@ async function initSubs() {
     }
     if (hideShorts == null) {
         hideShorts = settings["settings.hide.shorts"];
+    }
+    if (hideOlder == null) {
+        hideOlder = settings["settings.hide.older"];
+    }
+    if (hideOlderCutoff == null) {
+        hideOlderCutoff = settings["settings.hide.older.cutoff"];
     }
 
     buildUI();
