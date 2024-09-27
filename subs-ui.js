@@ -293,7 +293,7 @@ function removeWatchedAndAddButton() {
 
     let els = document.querySelectorAll(vidQuery());
 
-    let haveHidden = false;
+    let hiddenCount = 0;
 
     for (let item of els) {
         let vid = new SubscriptionVideo(item);
@@ -309,7 +309,7 @@ function removeWatchedAndAddButton() {
             (hideShorts && vid.isShort)
         ) {
             vid.hide();
-            haveHidden = true;
+            hiddenCount++;
         }
 
         // does it already have any button?
@@ -335,7 +335,7 @@ function removeWatchedAndAddButton() {
     log("Removing watched from feed and adding overlay... Done");
 
     // if we hid any videos, see if sections need changing, or videos loading
-    if (haveHidden) {
+    if (hiddenCount > 0) {
         processSections();
         loadMoreVideos();
     }
