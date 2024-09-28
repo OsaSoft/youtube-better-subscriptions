@@ -75,7 +75,7 @@ class Video {
                 if (hideOlderCutoff == "Today") {
                     this.isOlder = true;
                 }
-                else if (hideOlderCutoff == "1 Week" && Number(this.fuzzyDate.split(" ")[0]) >= 7) {
+                else if (hideOlderCutoff == "1 Week" && Number(this.fuzzyDate.match(/\d+/)[0]) >= 7) {
                     this.isOlder = true;
                 }
             }
