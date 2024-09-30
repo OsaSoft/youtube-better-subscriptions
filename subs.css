@@ -5,12 +5,12 @@
   background-repeat: no-repeat;
 }
 
-.subs-btn-hide-watched-checked, .subs-btn-hide-watched-unchecked, .subs-btn-hide-older-checked, .subs-btn-hide-older-unchecked  {
+.subs-btn-hide-watched-checked, .subs-btn-hide-watched-unchecked { 
   opacity: .8;
   margin: 0 12px !important;
 }
 
-.subs-btn-hide-watched-checked, .subs-btn-hide-older-checked, .toggle-button {
+.subs-btn-hide-watched-checked, .toggle-button {
   background-color: var(--paper-toggle-button-checked-button-color, var(--primary-color));
 
   background-image: url('images/markunwatched.svg'), /*works in Firefox*/ url('chrome-extension://__MSG_@@extension_id__/images/markunwatched.svg'); /*works in Chrome*/
@@ -18,7 +18,7 @@
   transform: translate(16px, 0);
 }
 
-.subs-btn-hide-watched-unchecked, .subs-btn-hide-older-unchecked, .toggle-button {
+.subs-btn-hide-watched-unchecked, .toggle-button {
   background-image: url('images/markwatched.svg'), /*works in Firefox*/ url('chrome-extension://__MSG_@@extension_id__/images/markwatched.svg'); /*works in Chrome*/
   background-size: cover;
 }
@@ -49,12 +49,12 @@
   background-size: cover;
 }
 
-.subs-btn-mark-watched:hover, .subs-btn-mark-unwatched:hover, .subs-btn-hide-watched-checked:hover, .subs-btn-hide-watched-unchecked:hover, .subs-btn-hide-older-checked:hover, .subs-btn-hide-older-unchecked:hover {
+.subs-btn-mark-watched:hover, .subs-btn-mark-unwatched:hover, .subs-btn-hide-watched-checked:hover, .subs-btn-hide-watched-unchecked:hover { 
   opacity: .8;
   cursor: pointer;
 }
 
-.subs-btn-mark-watched:active, .subs-btn-mark-unwatched:active, .subs-btn-hide-watched-checked:active, .subs-btn-hide-watched-unchecked:active, .subs-btn-hide-older-checked:active, .subs-btn-hide-older-unchecked:active {
+.subs-btn-mark-watched:active, .subs-btn-mark-unwatched:active, .subs-btn-hide-watched-checked:active, .subs-btn-hide-watched-unchecked:active { 
   opacity: 1.0;
   cursor: pointer;
 }
