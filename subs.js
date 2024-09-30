@@ -126,7 +126,7 @@ async function initSubs() {
     buildUI();
 
     intervalId = window.setInterval(function () {
-        if (hideWatched) {
+        if (hideWatched || hideOlder) {
             try {
                 removeWatchedAndAddButton();
             } catch (e) {
