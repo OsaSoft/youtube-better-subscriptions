@@ -39,20 +39,10 @@ function hideWatchedChanged(event) {
 
 function hideOlderChanged(event) {
     try {
-        let toggle = document.getElementById(HIDE_OLDER_TOGGLE);
-        log("Hide Older checkbox was changed. New value is: " + !hideOlder);
-
-        if (hideOlder) {
-            hideOlder = false;
-            toggle.classList.remove("subs-btn-hide-older-checked");
-            toggle.classList.add("subs-btn-hide-older-unchecked");
-            showOlder();
-        } else {
-            hideOlder = true;
-            toggle.classList.remove("subs-btn-hide-older-unchecked");
-            toggle.classList.add("subs-btn-hide-older-checked");
-            removeWatchedAndAddButton();
-        }
+        let select = document.getElementById(HIDE_OLDER_CUTOFF_SELECT);
+        hideOlderCutoff = select.value;
+        showOlder();
+        removeWatchedAndAddButton();
     } catch (e) {
         logError(e);
     }
