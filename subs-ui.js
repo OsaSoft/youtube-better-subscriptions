@@ -143,7 +143,6 @@ function addHideWatchedCheckbox() {
 
 function addHideOlderCutoffSelect() {
     if (hideOlder) {
-        deleteOldButton(HIDE_OLDER_CUTOFF_SELECT)
         let hideOlderCutoffSelect = document.createElement("select");
         hideOlderCutoffSelect.setAttribute("id", HIDE_OLDER_CUTOFF_SELECT);
 
@@ -151,6 +150,7 @@ function addHideOlderCutoffSelect() {
             let option = document.createElement("option");
             option.value = optionText;
             option.textContent = optionText;
+            if (optionText == hideOlderCutoff) option.selected = true;
             hideOlderCutoffSelect.appendChild(option);
         });
 
