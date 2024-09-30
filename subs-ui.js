@@ -20,7 +20,6 @@ function showWatched() {
 
     for (let item of hidden) {
         item.style.display = '';
-        item.style.visibility = '';
         item.classList.remove(HIDDEN_CLASS);
     }
     hidden = [];
@@ -33,8 +32,10 @@ function showOlder() {
     log("Showing older videos");
 
     for (let item of older) {
-        item.style.display = '';
         item.style.visibility = '';
+        if (! item.classList.contains(HIDDEN_CLASS)) {
+            item.style.display = '';
+        }
         item.classList.remove(OLDER_CLASS);
     }
     older = [];
