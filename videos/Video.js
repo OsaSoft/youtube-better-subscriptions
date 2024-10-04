@@ -6,13 +6,27 @@ function getVideoIdFromUrl(url) {
     }
 }
 
-function getVideoId(item) {
-    let videoUrl = item.querySelectorAll("a")[0].getAttribute("href");
+function getVideoUrl(item) {
+    let videoLink = item.querySelectorAll("a#video-title")[0] || item.querySelectorAll("a")[0];
+
+    if (!videoLink) {
+        return null;
+    }
+
+    let videoUrl = videoLink.getAttribute("href");
+
     if (videoUrl != null) {
-        return getVideoIdFromUrl(videoUrl);
+        return videoUrl;
     } else {
         log("Video URL is null - ad.");
+        return null;
     }
+}
+
+function getVideoId(item) {
+    let url = getVideoUrl(item);
+
+    return url ? getVideoIdFromUrl(url) : null;
 }
 
 function changeMarkWatchedToMarkUnwatched(item) {
@@ -43,7 +57,7 @@ class Video {
         }
 
         log("Checking video " + this.videoId + " for short");
-        let videoHref = containingDiv.querySelectorAll("a")[0].getAttribute("href");
+        let videoHref = getVideoUrl(containingDiv);
         if (videoHref != null) {
             this.isShort = (videoHref.includes("shorts") || videoHref.includes("adurl"));
         } else {

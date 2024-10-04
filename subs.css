@@ -36,6 +36,12 @@
   transition-duration: 0.4s;
 }
 
+/* For list view, doesn't need to be position absolute */
+#contents.ytd-section-list-renderer .subs-btn-mark-watched,
+#contents.ytd-section-list-renderer .subs-btn-mark-unwatched {
+  position: static;
+}
+
 .subs-btn-mark-watched {
   /*display: none;*/
   width: 24px;
