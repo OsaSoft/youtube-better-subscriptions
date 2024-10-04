@@ -16,7 +16,7 @@ class SubscriptionVideo extends Video {
         let firstChild = this.contentDiv.firstChild;
         let isListView = firstChild.nodeType === Node.COMMENT_NODE;
 
-        let buttonContainer = isListView ? this.contentDiv.querySelector('.text-wrapper.style-scope.ytd-video-renderer') : firstChild;
+        let buttonContainer = isListView ? this.contentDiv.querySelector(".text-wrapper.style-scope.ytd-video-renderer") : firstChild;
 
         // stored = false - build "Mark as watched"
         // stored = true  - build "Mark as unwatched"
