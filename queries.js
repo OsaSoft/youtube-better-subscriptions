@@ -26,3 +26,15 @@ function sectionContentsQuery() {
 function fuzzyDateQuery() {
     return '#metadata-line>span';
 }
+
+function searchContainerQuery() {
+    return "ytd-searchbox.style-scope"
+}
+
+function logoQuery() {
+    return "#logo"
+}
+
+function centerHeaderQuery() {
+    return "#center"
+}

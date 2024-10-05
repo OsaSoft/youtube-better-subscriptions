@@ -16,6 +16,7 @@ const DEFAULT_SETTINGS = {
     "settings.hide.shorts": false,
     "settings.hide.older": false,
     "settings.hide.older.cutoff":"All"
+    "settings.tweaks":true
 };
 
 const SETTINGS_KEY = "settings";

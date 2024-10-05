@@ -50,6 +50,7 @@ function buildUI() {
     addHideOlderCutoffSelect();
     addHideAllMenuButton();
     addSettingsButton();
+    if (tweaks) applyUITweaks();
 
     if (settings["settings.hide.watched.ui.stick.right"])
         addedElems[0].after(...addedElems);
