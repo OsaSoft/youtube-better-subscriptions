@@ -39,7 +39,7 @@
         "subs-ui.js",
         "subs.js",
         "vid.js",
-        "pageHandler.js"
+        "pageHandler.js",
         "tweaks.js"
       ],
       "css": [

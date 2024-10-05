@@ -24,7 +24,7 @@ function sectionContentsQuery() {
 }
 
 function fuzzyDateQuery() {
-    return '#metadata-line>span';
+    return "#metadata-line>span";
 }
 
 function searchContainerQuery() {
