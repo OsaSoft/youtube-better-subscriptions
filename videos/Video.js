@@ -1,9 +1,7 @@
 function getVideoIdFromUrl(url) {
-    if (url.includes("shorts")) {
-        return url.split("shorts/")[1].split("&")[0];
-    } else {
-        return url.split("=")[1].split("&")[0];
-    }
+    const segment = url.includes("shorts") ? url.split("shorts/")[1] : url.split("=")[1];
+
+    return segment ? segment.split("&")[0] : null;
 }
 
 function getVideoUrl(item) {
