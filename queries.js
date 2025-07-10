@@ -28,13 +28,17 @@ function fuzzyDateQuery() {
 }
 
 function searchContainerQuery() {
-    return "ytd-searchbox.style-scope"
+    return "ytd-searchbox.style-scope";
 }
 
-function logoQuery() {
-    return "#logo"
+function headerCenterQuery() {
+    return "#center";
 }
 
-function centerHeaderQuery() {
-    return "#center"
+function headerLogoQuery() {
+    return "#logo";
+}
+
+function guideButtonQuery() {
+    return "#guide-button";
 }

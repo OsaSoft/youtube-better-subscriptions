@@ -6,7 +6,6 @@ let hideShorts = null;
 let hideOlder = null;
 let hideOlderCutoff = null;
 let intervalId = null;
-let tweaks = null;
 
 function isYouTubeWatched(item) {
     let ytWatchedPercentThreshold = settings["settings.mark.watched.youtube.watched"];
@@ -112,9 +111,6 @@ async function initSubs() {
     }
     if (hideOlderCutoff == null) {
         hideOlderCutoff = settings["settings.hide.older.cutoff"];
-    }
-    if (tweaks == null) {
-        tweaks = settings["settings.tweaks"];
     }
 
     buildUI();

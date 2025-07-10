@@ -6,7 +6,8 @@ const PAGES = Object.freeze({
     "short": "/shorts",
     "channel": "/videos",
     "channelLive": "/streams",
-    "home": ""
+    "home": "",
+    "subscriptionsList": "/feed/channels",
 });
 
 function initExtension() {
