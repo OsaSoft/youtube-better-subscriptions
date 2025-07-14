@@ -1,8 +1,8 @@
 {
   "description": "Make navigating YouTube's subscription grid easier by hiding watched videos",
-  "short_name": "Better Subs Fixed",
+  "short_name": "Better Subs",
   "manifest_version": 3,
-  "name": "Better Subscriptions for YouTube™ Fixed",
+  "name": "Better Subscriptions for YouTube™",
   "version": "0.19.2",
   "browser_specific_settings": {
     "gecko": {
