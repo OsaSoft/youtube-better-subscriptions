@@ -15,10 +15,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Validate manifest.json (Chrome MV3) # should be compatible with Firefox too
-        uses: cardinalby/schema-validator-action@v1
+        uses: cardinalby/schema-validator-action@v3
         with:
           file: manifest.json
-          schema: 'https://json.schemastore.org/chrome-extension-manifest.json'
+          schema: 'https://json.schemastore.org/chrome-manifest'
 
       - name: Pack extension ZIP
         uses: TheDoctor0/zip-release@v0.3.0
