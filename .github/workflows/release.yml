@@ -18,7 +18,8 @@ jobs:
         uses: cardinalby/schema-validator-action@v3
         with:
           file: manifest.json
-          schema: 'https://json.schemastore.org/chrome-manifest'
+          schema: https://json.schemastore.org/chrome-manifest
+          fixSchemas: true          # <-- handles custom formats like "match-pattern"
 
       - name: Pack extension ZIP
         uses: TheDoctor0/zip-release@v0.3.0
