@@ -206,6 +206,9 @@ function processSections() {
         let sectionHeader = section.querySelector(sectionTitleQuery());
         // Temporary fix for PAGES.channel TODO: refactor this (when more pages added)
         if (!sectionHeader) break;
+        // Ignore for list view
+        if (section.classList.contains("ytd-section-list-renderer")) break;
+
         let sectionTitle = sectionHeader.textContent;
 
         // add collapse button to sections
