@@ -3,11 +3,11 @@
   "short_name": "Better Subs",
   "manifest_version": 3,
   "name": "Better Subscriptions for YouTube™",
-  "version": "0.19.2",
+  "version": "0.20.0",
   "browser_specific_settings": {
     "gecko": {
       "id": "{5dc6dafa-584e-424a-bf90-1d1d8cfa3caa}",
-      "strict_min_version": "58.0"
+      "strict_min_version": "109.0"
     }
   },
   "icons": {
@@ -58,6 +58,7 @@
     }
   ],
   "background": {
+    "scripts": ["pages/background.js"],
     "service_worker": "pages/background.js"
   },
   "options_ui": {
