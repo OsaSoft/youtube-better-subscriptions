@@ -8,7 +8,8 @@ function isYouTubeWatched(item) {
     let ytWatchedPercentThreshold = settings["settings.mark.watched.youtube.watched"];
     return ytWatchedPercentThreshold === true && (
             (item.querySelectorAll("yt-formatted-string.style-scope.ytd-thumbnail-overlay-playback-status-renderer").length > 0 || //has "WATCHED" on thumbnail
-                    item.querySelectorAll("#progress.style-scope.ytd-thumbnail-overlay-resume-playback-renderer").length > 0) || //has progress bar on thumbnail TODO allow percentage threshold
+                    item.querySelectorAll("#progress.style-scope.ytd-thumbnail-overlay-resume-playback-renderer").length > 0 || //has progress bar on thumbnail TODO allow percentage threshold
+                    item.querySelectorAll(".ytThumbnailOverlayProgressBarHostWatchedProgressBarSegment").length > 0) || // new YT layout as of 09/2025
             item.hasAttribute("is-dismissed") //also hide empty blocks left in by pressing "HIDE" button
     )
 }
