@@ -47,12 +47,7 @@ class Video {
         this.buttonId = this.isStored ? MARK_UNWATCHED_BTN : MARK_WATCHED_BTN;
 
         log("Checking video " + this.videoId + " for premiere");
-        let thumbOverlay = containingDiv.querySelector("ytd-thumbnail-overlay-time-status-renderer");
-        if (thumbOverlay == null) {
-            this.isPremiere = false;
-        } else {
-            this.isPremiere = thumbOverlay.getAttribute("overlay-style") === "UPCOMING";
-        }
+        this.isPremiere = containingDiv.textContent.includes("Notify me");
 
         log("Checking video " + this.videoId + " for short");
         let videoHref = getVideoUrl(containingDiv);
