@@ -27,6 +27,15 @@ function getVideoId(item) {
     return url ? getVideoIdFromUrl(url) : null;
 }
 
+function getVideoDuration(item) {
+    let duration = item.containingDiv.querySelector(".yt-badge-shape__text");
+    if ((duration != null) && (duration.textContent.includes(":"))) {
+        return duration.textContent;
+    } else {
+        return null;
+    }
+}
+
 function changeMarkWatchedToMarkUnwatched(item) {
     // find Mark as watched button and change it to Unmark as watched
     let metaDataLine = item.querySelector("#" + METADATA_LINE);
@@ -45,9 +54,12 @@ class Video {
         this.videoId = getVideoId(containingDiv);
         this.isStored = watchedVideos['w' + this.videoId];
         this.buttonId = this.isStored ? MARK_UNWATCHED_BTN : MARK_WATCHED_BTN;
+        this.videoDuration = getVideoDuration(this);
 
-        log("Checking video " + this.videoId + " for premiere");
-        this.isPremiere = containingDiv.textContent.includes("Notify me");
+        log("Checking video " + this.videoId + " for premiere: duration = " + this.videoDuration);
+        if (this.videoDuration == null) {
+            this.isPremiere = true;
+        }
 
         log("Checking video " + this.videoId + " for short");
         let videoHref = getVideoUrl(containingDiv);
