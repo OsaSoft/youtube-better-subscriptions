@@ -28,9 +28,9 @@ function getVideoId(item) {
 }
 
 function getVideoDuration(item) {
-    let duration = item.containingDiv.querySelector(".yt-badge-shape__text");
-    if ((duration != null) && (duration.textContent.includes(":"))) {
-        return duration.textContent;
+    let durationDiv = item.containingDiv.querySelector(".yt-badge-shape__text");
+    if ((durationDiv != null) && (durationDiv.textContent.includes(":"))) {
+        return durationDiv.textContent;
     } else {
         return null;
     }
