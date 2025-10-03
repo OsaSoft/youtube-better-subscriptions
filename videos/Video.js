@@ -27,6 +27,15 @@ function getVideoId(item) {
     return url ? getVideoIdFromUrl(url) : null;
 }
 
+function getVideoDuration(item) {
+    let durationDiv = item.containingDiv.querySelector(".yt-badge-shape__text");
+    if ((durationDiv != null) && (durationDiv.textContent.includes(":"))) {
+        return durationDiv.textContent;
+    } else {
+        return null;
+    }
+}
+
 function changeMarkWatchedToMarkUnwatched(item) {
     // find Mark as watched button and change it to Unmark as watched
     let metaDataLine = item.querySelector("#" + METADATA_LINE);
@@ -45,13 +54,11 @@ class Video {
         this.videoId = getVideoId(containingDiv);
         this.isStored = watchedVideos['w' + this.videoId];
         this.buttonId = this.isStored ? MARK_UNWATCHED_BTN : MARK_WATCHED_BTN;
+        this.videoDuration = getVideoDuration(this);
 
-        log("Checking video " + this.videoId + " for premiere");
-        let thumbOverlay = containingDiv.querySelector("ytd-thumbnail-overlay-time-status-renderer");
-        if (thumbOverlay == null) {
-            this.isPremiere = false;
-        } else {
-            this.isPremiere = thumbOverlay.getAttribute("overlay-style") === "UPCOMING";
+        log("Checking video " + this.videoId + " for premiere: duration = " + this.videoDuration);
+        if (this.videoDuration == null) {
+            this.isPremiere = true;
         }
 
         log("Checking video " + this.videoId + " for short");
