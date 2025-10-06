@@ -36,6 +36,16 @@ function getVideoDuration(item) {
     }
 }
 
+function isMemberOnly(badges) {
+    let membersOnly = false;
+    Array.from(badges).forEach(element => {
+        if (element.innerText.includes("Members only")) {
+            membersOnly = true;
+        }
+    });
+    return membersOnly;
+}
+
 function changeMarkWatchedToMarkUnwatched(item) {
     // find Mark as watched button and change it to Unmark as watched
     let metaDataLine = item.querySelector("#" + METADATA_LINE);
@@ -55,6 +65,8 @@ class Video {
         this.isStored = watchedVideos['w' + this.videoId];
         this.buttonId = this.isStored ? MARK_UNWATCHED_BTN : MARK_WATCHED_BTN;
         this.videoDuration = getVideoDuration(this);
+        this.badges = containingDiv.querySelectorAll("ytd-badge-supported-renderer");
+        this.membersOnly = isMemberOnly(this.badges);
 
         log("Checking video " + this.videoId + " for premiere: duration = " + this.videoDuration);
         if (this.videoDuration == null) {

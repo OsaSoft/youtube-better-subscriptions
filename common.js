@@ -14,6 +14,7 @@ const DEFAULT_SETTINGS = {
     "settings.hide.watched.auto.store": true,
     "settings.hide.premieres": false,
     "settings.hide.shorts": false,
+    "settings.hide.members": false
 };
 
 const SETTINGS_KEY = "settings";
