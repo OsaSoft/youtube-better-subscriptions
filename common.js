@@ -14,6 +14,8 @@ const DEFAULT_SETTINGS = {
     "settings.hide.watched.auto.store": true,
     "settings.hide.premieres": false,
     "settings.hide.shorts": false,
+    "settings.hide.older": true,
+    "settings.hide.older.cutoff":"1 Week"
 };
 
 const SETTINGS_KEY = "settings";

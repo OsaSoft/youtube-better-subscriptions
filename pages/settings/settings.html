@@ -68,9 +68,21 @@
       <label for="settings.hide.shorts">Hide Shorts automatically</label><br/>
       <br/>
 
+      <input id="settings.hide.older" type="checkbox"/>
+      <label for="settings.hide.older">Hide older videos </label>
+      <label for="settings.hide.older.cutoff">with default Cutoff: </label>
+      <select id="settings.hide.older.cutoff">
+        <option value="All">All</option>
+        <option value="Today">Today</option>
+        <option value="1 Week">1 Week</option>
+        <option value="2 Weeks">2 Weeks</option>
+        <option value="1 Month">1 Month</option>
+      </select><br/>
+      <br/>
+
       <label for="settings.hide.watched.refresh.rate">Refresh rate for feed clearing (milliseconds)</label>
       <input id="settings.hide.watched.refresh.rate" type="number"/><br/>
-      <label for="settings.hide.watched.refresh.rate">(currently works only in "hide watched" state)</label>
+      <label for="settings.hide.watched.refresh.rate">(currently works only in "hide watched" state or when hiding older videos)</label>
 
     </form>
   </div>

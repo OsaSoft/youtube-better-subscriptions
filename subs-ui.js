@@ -1,5 +1,6 @@
 const HIDE_WATCHED_TOGGLE = PREFIX + "hide-watched-toggle";
 const HIDE_WATCHED_LABEL = PREFIX + "hide-watched-toggle-label";
+const HIDE_OLDER_CUTOFF_SELECT = PREFIX + "hide-older-cutoff-select";
 const MARK_ALL_WATCHED_BTN = PREFIX + "subs-grid-menu-mark-all";
 const SETTINGS_BTN = PREFIX + "subs-grid-menu-settings";
 const MARK_WATCHED_BTN = PREFIX + "mark-watched";
@@ -8,7 +9,10 @@ const METADATA_LINE = PREFIX + "metadata-line";
 const COLLAPSE_SECTION_CHECKBOX = PREFIX + "collapse-section";
 
 const HIDDEN_CLASS = PREFIX + "hidden";
+const OLDER_CLASS = PREFIX + "older";
 const COLLAPSE_CLASS = PREFIX + "collapse-section";
+
+const HIDE_OLDER_CUTOFF_OPTIONS = ["All", "Today", "1 Week", "2 Weeks", "1 Month"]
 
 let addedElems = [];
 
@@ -24,10 +28,24 @@ function showWatched() {
     processSections();
 }
 
+function showOlder() {
+    log("Showing older videos");
+
+    for (let item of older) {
+        item.style.visibility = '';
+        if (! item.classList.contains(HIDDEN_CLASS)) {
+            item.style.display = '';
+        }
+        item.classList.remove(OLDER_CLASS);
+    }
+    older = [];
+}
+
 function buildUI() {
     log("Building subs UI");
 
     addHideWatchedCheckbox();
+    addHideOlderCutoffSelect();
     addHideAllMenuButton();
     addSettingsButton();
 
@@ -120,6 +138,26 @@ function addHideWatchedCheckbox() {
 
     let messenger = document.getElementById(HIDE_WATCHED_TOGGLE);
     messenger.addEventListener("click", hideWatchedChanged);
+}
+
+function addHideOlderCutoffSelect() {
+    if (hideOlder) {
+        let hideOlderCutoffSelect = document.createElement("select");
+        hideOlderCutoffSelect.setAttribute("id", HIDE_OLDER_CUTOFF_SELECT);
+
+        HIDE_OLDER_CUTOFF_OPTIONS.forEach(optionText => {
+            let option = document.createElement("option");
+            option.value = optionText;
+            option.textContent = optionText;
+            if (optionText == hideOlderCutoff) option.selected = true;
+            hideOlderCutoffSelect.appendChild(option);
+        });
+
+        addElementToMenuUI(hideOlderCutoffSelect);
+
+        let messenger = document.getElementById(HIDE_OLDER_CUTOFF_SELECT);
+        messenger.addEventListener("change", hideOlderChanged);
+    }
 }
 
 function addElementToMenuUI(element) {
@@ -244,6 +282,9 @@ function removeWatchedAndAddButton() {
     for (let item of els) {
         let vid = new SubscriptionVideo(item);
 
+        if (hideOlder && vid.isOlder){
+            vid.hideOlder();
+        }
         if (!vid.isStored && isYouTubeWatched(item)) {
             vid.markWatched();
         } else if (
@@ -299,5 +340,14 @@ function removeUI() {
         item.style.display = '';
         item.classList.remove(HIDDEN_CLASS);
     }
+
+    // make older videos visible
+    for (let item of older) {
+        item.style.display = '';
+        item.style.visibility = '';
+        item.classList.remove(OLDER_CLASS);
+    }
+
     hidden = [];
+    older = [];
 }
