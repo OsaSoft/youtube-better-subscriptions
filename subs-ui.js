@@ -291,7 +291,7 @@ function removeWatchedAndAddButton() {
             (hideWatched && vid.isStored) ||
             (hidePremieres && vid.isPremiere) ||
             (hideShorts && vid.isShort) ||
-            (hideWithoutTimestamp && vid.fuzzyDate == null)
+            (hideWithoutTimestamp && vid.fuzzyDate == "")
         ) {
             vid.hide();
             hiddenCount++;

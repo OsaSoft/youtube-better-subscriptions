@@ -99,8 +99,11 @@ class Video {
                 if (hideOlderCutoff == "Today") {
                     this.isOlder = true;
                 }
-                else if (hideOlderCutoff == "1 Week" && Number(this.fuzzyDate.match(/\d+/)[0]) >= 7) {
-                    this.isOlder = true;
+                else if (hideOlderCutoff == "1 Week") {
+                    let match = this.fuzzyDate.match(/\d+/);
+                    if (match && Number(match[0]) >= 7) {
+                        this.isOlder = true;
+                    }
                 }
             }
         }
