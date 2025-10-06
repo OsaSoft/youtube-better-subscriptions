@@ -15,7 +15,8 @@ const DEFAULT_SETTINGS = {
     "settings.hide.premieres": false,
     "settings.hide.shorts": false,
     "settings.hide.older": false,
-    "settings.hide.older.cutoff":"1 Week"
+    "settings.hide.older.cutoff":"1 Week",
+    "settings.hide.without.timestamp": false,
 };
 
 const SETTINGS_KEY = "settings";
