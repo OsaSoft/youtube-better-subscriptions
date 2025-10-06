@@ -64,7 +64,13 @@ class Video {
         this.videoId = getVideoId(containingDiv);
         this.isStored = watchedVideos['w' + this.videoId];
         this.buttonId = this.isStored ? MARK_UNWATCHED_BTN : MARK_WATCHED_BTN;
-        this.fuzzyDate = containingDiv.querySelectorAll(".yt-content-metadata-view-model__metadata-text")[2].innerText
+        try {
+            const fuzzyNodes = containingDiv.querySelectorAll(".yt-content-metadata-view-model__metadata-text");
+            this.fuzzyDate = (fuzzyNodes && fuzzyNodes.length > 2 && fuzzyNodes[2].innerText) ? fuzzyNodes[2].innerText : "";
+        } catch (e) {
+            log("Error setting fuzzyDate in Video constructor: " + e);
+            this.fuzzyDate = "";
+        }
         this.videoDuration = getVideoDuration(this);
 
         log("Checking video " + this.videoId + " for premiere: duration = " + this.videoDuration);
