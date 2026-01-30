@@ -5,7 +5,7 @@ function getVideoIdFromUrl(url) {
 }
 
 function getVideoUrl(item) {
-    // Try old layout selectors first
+    // Try old layout selector first
     let videoLink = item.querySelectorAll("a#video-title")[0];
 
     // Try new January 2026 lockupViewModel layout
