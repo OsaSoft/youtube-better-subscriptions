@@ -237,6 +237,11 @@ function processSections() {
 function removeWatchedAndAddButton() {
     log("Removing watched from feed and adding overlay");
 
+    let richSections = document.querySelectorAll(".ytd-rich-section-renderer");
+    if (removeRichSections) {
+        richSections.forEach(elem => elem.remove());
+    }
+
     let els = document.querySelectorAll(vidQuery());
 
     let hiddenCount = 0;
