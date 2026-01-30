@@ -1,14 +1,16 @@
 settingsLoadedCallbacks.push(initExtension);
 
+//globally scope PAGES object so we can change behaviour based on page elsewhere
+const PAGES = Object.freeze({
+    "subscriptions": "/feed/subscriptions",
+    "video": "/watch",
+    "short": "/shorts",
+    "channel": "/videos",
+    "channelLive": "/streams",
+    "home": ""
+});
+
 function initExtension() {
-    const PAGES = Object.freeze({
-        "subscriptions": "/feed/subscriptions",
-        "video": "/watch",
-        "short": "/shorts",
-        "channel": "/videos",
-        "channelLive": "/streams",
-        "home": ""
-    });
 
     async function handlePageChange() {
         //remove trailing /
