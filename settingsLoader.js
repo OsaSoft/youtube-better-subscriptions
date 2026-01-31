@@ -8,6 +8,10 @@ function settingsChanged(oldSettings, newSettings) {
     for (let key in DEFAULT_SETTINGS) {
         if (oldSettings[key] !== newSettings[key]) return true;
     }
+    // Detect new keys from newer extension versions
+    for (let key in newSettings) {
+        if (!(key in oldSettings)) return true;
+    }
     return false;
 }
 
@@ -16,14 +20,16 @@ function showSettingsUpdatedNotification() {
     // Create a subtle banner that auto-dismisses
     let banner = document.createElement("div");
     banner.className = PREFIX + "settings-updated-banner";
-    banner.textContent = "Better Subscriptions: Settings synced. Refresh to apply.";
+    banner.textContent = "Better Subscriptions: Settings synced and applied.";
     banner.style.cssText = `
         position: fixed; top: 60px; right: 20px; z-index: 9999;
         background: #065fd4; color: white; padding: 8px 16px;
         border-radius: 4px; font-size: 13px; opacity: 0;
         transition: opacity 0.3s;
     `;
-    document.body.appendChild(banner);
+    const target = document.body || document.documentElement;
+    if (!target) return;
+    target.appendChild(banner);
     requestAnimationFrame(() => banner.style.opacity = "1");
     setTimeout(() => {
         banner.style.opacity = "0";
@@ -50,6 +56,10 @@ async function loadSettings() {
 
         // Background: fetch sync and update if different
         brwsr.storage.sync.get(SETTINGS_KEY, items => {
+            if (brwsr.runtime.lastError) {
+                log("Sync storage error: " + brwsr.runtime.lastError.message);
+                return;
+            }
             const syncSettings = items[SETTINGS_KEY];
             if (settingsChanged(settings, syncSettings)) {
                 log("Sync settings differ, updating...");

@@ -125,26 +125,30 @@ function addHideWatchedCheckbox() {
 function addElementToMenuUI(element) {
     log("Adding element to menu UI");
 
-    // Try multiple possible anchor elements for different YouTube layouts
-    let anchor = document.getElementById("end") ||                              // Old layout
-                 document.querySelector("ytd-feed-filter-chip-bar-renderer") || // New layout chip bar
-                 document.querySelector("#primary ytd-rich-grid-renderer") ||   // Grid container
-                 document.querySelector("ytd-browse[page-subtype='subscriptions']"); // Page container
+    // Try multiple possible insertion points for different YouTube layouts
+    let insertionPoint = document.getElementById("end") ||                              // Old layout
+                         document.querySelector("ytd-feed-filter-chip-bar-renderer") || // New layout chip bar
+                         document.querySelector("#primary ytd-rich-grid-renderer") ||   // Grid container
+                         document.querySelector("ytd-browse[page-subtype='subscriptions']"); // Page container
 
-    if (anchor != null) {
-        if (anchor.id === "end") {
+    if (insertionPoint != null) {
+        if (insertionPoint.id === "end") {
             // Old layout behavior
             if (settings["settings.hide.watched.ui.stick.right"])
-                anchor.prepend(element);
+                insertionPoint.prepend(element);
             else
-                anchor.parentNode.insertBefore(element, anchor);
+                insertionPoint.parentNode.insertBefore(element, insertionPoint);
         } else {
-            // New layout - insert at the beginning of the anchor
-            anchor.insertBefore(element, anchor.firstChild);
+            // New layout behavior - respect stick-right setting
+            if (settings["settings.hide.watched.ui.stick.right"]) {
+                insertionPoint.appendChild(element);
+            } else {
+                insertionPoint.insertBefore(element, insertionPoint.firstChild);
+            }
         }
         addedElems.push(element);
     } else {
-        logError({"message": "Could not find UI anchor element", "stack": "subs-ui.js:addElementToMenuUI"});
+        logError({"message": "Could not find UI insertion point", "stack": "subs-ui.js:addElementToMenuUI"});
     }
 }
 
@@ -298,7 +302,7 @@ function removeWatchedAndAddButton() {
 
 function removeUI() {
     addedElems.forEach((elem) => {
-        elem.parentNode.removeChild(elem);
+        elem.remove();  // Safe - doesn't throw if already removed from DOM
     });
 
     addedElems = [];
@@ -316,7 +320,11 @@ function removeUI() {
 
 function rebuildUI() {
     if (getCurrentPage() === "/feed/subscriptions") {
-        removeUI();
-        buildUI();
+        try {
+            removeUI();
+            buildUI();
+        } catch (e) {
+            logError(e);
+        }
     }
 }
