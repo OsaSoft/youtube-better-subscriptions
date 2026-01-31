@@ -10,9 +10,18 @@ function initExtension() {
         "home": ""
     });
 
-    async function handlePageChange() {
-        //remove trailing /
+    let pageChangeTimeout = null;
+    let lastHandledPage = null;
+
+async function handlePageChange() {
         let page = getCurrentPage();
+
+        // Skip if page hasn't actually changed (fixes SPA navigation timing issue)
+        if (page === lastHandledPage) {
+            log("Page change event fired but URL unchanged, skipping: " + page);
+            return;
+        }
+        lastHandledPage = page;
 
         log("Page was changed to " + page);
 
@@ -55,7 +64,10 @@ function initExtension() {
                 mutations.forEach((mutationRecord) => {
                     //is page fully loaded?
                     if (mutationRecord.target.attributes["aria-valuenow"].value === "100") {
-                        handlePageChange();
+                        // Debounce: cancel any pending call, schedule new one
+                        // The delay allows the URL to update before we check it
+                        clearTimeout(pageChangeTimeout);
+                        pageChangeTimeout = setTimeout(handlePageChange, 100);
                     }
                 });
             });
