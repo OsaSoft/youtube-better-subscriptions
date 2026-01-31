@@ -5,7 +5,22 @@ function getVideoIdFromUrl(url) {
 }
 
 function getVideoUrl(item) {
-    let videoLink = item.querySelectorAll("a#video-title")[0] || item.querySelectorAll("a")[0];
+    // Try old layout selector first
+    let videoLink = item.querySelectorAll("a#video-title")[0];
+
+    // Try new January 2026 lockupViewModel layout
+    if (!videoLink) {
+        // In the new layout, the main link is inside lockup-view-model
+        let lockupViewModel = item.querySelector("lockup-view-model");
+        if (lockupViewModel) {
+            videoLink = lockupViewModel.querySelector("a");
+        }
+    }
+
+    // Fallback to any link
+    if (!videoLink) {
+        videoLink = item.querySelectorAll("a")[0];
+    }
 
     if (!videoLink) {
         return null;
@@ -28,12 +43,25 @@ function getVideoId(item) {
 }
 
 function getVideoDuration(item) {
+    // Try old layout selector
     let durationDiv = item.containingDiv.querySelector(".yt-badge-shape__text");
     if ((durationDiv != null) && (durationDiv.textContent.includes(":"))) {
         return durationDiv.textContent;
-    } else {
-        return null;
     }
+
+    // Try new lockupViewModel layout - duration badge is in thumbnail-badge-view-model
+    let lockupViewModel = item.containingDiv.querySelector("lockup-view-model");
+    if (lockupViewModel) {
+        let badgeViewModel = lockupViewModel.querySelector("thumbnail-badge-view-model");
+        if (badgeViewModel) {
+            let badgeText = badgeViewModel.textContent.trim();
+            if (badgeText && badgeText.includes(":")) {
+                return badgeText;
+            }
+        }
+    }
+
+    return null;
 }
 
 function changeMarkWatchedToMarkUnwatched(item) {

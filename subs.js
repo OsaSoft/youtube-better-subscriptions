@@ -9,7 +9,8 @@ function isYouTubeWatched(item) {
     return ytWatchedPercentThreshold === true && (
             (item.querySelectorAll("yt-formatted-string.style-scope.ytd-thumbnail-overlay-playback-status-renderer").length > 0 || //has "WATCHED" on thumbnail
                     item.querySelectorAll("#progress.style-scope.ytd-thumbnail-overlay-resume-playback-renderer").length > 0 || //has progress bar on thumbnail TODO allow percentage threshold
-                    item.querySelectorAll(".ytThumbnailOverlayProgressBarHostWatchedProgressBarSegment").length > 0) || // new YT layout as of 09/2025
+                    item.querySelectorAll(".ytThumbnailOverlayProgressBarHostWatchedProgressBarSegment").length > 0 || // new YT layout as of 09/2025
+                    item.querySelectorAll("thumbnail-overlay-progress-bar-view-model").length > 0) || // new lockupViewModel layout as of 01/2026
             item.hasAttribute("is-dismissed") //also hide empty blocks left in by pressing "HIDE" button
     )
 }
@@ -76,7 +77,22 @@ function loadMoreVideos() {
 }
 
 function getVideoTitle(item) {
-    return item.querySelector("#video-title").title;
+    // Try old layout
+    let titleElem = item.querySelector("#video-title");
+    if (titleElem && titleElem.title) {
+        return titleElem.title;
+    }
+
+    // Try new lockupViewModel layout - the title is in an anchor tag
+    let lockupViewModel = item.querySelector("lockup-view-model");
+    if (lockupViewModel) {
+        let link = lockupViewModel.querySelector("a");
+        if (link) {
+            return link.getAttribute("title") || link.textContent.trim();
+        }
+    }
+
+    return "";
 }
 
 async function initSubs() {
