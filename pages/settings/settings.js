@@ -55,9 +55,10 @@ function saveSettings() {
     }
 
     log("Saving values:" + JSON.stringify(values));
-    brwsr.storage.sync.set({
-        [SETTINGS_KEY]: values
-    });
+
+    // Save to both sync (for cross-device) and local (for fast cache)
+    brwsr.storage.sync.set({[SETTINGS_KEY]: values});
+    brwsr.storage.local.set({[SETTINGS_LOCAL_KEY]: values});
 }
 
 function setupButtons() {

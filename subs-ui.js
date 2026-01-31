@@ -125,15 +125,27 @@ function addHideWatchedCheckbox() {
 function addElementToMenuUI(element) {
     log("Adding element to menu UI");
 
-    let topMenuEnd = document.getElementById("end");
-    if (topMenuEnd != null) { //just in case...
-        if (settings["settings.hide.watched.ui.stick.right"])
-            topMenuEnd.prepend(element);
-        else
-            topMenuEnd.parentNode.insertBefore(element, topMenuEnd);
-    }
+    // Try multiple possible anchor elements for different YouTube layouts
+    let anchor = document.getElementById("end") ||                              // Old layout
+                 document.querySelector("ytd-feed-filter-chip-bar-renderer") || // New layout chip bar
+                 document.querySelector("#primary ytd-rich-grid-renderer") ||   // Grid container
+                 document.querySelector("ytd-browse[page-subtype='subscriptions']"); // Page container
 
-    addedElems.push(element);
+    if (anchor != null) {
+        if (anchor.id === "end") {
+            // Old layout behavior
+            if (settings["settings.hide.watched.ui.stick.right"])
+                anchor.prepend(element);
+            else
+                anchor.parentNode.insertBefore(element, anchor);
+        } else {
+            // New layout - insert at the beginning of the anchor
+            anchor.insertBefore(element, anchor.firstChild);
+        }
+        addedElems.push(element);
+    } else {
+        logError({"message": "Could not find UI anchor element", "stack": "subs-ui.js:addElementToMenuUI"});
+    }
 }
 
 function buildMarkWatchedButton(dismissibleDiv, item, videoId, isMarkWatchedBtn = true) {
@@ -300,4 +312,11 @@ function removeUI() {
         item.classList.remove(HIDDEN_CLASS);
     }
     hidden = [];
+}
+
+function rebuildUI() {
+    if (getCurrentPage() === "/feed/subscriptions") {
+        removeUI();
+        buildUI();
+    }
 }
