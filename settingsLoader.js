@@ -16,7 +16,7 @@ function showSettingsUpdatedNotification() {
     // Create a subtle banner that auto-dismisses
     let banner = document.createElement("div");
     banner.className = PREFIX + "settings-updated-banner";
-    banner.textContent = "Settings synced from cloud";
+    banner.textContent = "Better Subscriptions: Settings synced. Refresh to apply.";
     banner.style.cssText = `
         position: fixed; top: 60px; right: 20px; z-index: 9999;
         background: #065fd4; color: white; padding: 8px 16px;
