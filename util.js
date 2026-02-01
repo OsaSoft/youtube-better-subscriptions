@@ -6,8 +6,18 @@ function isLogEnabled() {
     return settings["settings.log.enabled"];
 }
 
+function isDebugLogEnabled() {
+    return settings["settings.log.debug"];
+}
+
 function log(content) {
     if (isLogEnabled()) {
+        console.log(prepareMessage(content));
+    }
+}
+
+function logDebug(content) {
+    if (isLogEnabled() && isDebugLogEnabled()) {
         console.log(prepareMessage(content));
     }
 }

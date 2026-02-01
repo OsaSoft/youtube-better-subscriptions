@@ -9,6 +9,7 @@ const DEFAULT_SETTINGS = {
     "settings.hide.watched.refresh.rate": 3000,
     "settings.mark.watched.youtube.watched": false,
     "settings.log.enabled": false,
+    "settings.log.debug": false,
     "settings.hide.watched.support.channel": true,
     "settings.hide.watched.support.home": true,
     "settings.hide.watched.auto.store": true,

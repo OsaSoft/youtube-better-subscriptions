@@ -8,8 +8,9 @@ function initSettings() {
         hideSpinners();
         showSettings();
         updateSettings();
+        updateDebugLogVisibility();
     } else {
-        settingsLoadedCallbacks.push(hideSpinners, showSettings, updateSettings);
+        settingsLoadedCallbacks.push(hideSpinners, showSettings, updateSettings, updateDebugLogVisibility);
     }
 }
 
@@ -70,6 +71,18 @@ function setupButtons() {
     document.getElementById("watched.export").addEventListener("click", exportVideos);
     document.getElementById("watched.import").addEventListener("click", importVideos);
     document.getElementById("watched.clear").addEventListener("click", clearVideos);
+
+    document.getElementById("settings.log.enabled").addEventListener("change", updateDebugLogVisibility);
+}
+
+function updateDebugLogVisibility() {
+    let logEnabled = document.getElementById("settings.log.enabled").checked;
+    let debugContainer = document.getElementById("settings.log.debug.container");
+    if (logEnabled) {
+        debugContainer.classList.remove("hidden");
+    } else {
+        debugContainer.classList.add("hidden");
+    }
 }
 
 async function exportVideos() {
