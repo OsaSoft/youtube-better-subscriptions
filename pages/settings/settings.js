@@ -4,6 +4,9 @@ document.addEventListener("DOMContentLoaded", setupButtons);
 document.addEventListener("DOMContentLoaded", initSettings);
 document.addEventListener("DOMContentLoaded", displayVersion);
 
+// Track the element that opened the modal for focus restoration
+let previouslyFocusedElement = null;
+
 function initSettings() {
     if (settingsLoaded) {
         hideSpinners();
@@ -83,6 +86,16 @@ function setupButtons() {
     document.getElementById("modal-cancel").addEventListener("click", hideConfirmModal);
     document.getElementById("modal-confirm").addEventListener("click", performClearVideos);
     document.getElementById("confirm-modal").querySelector(".modal__backdrop").addEventListener("click", hideConfirmModal);
+
+    // Escape key to close modal
+    document.addEventListener("keydown", function(event) {
+        if (event.key === "Escape") {
+            const modal = document.getElementById("confirm-modal");
+            if (!modal.classList.contains("hidden")) {
+                hideConfirmModal();
+            }
+        }
+    });
 }
 
 async function exportVideos() {
@@ -139,25 +152,62 @@ async function importVideos() {
 }
 
 function showConfirmModal() {
-    document.getElementById("confirm-modal").classList.remove("hidden");
+    previouslyFocusedElement = document.activeElement;
+    const modal = document.getElementById("confirm-modal");
+    modal.classList.remove("hidden");
+    // Focus the cancel button when modal opens
+    document.getElementById("modal-cancel").focus();
 }
 
 function hideConfirmModal() {
     document.getElementById("confirm-modal").classList.add("hidden");
+    // Restore focus to the element that opened the modal
+    if (previouslyFocusedElement) {
+        previouslyFocusedElement.focus();
+        previouslyFocusedElement = null;
+    }
+}
+
+// Helper to promisify storage operations for Chrome compatibility
+function storageLocalRemove(keys) {
+    return new Promise((resolve) => {
+        brwsr.storage.local.remove(keys, resolve);
+    });
+}
+
+function storageSyncRemove(key) {
+    return new Promise((resolve) => {
+        brwsr.storage.sync.remove(key, resolve);
+    });
 }
 
 async function performClearVideos() {
     hideConfirmModal();
 
-    brwsr.storage.local.clear();
+    // Clear only watched-video-related data from local storage, preserving settings
+    const localData = await new Promise((resolve) => {
+        brwsr.storage.local.get(null, resolve);
+    });
+    const localKeys = Object.keys(localData || {});
+    const localWatchedKeys = localKeys.filter(key => {
+        // Keys for watched videos use VIDEO_WATCH_KEY prefix
+        // Preserve settings keys (SETTINGS_LOCAL_KEY, etc.)
+        if (typeof VIDEO_WATCH_KEY === "string" && VIDEO_WATCH_KEY.length > 0) {
+            return key.indexOf(VIDEO_WATCH_KEY) === 0;
+        }
+        return false;
+    });
+    if (localWatchedKeys.length > 0) {
+        await storageLocalRemove(localWatchedKeys);
+    }
 
-    await Promise.all(
-        Object.keys((await syncStorageGet(null)) || {}).map(key => {
-            if (key.indexOf(VIDEO_WATCH_KEY) === 0) {
-                brwsr.storage.sync.remove(key);
-            }
-        })
-    );
+    // Clear watched videos from sync storage
+    const syncData = await syncStorageGet(null);
+    const syncKeys = Object.keys(syncData || {});
+    const removePromises = syncKeys
+        .filter(key => key.indexOf(VIDEO_WATCH_KEY) === 0)
+        .map(key => storageSyncRemove(key));
+    await Promise.all(removePromises);
 
     await loadWatchedVideos();
     showToast("All watched videos cleared", "success");
@@ -179,12 +229,25 @@ function showToast(message, type = "success") {
     const toast = document.createElement("div");
     toast.className = `toast toast--${type}`;
 
-    // Add icon based on type
-    const iconSvg = type === "success"
-        ? '<svg class="toast__icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>'
-        : '<svg class="toast__icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>';
+    // Create icon SVG using DOM methods to avoid innerHTML injection
+    const iconSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    iconSvg.setAttribute("class", "toast__icon");
+    iconSvg.setAttribute("viewBox", "0 0 24 24");
+    iconSvg.setAttribute("fill", "currentColor");
 
-    toast.innerHTML = `${iconSvg}<span>${message}</span>`;
+    const iconPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    if (type === "success") {
+        iconPath.setAttribute("d", "M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z");
+    } else {
+        iconPath.setAttribute("d", "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z");
+    }
+    iconSvg.appendChild(iconPath);
+
+    const messageSpan = document.createElement("span");
+    messageSpan.textContent = message;
+
+    toast.appendChild(iconSvg);
+    toast.appendChild(messageSpan);
     container.appendChild(toast);
 
     // Auto-remove after delay

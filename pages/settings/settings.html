@@ -52,88 +52,88 @@
                 <div class="settings-list hidden">
                     <div class="setting-item">
                         <div class="setting-info">
-                            <span class="setting-title">Show "Hide Watched" label</span>
-                            <span class="setting-description">Display the label text next to the hide watched button</span>
+                            <span class="setting-title" id="setting-hide-watched-label-title">Show "Hide Watched" label</span>
+                            <span class="setting-description" id="setting-hide-watched-label-desc">Display the label text next to the hide watched button</span>
                         </div>
                         <label class="toggle">
-                            <input type="checkbox" id="settings.hide.watched.label">
+                            <input type="checkbox" id="settings.hide.watched.label" aria-labelledby="setting-hide-watched-label-title" aria-describedby="setting-hide-watched-label-desc">
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
 
                     <div class="setting-item">
                         <div class="setting-info">
-                            <span class="setting-title">Show "Mark all as watched" label</span>
-                            <span class="setting-description">Display the label text next to the mark all button</span>
+                            <span class="setting-title" id="setting-hide-watched-all-label-title">Show "Mark all as watched" label</span>
+                            <span class="setting-description" id="setting-hide-watched-all-label-desc">Display the label text next to the mark all button</span>
                         </div>
                         <label class="toggle">
-                            <input type="checkbox" id="settings.hide.watched.all.label">
+                            <input type="checkbox" id="settings.hide.watched.all.label" aria-labelledby="setting-hide-watched-all-label-title" aria-describedby="setting-hide-watched-all-label-desc">
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
 
                     <div class="setting-item">
                         <div class="setting-info">
-                            <span class="setting-title">Stick UI to the right menu</span>
-                            <span class="setting-description">Position the extension controls on the right side of the page</span>
+                            <span class="setting-title" id="setting-ui-stick-right-title">Stick UI to the right menu</span>
+                            <span class="setting-description" id="setting-ui-stick-right-desc">Position the extension controls on the right side of the page</span>
                         </div>
                         <label class="toggle">
-                            <input type="checkbox" id="settings.hide.watched.ui.stick.right">
+                            <input type="checkbox" id="settings.hide.watched.ui.stick.right" aria-labelledby="setting-ui-stick-right-title" aria-describedby="setting-ui-stick-right-desc">
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
 
                     <div class="setting-item">
                         <div class="setting-info">
-                            <span class="setting-title">Hide watched by default</span>
-                            <span class="setting-description">Automatically hide watched videos when loading the subscriptions page</span>
+                            <span class="setting-title" id="setting-hide-watched-default-title">Hide watched by default</span>
+                            <span class="setting-description" id="setting-hide-watched-default-desc">Automatically hide watched videos when loading the subscriptions page</span>
                         </div>
                         <label class="toggle">
-                            <input type="checkbox" id="settings.hide.watched.default">
+                            <input type="checkbox" id="settings.hide.watched.default" aria-labelledby="setting-hide-watched-default-title" aria-describedby="setting-hide-watched-default-desc">
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
 
                     <div class="setting-item">
                         <div class="setting-info">
-                            <span class="setting-title">Keep hide state through navigation</span>
-                            <span class="setting-description">Preserve the "Hide Watched" checkbox state when navigating to other pages and back</span>
+                            <span class="setting-title" id="setting-keep-state-title">Keep hide state through navigation</span>
+                            <span class="setting-description" id="setting-keep-state-desc">Preserve the "Hide Watched" checkbox state when navigating to other pages and back</span>
                         </div>
                         <label class="toggle">
-                            <input type="checkbox" id="settings.hide.watched.keep.state">
+                            <input type="checkbox" id="settings.hide.watched.keep.state" aria-labelledby="setting-keep-state-title" aria-describedby="setting-keep-state-desc">
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
 
                     <div class="setting-item">
                         <div class="setting-info">
-                            <span class="setting-title">Use YouTube's watched indicator</span>
-                            <span class="setting-description">Mark videos as watched based on YouTube's red progress bar. Requires page reload to apply.</span>
+                            <span class="setting-title" id="setting-youtube-watched-title">Use YouTube's watched indicator</span>
+                            <span class="setting-description" id="setting-youtube-watched-desc">Mark videos as watched based on YouTube's red progress bar. Requires page reload to apply.</span>
                         </div>
                         <label class="toggle">
-                            <input type="checkbox" id="settings.mark.watched.youtube.watched">
+                            <input type="checkbox" id="settings.mark.watched.youtube.watched" aria-labelledby="setting-youtube-watched-title" aria-describedby="setting-youtube-watched-desc">
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
 
                     <div class="setting-item">
                         <div class="setting-info">
-                            <span class="setting-title">Hide Premieres</span>
-                            <span class="setting-description">Hide premiere videos until they are available to watch</span>
+                            <span class="setting-title" id="setting-hide-premieres-title">Hide Premieres</span>
+                            <span class="setting-description" id="setting-hide-premieres-desc">Hide premiere videos until they are available to watch</span>
                         </div>
                         <label class="toggle">
-                            <input type="checkbox" id="settings.hide.premieres">
+                            <input type="checkbox" id="settings.hide.premieres" aria-labelledby="setting-hide-premieres-title" aria-describedby="setting-hide-premieres-desc">
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
 
                     <div class="setting-item">
                         <div class="setting-info">
-                            <span class="setting-title">Hide Shorts</span>
-                            <span class="setting-description">Automatically hide YouTube Shorts from your feed</span>
+                            <span class="setting-title" id="setting-hide-shorts-title">Hide Shorts</span>
+                            <span class="setting-description" id="setting-hide-shorts-desc">Automatically hide YouTube Shorts from your feed</span>
                         </div>
                         <label class="toggle">
-                            <input type="checkbox" id="settings.hide.shorts">
+                            <input type="checkbox" id="settings.hide.shorts" aria-labelledby="setting-hide-shorts-title" aria-describedby="setting-hide-shorts-desc">
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
@@ -179,22 +179,22 @@
                 <div class="settings-list hidden">
                     <div class="setting-item">
                         <div class="setting-info">
-                            <span class="setting-title">Enable on channel pages</span>
-                            <span class="setting-description">Show extension controls on channel video pages</span>
+                            <span class="setting-title" id="setting-support-channel-title">Enable on channel pages</span>
+                            <span class="setting-description" id="setting-support-channel-desc">Show extension controls on channel video pages</span>
                         </div>
                         <label class="toggle">
-                            <input type="checkbox" id="settings.hide.watched.support.channel">
+                            <input type="checkbox" id="settings.hide.watched.support.channel" aria-labelledby="setting-support-channel-title" aria-describedby="setting-support-channel-desc">
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
 
                     <div class="setting-item">
                         <div class="setting-info">
-                            <span class="setting-title">Enable on homepage</span>
-                            <span class="setting-description">Show extension controls on the YouTube homepage</span>
+                            <span class="setting-title" id="setting-support-home-title">Enable on homepage</span>
+                            <span class="setting-description" id="setting-support-home-desc">Show extension controls on the YouTube homepage</span>
                         </div>
                         <label class="toggle">
-                            <input type="checkbox" id="settings.hide.watched.support.home">
+                            <input type="checkbox" id="settings.hide.watched.support.home" aria-labelledby="setting-support-home-title" aria-describedby="setting-support-home-desc">
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
@@ -229,11 +229,11 @@
                 <div class="settings-list hidden">
                     <div class="setting-item">
                         <div class="setting-info">
-                            <span class="setting-title">Auto-mark videos as watched</span>
-                            <span class="setting-description">Automatically mark videos as watched when you click on them</span>
+                            <span class="setting-title" id="setting-auto-store-title">Auto-mark videos as watched</span>
+                            <span class="setting-description" id="setting-auto-store-desc">Automatically mark videos as watched when you click on them</span>
                         </div>
                         <label class="toggle">
-                            <input type="checkbox" id="settings.hide.watched.auto.store">
+                            <input type="checkbox" id="settings.hide.watched.auto.store" aria-labelledby="setting-auto-store-title" aria-describedby="setting-auto-store-desc">
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
@@ -352,11 +352,11 @@
     <div id="toast-container" class="toast-container"></div>
 
     <!-- Confirm Modal -->
-    <div id="confirm-modal" class="modal hidden">
+    <div id="confirm-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title">
         <div class="modal__backdrop"></div>
         <div class="modal__dialog">
             <div class="modal__header">
-                <h3 class="modal__title">Clear All Data</h3>
+                <h3 class="modal__title" id="confirm-modal-title">Clear Watched Videos</h3>
             </div>
             <div class="modal__body">
                 <p>This will permanently delete all your watched video data.</p>

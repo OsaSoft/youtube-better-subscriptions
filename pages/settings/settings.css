@@ -368,26 +368,7 @@ body {
     height: 20px;
 }
 
-/* Button Groups */
-.button-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-md) var(--spacing-lg);
-}
-
-.button-group--center {
-    justify-content: center;
-}
-
 /* File Input */
-.file-input-wrapper {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-md);
-    flex-wrap: wrap;
-}
-
 .file-input {
     font-size: var(--font-size-sm);
     color: var(--color-text-secondary);
