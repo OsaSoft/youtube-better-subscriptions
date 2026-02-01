@@ -120,10 +120,12 @@ class Video {
     }
 
     shouldHide() {
-        return (hideWatched && this.isStored) ||
-               (hidePremieres && this.isPremiere) ||
-               (hideShorts && this.isShort) ||
-               (hideLives && this.isLivestream);
+        return Boolean(
+                (hideWatched && this.isStored) ||
+                (hidePremieres && this.isPremiere) ||
+                (hideShorts && this.isShort) ||
+                (hideLives && this.isLivestream)
+        );
     }
 
     hide() {
