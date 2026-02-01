@@ -126,8 +126,13 @@
         (Disabling this means videos are only marked as watched when you click the 'Mark as watched' icon)
       </label><br/>
 
-      <input id="settings.log.enabled" type="checkbox"/>
-      <label for="settings.log.enabled">Enable logging</label><br/>
+      <label for="settings.log.level">Log level</label>
+      <select id="settings.log.level">
+        <option value="1">Errors only</option>
+        <option value="2">Warnings</option>
+        <option value="3">Info</option>
+        <option value="4">Debug (verbose)</option>
+      </select><br/>
     </form>
   </div>
 

@@ -31,7 +31,7 @@ function getVideoUrl(item) {
     if (videoUrl != null) {
         return videoUrl;
     } else {
-        log("Video URL is null - ad.");
+        logDebug("Video URL is null - ad.");
         return null;
     }
 }
@@ -84,17 +84,17 @@ class Video {
         this.buttonId = this.isStored ? MARK_UNWATCHED_BTN : MARK_WATCHED_BTN;
         this.videoDuration = getVideoDuration(this);
 
-        log("Checking video " + this.videoId + " for premiere: duration = " + this.videoDuration);
+        logDebug("Checking video " + this.videoId + " for premiere: duration = " + this.videoDuration);
         if (this.videoDuration == null) {
             this.isPremiere = true;
         }
 
-        log("Checking video " + this.videoId + " for short");
+        logDebug("Checking video " + this.videoId + " for short");
         let videoHref = getVideoUrl(containingDiv);
         if (videoHref != null) {
             this.isShort = (videoHref.includes("shorts") || videoHref.includes("adurl"));
         } else {
-            log("Video URL is null - ad.");
+            logDebug("Video URL is null - ad.");
             this.isShort = true;
         }
     }

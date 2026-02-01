@@ -234,14 +234,14 @@ function processSections() {
         if (section.querySelector(vidQuery()) == null) {
             // section has no videos that arent hidden, so hide it
             if (!section.classList.contains(HIDDEN_CLASS)) {
-                log("Hiding section '" + sectionTitle + "'");
+                logDebug("Hiding section '" + sectionTitle + "'");
                 section.style.display = 'none';
                 section.classList.add(HIDDEN_CLASS);
             }
         } else {
             // section has some videos that arent hidden, in case we hid it before, show it now
             if (section.classList.contains(HIDDEN_CLASS)) {
-                log("Showing section '" + sectionTitle + "'");
+                logDebug("Showing section '" + sectionTitle + "'");
                 section.style.display = '';
                 section.classList.remove(HIDDEN_CLASS);
             }

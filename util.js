@@ -1,25 +1,38 @@
 const LOG_HEADER = "[YT-Better-Subs] ";
 
-let printDate = false;
+// Log levels: 1=ERROR, 2=WARN, 3=INFO, 4=DEBUG
+const LOG_LEVEL = { ERROR: 1, WARN: 2, INFO: 3, DEBUG: 4 };
 
-function isLogEnabled() {
-    return settings["settings.log.enabled"];
+function getLogLevel() {
+    return settings["settings.log.level"] ?? LOG_LEVEL.ERROR;
 }
 
 function log(content) {
-    if (isLogEnabled()) {
+    if (getLogLevel() >= LOG_LEVEL.INFO) {
         console.log(prepareMessage(content));
     }
 }
 
+function logDebug(content) {
+    if (getLogLevel() >= LOG_LEVEL.DEBUG) {
+        console.log(prepareMessage(content));
+    }
+}
+
+function logWarn(content) {
+    if (getLogLevel() >= LOG_LEVEL.WARN) {
+        console.warn(prepareMessage(content));
+    }
+}
+
 function logError(error) {
+    // Always print errors regardless of log level
     console.error(prepareMessage("ERROR! "), error.message);
     console.error(error.stack.substring(0, 1000));
 }
 
 function prepareMessage(content = null) {
     let message = LOG_HEADER;
-    if (printDate) message += new Date().toTimeString() + ": ";
     if (content != null) message += (typeof content === 'object') ? JSON.stringify(content) : content;
 
     return message;

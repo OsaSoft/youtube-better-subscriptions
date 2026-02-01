@@ -10,9 +10,25 @@ function initExtension() {
         "home": ""
     });
 
+    let pageChangeTimeout = null;
+    let lastHandledPage = null;
+
+    // Debounced page change handler - delays processing to allow URL to update
+    // during SPA navigation before we check which page we're on (fixes #180)
+    function schedulePageChange() {
+        clearTimeout(pageChangeTimeout);
+        pageChangeTimeout = setTimeout(handlePageChange, 100);
+    }
+
     async function handlePageChange() {
-        //remove trailing /
         let page = getCurrentPage();
+
+        // Skip if page hasn't actually changed (avoids duplicate processing)
+        if (page === lastHandledPage) {
+            log("Page change event fired but URL unchanged, skipping: " + page);
+            return;
+        }
+        lastHandledPage = page;
 
         log("Page was changed to " + page);
 
@@ -55,7 +71,7 @@ function initExtension() {
                 mutations.forEach((mutationRecord) => {
                     //is page fully loaded?
                     if (mutationRecord.target.attributes["aria-valuenow"].value === "100") {
-                        handlePageChange();
+                        schedulePageChange();
                     }
                 });
             });
@@ -65,7 +81,7 @@ function initExtension() {
         } else {
             // Method 2: New layout - use yt-navigate-finish event
             log("Using yt-navigate-finish event (new layout)");
-            document.addEventListener('yt-navigate-finish', handlePageChange);
+            document.addEventListener('yt-navigate-finish', schedulePageChange);
         }
 
         // Handle initial page load regardless of method

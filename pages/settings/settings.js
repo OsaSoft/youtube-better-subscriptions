@@ -19,6 +19,8 @@ function updateSettings() {
         if (elem) {
             if (elem.matches('input[type="checkbox"]')) {
                 elem.checked = settings[key];
+            } else if (elem.matches('select')) {
+                elem.value = settings[key];
             } else {
                 elem.value = settings[key];
             }
@@ -46,11 +48,13 @@ function hideSpinners() {
 function saveSettings() {
     let values = {};
 
-    for (let elem of document.querySelectorAll("input[id^='settings.']")) {
+    for (let elem of document.querySelectorAll("[id^='settings.']")) {
         if (elem.matches('input[type="checkbox"]')) {
             values[elem.id] = elem.checked;
+        } else if (elem.matches('select')) {
+            values[elem.id] = parseInt(elem.value, 10);
         } else {
-            values[elem.id] = elem.value
+            values[elem.id] = elem.value;
         }
     }
 
