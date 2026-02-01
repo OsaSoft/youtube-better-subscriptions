@@ -8,9 +8,8 @@ function initSettings() {
         hideSpinners();
         showSettings();
         updateSettings();
-        updateDebugLogVisibility();
     } else {
-        settingsLoadedCallbacks.push(hideSpinners, showSettings, updateSettings, updateDebugLogVisibility);
+        settingsLoadedCallbacks.push(hideSpinners, showSettings, updateSettings);
     }
 }
 
@@ -20,6 +19,8 @@ function updateSettings() {
         if (elem) {
             if (elem.matches('input[type="checkbox"]')) {
                 elem.checked = settings[key];
+            } else if (elem.matches('select')) {
+                elem.value = settings[key];
             } else {
                 elem.value = settings[key];
             }
@@ -47,11 +48,13 @@ function hideSpinners() {
 function saveSettings() {
     let values = {};
 
-    for (let elem of document.querySelectorAll("input[id^='settings.']")) {
+    for (let elem of document.querySelectorAll("[id^='settings.']")) {
         if (elem.matches('input[type="checkbox"]')) {
             values[elem.id] = elem.checked;
+        } else if (elem.matches('select')) {
+            values[elem.id] = parseInt(elem.value);
         } else {
-            values[elem.id] = elem.value
+            values[elem.id] = elem.value;
         }
     }
 
@@ -71,18 +74,6 @@ function setupButtons() {
     document.getElementById("watched.export").addEventListener("click", exportVideos);
     document.getElementById("watched.import").addEventListener("click", importVideos);
     document.getElementById("watched.clear").addEventListener("click", clearVideos);
-
-    document.getElementById("settings.log.enabled").addEventListener("change", updateDebugLogVisibility);
-}
-
-function updateDebugLogVisibility() {
-    let logEnabled = document.getElementById("settings.log.enabled").checked;
-    let debugContainer = document.getElementById("settings.log.debug.container");
-    if (logEnabled) {
-        debugContainer.classList.remove("hidden");
-    } else {
-        debugContainer.classList.add("hidden");
-    }
 }
 
 async function exportVideos() {

@@ -2,6 +2,26 @@ let settings = {...DEFAULT_SETTINGS};
 let settingsLoadedCallbacks = [];
 let settingsLoaded = false;
 
+// Migrate old boolean log settings to new level system
+function migrateSettings(loadedSettings) {
+    if (!loadedSettings) return loadedSettings;
+
+    // Migrate old boolean log settings to new level system
+    if (typeof loadedSettings["settings.log.enabled"] === "boolean") {
+        if (loadedSettings["settings.log.debug"]) {
+            loadedSettings["settings.log.level"] = 4; // DEBUG
+        } else if (loadedSettings["settings.log.enabled"]) {
+            loadedSettings["settings.log.level"] = 3; // INFO
+        } else {
+            loadedSettings["settings.log.level"] = 1; // ERROR (minimum)
+        }
+        delete loadedSettings["settings.log.enabled"];
+        delete loadedSettings["settings.log.debug"];
+    }
+
+    return loadedSettings;
+}
+
 // Helper to compare settings objects
 function settingsChanged(oldSettings, newSettings) {
     if (!newSettings) return false;
@@ -48,7 +68,12 @@ async function loadSettings() {
     if (localSettings) {
         // Have cached settings - start immediately
         log("Settings loaded from local cache");
-        settings = {...DEFAULT_SETTINGS, ...localSettings};
+        const migratedLocal = migrateSettings({...localSettings});
+        settings = {...DEFAULT_SETTINGS, ...migratedLocal};
+        // If migrated, update local cache
+        if (migratedLocal["settings.log.level"] !== undefined && localSettings["settings.log.enabled"] !== undefined) {
+            brwsr.storage.local.set({[SETTINGS_LOCAL_KEY]: migratedLocal});
+        }
         settingsLoaded = true;
         for (let callback of settingsLoadedCallbacks) {
             callback();
@@ -63,8 +88,13 @@ async function loadSettings() {
             const syncSettings = items[SETTINGS_KEY];
             if (settingsChanged(settings, syncSettings)) {
                 log("Sync settings differ, updating...");
-                settings = {...DEFAULT_SETTINGS, ...syncSettings};
-                brwsr.storage.local.set({[SETTINGS_LOCAL_KEY]: syncSettings});
+                const migratedSync = migrateSettings({...syncSettings});
+                settings = {...DEFAULT_SETTINGS, ...migratedSync};
+                brwsr.storage.local.set({[SETTINGS_LOCAL_KEY]: migratedSync});
+                // If migrated, update sync storage too
+                if (migratedSync["settings.log.level"] !== undefined && syncSettings["settings.log.enabled"] !== undefined) {
+                    brwsr.storage.sync.set({[SETTINGS_KEY]: migratedSync});
+                }
                 showSettingsUpdatedNotification();
                 // Trigger UI rebuild if on subscriptions page
                 if (typeof rebuildUI === 'function') rebuildUI();
@@ -89,11 +119,16 @@ async function loadSettings() {
 
             log("Settings loaded from sync");
             const syncSettings = items[SETTINGS_KEY];
-            settings = {...DEFAULT_SETTINGS, ...syncSettings};
+            const migratedSync = migrateSettings(syncSettings ? {...syncSettings} : null);
+            settings = {...DEFAULT_SETTINGS, ...migratedSync};
 
             // Cache to local for next time
-            if (syncSettings) {
-                brwsr.storage.local.set({[SETTINGS_LOCAL_KEY]: syncSettings});
+            if (migratedSync) {
+                brwsr.storage.local.set({[SETTINGS_LOCAL_KEY]: migratedSync});
+                // If migrated, update sync storage too
+                if (migratedSync["settings.log.level"] !== undefined && syncSettings["settings.log.enabled"] !== undefined) {
+                    brwsr.storage.sync.set({[SETTINGS_KEY]: migratedSync});
+                }
             }
 
             settingsLoaded = true;

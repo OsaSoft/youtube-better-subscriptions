@@ -8,8 +8,7 @@ const DEFAULT_SETTINGS = {
     "settings.hide.watched.keep.state": true,
     "settings.hide.watched.refresh.rate": 3000,
     "settings.mark.watched.youtube.watched": false,
-    "settings.log.enabled": false,
-    "settings.log.debug": false,
+    "settings.log.level": 1,  // 1=ERROR, 2=WARN, 3=INFO, 4=DEBUG
     "settings.hide.watched.support.channel": true,
     "settings.hide.watched.support.home": true,
     "settings.hide.watched.auto.store": true,
@@ -82,7 +81,7 @@ async function loadWatchedVideos() {
 
         const watchedBatch = items[key];
         if (!Array.isArray(watchedBatch)) {
-            console.error('Invalid watch history item', key);
+            logWarn("Invalid watch history item: " + key);
             continue;
         }
         batches[index] = watchedBatch;
@@ -109,7 +108,7 @@ async function loadWatchedVideos() {
         brwsr.storage.local.remove(watchedVideoIds);
 
         await syncWatchedVideos();
-        console.log('Synced old format watch history');
+        log("Synced old format watch history");
     }
 }
 
@@ -165,7 +164,7 @@ async function syncWatchedVideos() {
         lastSyncUpdate = Date.now();
     }
     catch (error) {
-        console.error(error || (typeof runtime !== 'undefined' && runtime.lastError));
+        logError({message: "Sync failed", stack: error?.stack || ""});
     }
 
     return Object.values(batches).map(batch => batch.length).reduce((acc, batchLength) => acc + batchLength, 0);
