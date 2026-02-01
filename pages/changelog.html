@@ -26,27 +26,16 @@
                 <svg class="card__icon" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
                 </svg>
-                <h2 class="card__title">What's New in v0.21.4</h2>
+                <h2 class="card__title">What's New in v0.22.0</h2>
                 <span class="badge badge--latest">LATEST</span>
             </div>
             <div class="card__content">
                 <ul class="feature-list">
-                    <li class="feature-list__item">Improved support for YouTube's January 2026 layout update</li>
-                    <li class="feature-list__item">Redesigned settings loader with local-first approach for faster initialization</li>
+                    <li class="feature-list__item">Fixed SPA navigation timing issue where URL wasn't updated during page transitions</li>
+                    <li class="feature-list__item">New logging system with configurable log levels (ERROR/WARN/INFO/DEBUG)</li>
+                    <li class="feature-list__item">Redesigned settings page with YouTube-inspired UI</li>
+                    <li class="feature-list__item">Redesigned changelog page with modern card-based layout</li>
                 </ul>
-            </div>
-        </section>
-
-        <!-- Contributor Thank You Card -->
-        <section class="card">
-            <div class="card__header">
-                <svg class="card__icon" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                </svg>
-                <h2 class="card__title">Contributor Thank You</h2>
-            </div>
-            <div class="card__content">
-                <p>Massive kudos to <a href="https://github.com/mocanew" target="_blank" rel="noopener">Valentin Mocanu</a> for tackling the sync storage, which has been on my list to do since the very first version of this extension.</p>
             </div>
         </section>
 
@@ -74,6 +63,16 @@
                 <h2 class="card__title">Complete Changelog</h2>
             </div>
             <div class="card__content changelog-content">
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.22.0</h3>
+                    <ul class="version-entry__changes">
+                        <li>Fixed SPA navigation timing issue where URL wasn't updated during page transitions</li>
+                        <li>New logging system with configurable log levels (ERROR/WARN/INFO/DEBUG)</li>
+                        <li>Redesigned settings page with YouTube-inspired UI</li>
+                        <li>Redesigned changelog page with modern card-based layout</li>
+                    </ul>
+                </article>
+
                 <article class="version-entry">
                     <h3 class="version-entry__title">0.21.4</h3>
                     <ul class="version-entry__changes">
