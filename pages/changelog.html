@@ -1,226 +1,401 @@
-<style>
-  dt {
-    font-weight: bold;
-  }
-</style>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What's New - Better Subscriptions for YouTube</title>
 
-  <title>Thanks for using Better Subscriptions for YouTube&trade;!</title>
+    <link rel="stylesheet" type="text/css" href="../common.css"/>
+    <link rel="stylesheet" type="text/css" href="common-pages.css"/>
+    <link rel="stylesheet" type="text/css" href="changelog.css"/>
 </head>
+<body>
+    <div class="page-container">
+        <!-- Header -->
+        <header class="page-header">
+            <img src="../icons/ic_video_library_black_48dp_1x.png" alt="Extension icon" class="page-header__logo">
+            <div class="page-header__content">
+                <h1 class="page-header__title">Thanks for using Better Subscriptions!</h1>
+                <p class="page-header__subtitle">See what's changed and new in the extension</p>
+            </div>
+        </header>
 
-<h1>Thanks for using Better Subscriptions for YouTube&trade;!</h1>
+        <!-- What's New Hero Card -->
+        <section class="card card--hero">
+            <div class="card__header">
+                <svg class="card__icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                </svg>
+                <h2 class="card__title">What's New in v0.21.4</h2>
+                <span class="badge badge--latest">LATEST</span>
+            </div>
+            <div class="card__content">
+                <ul class="feature-list">
+                    <li class="feature-list__item">Improved support for YouTube's January 2026 layout update</li>
+                    <li class="feature-list__item">Redesigned settings loader with local-first approach for faster initialization</li>
+                </ul>
+            </div>
+        </section>
 
-<p>
-  I hope you like this extension. Feel free to reach out to me on Twitter <a href="https://twitter.com/Osa_Soft">@Osa_Soft</a>
-  or if you find any bugs or have a cool idea for a new feature, let me know on the extension's <a
-  href="https://github.com/OsaSoft/youtube-better-subscriptions/">GitHub page</a>!
-</p>
+        <!-- Contributor Thank You Card -->
+        <section class="card">
+            <div class="card__header">
+                <svg class="card__icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+                <h2 class="card__title">Contributor Thank You</h2>
+            </div>
+            <div class="card__content">
+                <p>Massive kudos to <a href="https://github.com/mocanew" target="_blank" rel="noopener">Valentin Mocanu</a> for tackling the sync storage, which has been on my list to do since the very first version of this extension.</p>
+            </div>
+        </section>
 
-<p>
-  The purpose of this page is to let you know what's changed or new in the extension and it will show up after
-  installing or updating the extension to a new version.
-</p>
+        <!-- Want to Help Card -->
+        <section class="card">
+            <div class="card__header">
+                <svg class="card__icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                </svg>
+                <h2 class="card__title">Want to Help?</h2>
+            </div>
+            <div class="card__content">
+                <p>This extension is developed completely as a hobby project in my free time. If you want to help me, even reaching out with a kind word is enough.</p>
+                <p>I would appreciate it if you can help spread the word and get the extension out into more people's hands.</p>
+                <p>For those that would like a more hands-on approach, you can contribute to the source code on <a href="https://github.com/OsaSoft/youtube-better-subscriptions/" target="_blank" rel="noopener">GitHub</a>. If you can't code, there are some non-coding things I'd very much appreciate help with (like prettier UI, screenshots, etc). Check out the <a href="https://github.com/OsaSoft/youtube-better-subscriptions/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3A%22help+wanted%22" target="_blank" rel="noopener">issues with the "Help Wanted" tag</a>.</p>
+            </div>
+        </section>
 
-<h2>What's new in version 0.21.4?</h2>
-<ul>
-  <li>Improved support for YouTube's January 2026 layout update</li>
-  <li>Redesigned settings loader with local-first approach for faster initialization</li>
-</ul>
+        <!-- Complete Changelog Card -->
+        <section class="card changelog-card">
+            <div class="card__header">
+                <svg class="card__icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                </svg>
+                <h2 class="card__title">Complete Changelog</h2>
+            </div>
+            <div class="card__content changelog-content">
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.21.4</h3>
+                    <ul class="version-entry__changes">
+                        <li>Improved support for YouTube's January 2026 layout update</li>
+                        <li>Redesigned settings loader with local-first approach</li>
+                    </ul>
+                </article>
 
-<h2>Contributor thank you</h2>
-<p>
-  Massive kudos to <a href="https://github.com/mocanew">Valentin Mocanu</a> for the tackling the sync storage,
-  which has been on my list to do since the very first version of this extension.
-</p>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.21.3</h3>
+                    <ul class="version-entry__changes">
+                        <li>Support for YouTube's January 2026 layout update</li>
+                    </ul>
+                </article>
 
-<h2>Want to help?</h2>
-<p>This extension is developed completely as a hobby project in my free time, if you want to help me, even reaching out
-  with a kind word is enough.</p>
-<p>Other than that, I would appreciate it if you can help spread the word and get the extension out into more people's
-  hands.</p>
-<p>For those that would like a more hands-on approach to helping, you can always contribute to the source code on <a
-  href="https://github.com/OsaSoft/youtube-better-subscriptions/">GitHub</a>, and if you can't code, there are some
-  non-coding things I'd very much appreciate
-  some help with (like prettier UI, screenshots, etc). You can see some of those in the <a
-    href="https://github.com/OsaSoft/youtube-better-subscriptions/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3A%22help+wanted%22">
-    Github issues with the "Help Wanted" tag</a></p>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.21.2</h3>
+                    <ul class="version-entry__changes">
+                        <li>Fix YT premieres not hidden when config enabled</li>
+                    </ul>
+                </article>
 
-<h2>Complete changelog</h2>
-<dl>
-  <dt>0.21.4</dt>
-  <dd>Improved support for YouTube's January 2026 layout update</dd>
-  <dd>Redesigned settings loader with local-first approach</dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.21.1</h3>
+                    <ul class="version-entry__changes">
+                        <li>Fix YT's new progress bar not being detected to mark video as watched</li>
+                    </ul>
+                </article>
 
-  <dt>0.21.3</dt>
-  <dd>Support for YouTube's January 2026 layout update</dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.21.0</h3>
+                    <ul class="version-entry__changes">
+                        <li>Support for subscription feed list view</li>
+                    </ul>
+                </article>
 
-  <dt>0.21.2</dt>
-  <dd>Fix YT premieres not hidden when config enabled</dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.20.0</h3>
+                    <ul class="version-entry__changes">
+                        <li>Support for Chrome's v3 manifest</li>
+                    </ul>
+                </article>
 
-  <dt>0.21.1</dt>
-  <dd>Fix YT's new progress bar not being detected to mark video as watched</dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.19.2</h3>
+                    <ul class="version-entry__changes">
+                        <li>Support YouTube's updated layout</li>
+                    </ul>
+                </article>
 
-  <dt>0.21.0</dt>
-  <dd>Support for subscription feed list view</dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.19.0</h3>
+                    <ul class="version-entry__changes">
+                        <li>Sync watch history across devices (using same browser)</li>
+                    </ul>
+                </article>
 
-  <dt>0.20.0</dt>
-  <dd>Support for Chrome's v3 manifest</dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.18.0</h3>
+                    <ul class="version-entry__changes">
+                        <li>Enable UI for channel's live video (livestream) history</li>
+                        <li>Moved forced-grid rules in css to improve performance</li>
+                        <li>Enabled forced grid layout on all page</li>
+                        <li>Fix: shorts video query catch "Latest YouTube posts" too</li>
+                    </ul>
+                </article>
 
-  <dt>0.19.2</dt>
-  <dd>Support YouTube's updated layout</dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.17.6</h3>
+                    <ul class="version-entry__changes">
+                        <li>Enable UI for channel's live video (livestream) history</li>
+                        <li>Moved forced-grid rules in css to improve performance</li>
+                        <li>Enabled forced grid layout on all page</li>
+                        <li>Fix: shorts video query catch "Latest YouTube posts" too</li>
+                    </ul>
+                </article>
 
-  <dt>v0.19.0</dt>
-  <dd>Sync watch history across devices (using same browser)</dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.17.5</h3>
+                    <ul class="version-entry__changes">
+                        <li>Fix YT grid layout, where hidden videos were leaving blank spaces at the end of rows</li>
+                    </ul>
+                </article>
 
-  <dt>v0.18.0</dt>
-  <dd>Enable UI for channel's live video (livestream) history</dd>
-  <dd>Moved forced-grid rules in css to improve performance</dd>
-  <dd>Enabled forced grid layout on all page</dd>
-  <dd>Fix: shorts video query catch "Latest YouTube posts" too</dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.17.4</h3>
+                    <ul class="version-entry__changes">
+                        <li>Fix inline ads without link breaking functionality</li>
+                        <li>Fix YT update breaking functionality (again, thanks YT)</li>
+                    </ul>
+                </article>
 
-  <dt>v0.17.6</dt>
-  <dd>Enable UI for channel's live video (livestream) history</dd>
-  <dd>Moved forced-grid rules in css to improve performance</dd>
-  <dd>Enabled forced grid layout on all page</dd>
-  <dd>Fix: shorts video query catch "Latest YouTube posts" too</dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.17.3</h3>
+                    <ul class="version-entry__changes">
+                        <li>Fixed shorts not being marked as watched automatically upon viewing (if setting is enabled)</li>
+                        <li>Fixed YT UI update breaking the "Mark as watched" overlay on both the subscriptions and channel videos pages</li>
+                    </ul>
+                </article>
 
-  <dt>v0.17.5</dt>
-  <dd>Fix YT grid layout, where hidden videos were leaving blank spaces at the end of rows.</dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.17.2</h3>
+                    <ul class="version-entry__changes">
+                        <li>Fixed issue where setting option for using YT's watched state to mark as watched to off was ignored</li>
+                        <li>Removed support for legacy YouTube (pre-Polymer)</li>
+                    </ul>
+                </article>
 
-  <dt>v0.17.4</dt>
-  <dd>Fix inline ads without link breaking functionality.</dd>
-  <dd>Fix YT update breaking functionality (again, thanks YT).</dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.17.1</h3>
+                    <ul class="version-entry__changes">
+                        <li>Fixed issue where YT design update caused the detection of videos and therefore hiding them to break on channel video pages</li>
+                    </ul>
+                </article>
 
-  <dt>v0.17.3</dt>
-  <dd>Fixed shorts not being marked as watched automatically upon viewing (if setting is enabled).</dd>
-  <dd>
-    Fixed YT UI update breaking the "Mark as watched" overlay on both the subscriptions and channel videos pages.<\br>
-    Not the prettiest fix, but it works for now. Since I don't have access to the old overlay, not sure
-    what the impact on that will be (most likely the button visible at all times, not just on hover).
-  </dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.17.0</h3>
+                    <ul class="version-entry__changes">
+                        <li>Now you can auto-hide (mark as watched) Shorts! This behaviour is off by default, so you'll have to turn it on in the settings page</li>
+                        <li>Fixed issue with new layout YT is rolling out that broke the feed when a Short was included</li>
+                        <li>Fixed some issues with the settings page not loading correctly in certain cases</li>
+                    </ul>
+                </article>
 
-  <dt>v0.17.2</dt>
-  <dd>Fixed issue where setting option for using YT's watched state to mark as watched to off was ignored.</dd>
-  <dd>Removed support for legacy YouTube&trade; (pre-Polymer). Afaik it hasn't been used for a long time.</dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.16.1</h3>
+                    <ul class="version-entry__changes">
+                        <li>Now you can hide premieres until they are available to watch! Enable this feature in the settings</li>
+                        <li>Mark as Watched toggle is back. Cause for disappearance was YT changing the name of their toggle element</li>
+                    </ul>
+                </article>
 
-  <dt>v0.17.1</dt>
-  <dd>Fixed issue where YT design update caused the detection of videos and therefore hiding them to break on channel
-    video pages.
-  </dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.15.2</h3>
+                    <ul class="version-entry__changes">
+                        <li>Fix: "Use YouTube's watched gauge" Settings should now correctly save</li>
+                    </ul>
+                </article>
 
-  <dt>v0.17.0</dt>
-  <dd>Now you can auto-hide (mark as watched) Shorts! This behaviour is off by default, so you'll have to turn it on in
-    the settings page.
-  </dd>
-  <dd>Fixed issue with new layout YT is rolling out that broke the feed when a Short was included.</dd>
-  <dd>Fixed some issues with the settings page not loading correctly in certain cases.</dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.15.1</h3>
+                    <ul class="version-entry__changes">
+                        <li>Fix: Changelog should now only be shown once per version (not with every browser update)</li>
+                    </ul>
+                </article>
 
-  <dt>v0.16.1</dt>
-  <dd>Now you can hide premieres until they are available to watch! Enable this feature in the settings.</dd>
-  <dd>Mark as Watched toggle is back. Cause for disappearance was YT changing the name of their toggle element.</dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.15.0</h3>
+                    <ul class="version-entry__changes">
+                        <li>Reintroduced ability to automatically mark as watched videos marked by YouTube (using red bar on bottom of thumbnail)</li>
+                    </ul>
+                </article>
 
-  <dt>v0.15.2</dt>
-  <dd>Fix: "Use YouTube™'s watched gauge" Settings should now correctly save</dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.14.1</h3>
+                    <ul class="version-entry__changes">
+                        <li>Hotfix: Fix missing Mark as watched button</li>
+                    </ul>
+                </article>
 
-  <dt>v0.15.1</dt>
-  <dd>Fix: Changelog should now only be shown once per version (not with every browser update)</dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.14</h3>
+                    <ul class="version-entry__changes">
+                        <li>Added hiding watched videos on the YouTube homepage</li>
+                        <li>Added hiding watched videos on Channel videos page</li>
+                        <li>Removed using YT's watched status, as its unreliable. Might readd in some form later</li>
+                        <li>Added new settings</li>
+                        <li>Improved settings page UI</li>
+                        <li>Fix sometimes marked videos not displaying correctly</li>
+                        <li>Fix icon repeat in ui</li>
+                        <li>Fix watched icon</li>
+                        <li>Fix issue in Chrome causing inability to clear storage</li>
+                    </ul>
+                </article>
 
-  <dt>v0.15.0</dt>
-  <dd>Reintroduced ability to automatically mark as watched videos marked by YouTube&trade; (using red bar on bottom of
-    thumbnail)
-  </dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.13.1</h3>
+                    <ul class="version-entry__changes">
+                        <li>This version fixes YouTube's slight change to their DOM layout in a recent update, which caused the extension to stop working</li>
+                    </ul>
+                </article>
 
-  <dt>v0.14.1</dt>
-  <dd>Hotfix: Fix missing Mark as watched button</dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.13</h3>
+                    <ul class="version-entry__changes">
+                        <li>Added basic functionality to the settings page. Now supports saving and loading of configuration</li>
+                        <li>Added basic configuration for subs feed to settings page</li>
+                        <li>Added watched list export/import/clearing to settings page</li>
+                        <li>Added settings menu to subs page UI</li>
+                    </ul>
+                </article>
 
-  <dt>v0.14</dt>
-  <dd>Added hiding watched videos on the YouTube homepage.</dd>
-  <dd>Added hiding watched videos on Channel videos page.</dd>
-  <dd>Removed using YT's watched status, as its unreliable. Might readd in some form later</dd>
-  <dd>Added new settings</dd>
-  <dd>Improved settings page UI</dd>
-  <dd>Fix sometimes marked videos not displaying correctly</dd>
-  <dd>Fix icon repeat in ui</dd>
-  <dd>Fix watched icon</dd>
-  <dd>Fix issue in Chrome causing inability to clear storage</dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.12</h3>
+                    <ul class="version-entry__changes">
+                        <li>Replaced Hide Watched checkbox with prettier, YouTube style toggle button</li>
+                        <li>Added settings page. Empty for now</li>
+                    </ul>
+                </article>
 
-  <dt>v0.13.1</dt>
-  <dd>This version fixes YouTube's slight change to their DOM layout in a recent update, which caused the extension to
-    stop working.
-  </dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.11</h3>
+                    <ul class="version-entry__changes">
+                        <li>Added changelog page that opens when extension updates</li>
+                        <li>Fixed bug where extension would not active properly on pages in some cases (<a href="https://github.com/OsaSoft/youtube-better-subscriptions/issues/56" target="_blank" rel="noopener">#56</a>)</li>
+                    </ul>
+                </article>
 
-  <dt>v0.13</dt>
-  <dd>Added basic functionality to the settings page. Now supports saving and loading of configuration.</dd>
-  <dd>Added basic configuration for subs feed to settings page.</dd>
-  <dd>Added watched list export/import/clearing to seetings page.</dd>
-  <dd>Added settings menu to subs page UI</dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.10</h3>
+                    <ul class="version-entry__changes">
+                        <li>Sections now have a checkbox that collapses them, fixed alignment of Hide Watched and Mark All as Watched buttons</li>
+                    </ul>
+                </article>
 
-  <dt>v0.12</dt>
-  <dd>Replaced Hide Watched checkbox with prettier, YouTube&trade; style toggle button</dd>
-  <dd>Added settings page. Empty for now.</dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.9</h3>
+                    <ul class="version-entry__changes">
+                        <li>Sections with no visible videos in it are now hidden</li>
+                    </ul>
+                </article>
 
-  <dt>v0.11</dt>
-  <dd>Added changelog page that opens when extension updates</dd>
-  <dd>Fixed bug where extension would not active properly on pages in some cases (<a
-    href="https://github.com/OsaSoft/youtube-better-subscriptions/issues/56">#56</a>)
-  </dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.8.1</h3>
+                    <ul class="version-entry__changes">
+                        <li>Fixed bug where video loading wouldn't trigger in certain situations</li>
+                    </ul>
+                </article>
 
-  <dt>v0.10</dt>
-  <dd>Sections now have a checkbox that collapses them, fixed alignment of Hide Watched and Mark All as Watched
-    buttons
-  </dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.8</h3>
+                    <ul class="version-entry__changes">
+                        <li>Added watched overlay and Mark as not watched button to marked videos when not hidden</li>
+                    </ul>
+                </article>
 
-  <dt>v0.9</dt>
-  <dd>Sections with no visible videos in it are now hidden</dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.7.1</h3>
+                    <ul class="version-entry__changes">
+                        <li>Fixed several issues with old YT non-Polymer layout</li>
+                    </ul>
+                </article>
 
-  <dt>v0.8.1</dt>
-  <dd>Fixed bug where video loading wouldn't trigger in certain situations</dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.7</h3>
+                    <ul class="version-entry__changes">
+                        <li>Plugin now activates on all YT pages and depending on location decides what to do</li>
+                        <li>Moved buttons to top bar</li>
+                        <li>Switched to new, more concise versioning scheme: &lt;major&gt;.&lt;minor&gt;.&lt;hotfix&gt;, where hotfix version is omitted when 0</li>
+                    </ul>
+                </article>
 
-  <dt>v0.8</dt>
-  <dd>Added watched overlay and Mark as not watched button to marked videos when not hidden</dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.6.1</h3>
+                    <ul class="version-entry__changes">
+                        <li>Mark all as watched button added</li>
+                    </ul>
+                </article>
 
-  <dt>v0.7.1</dt>
-  <dd>Fixed several issues with old YT non-Polymer layout</dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.6</h3>
+                    <ul class="version-entry__changes">
+                        <li>Videos are now hidden automatically in field once you start watching a video, even without refreshing the feed page</li>
+                        <li>Prettier Mark as Watched button</li>
+                        <li>Performance increase</li>
+                    </ul>
+                </article>
 
-  <dt>v0.7</dt>
-  <dd>Plugin now activates on all YT pages and depending on location decides what to do</dd>
-  <dd>Moved buttons to top bar</dd>
-  <dd>Switched to new, more concise versioning scheme: &lt;major&gt;.&lt;minor&gt;.&lt;hotfix&gt;, where hotfix version
-    is omitted when 0
-  </dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.5</h3>
+                    <ul class="version-entry__changes">
+                        <li>Mark as watched button added</li>
+                    </ul>
+                </article>
 
-  <dt>v0.6.1</dt>
-  <dd>Mark all as watched button added</dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.2</h3>
+                    <ul class="version-entry__changes">
+                        <li>The Hide Watched button is now placed in the top right menu and changes color depending on light/dark mode in the new YT layout</li>
+                    </ul>
+                </article>
 
-  <dt>v0.6</dt>
-  <dd>Videos are now hidden automatically in field once you start watching a video, even without refreshing the feed
-    page.
-  </dd>
-  <dd>Prettier Mark as Watched button</dd>
-  <dd>Performance increase</dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.1.4</h3>
+                    <ul class="version-entry__changes">
+                        <li>Fixed bug with hidden videos not reappearing after unchecking Hide Watched</li>
+                        <li>When using YouTube's HIDE button, the thumbnail area will be automatically hidden</li>
+                    </ul>
+                </article>
 
-  <dt>v0.5</dt>
-  <dd>Mark as watched button added</dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.1.3</h3>
+                    <ul class="version-entry__changes">
+                        <li>Fix for YouTube's new late-loading of watched status and fix for watched not being hidden when loading more</li>
+                    </ul>
+                </article>
 
-  <dt>v0.2</dt>
-  <dd>The Hide Watched button is now placed in the top right menu and changes
-    color depending on light/dark mode in the new YT layout
-  </dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.1.2</h3>
+                    <ul class="version-entry__changes">
+                        <li>Addon now works for YouTube's new design</li>
+                    </ul>
+                </article>
 
-  <dt>v0.1.4</dt>
-  <dd>Fixed bug with hidden videos not reappearing after unchecking Hide Watched
-    when using YouTube's HIDE button, the thumbnail area will be automatically hidden
-  </dd>
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.1</h3>
+                    <ul class="version-entry__changes">
+                        <li>First proof of concept version. Can hide and show videos</li>
+                    </ul>
+                </article>
+            </div>
+        </section>
 
-  <dt>v0.1.3</dt>
-  <dd>Fix for YouTube's new late-loading of watched status and fix for watched not being hidden when loading
-    more
-  </dd>
-
-  <dt>v0.1.2</dt>
-  <dd>Addon now works for YouTube's new design</dd>
-
-  <dt>v0.1</dt>
-  <dd>First proof of concept version. Can hide and show videos</dd>
-</dl>
+        <!-- Footer -->
+        <footer class="page-footer">
+            <p class="page-footer__text">
+                Feel free to reach out on Twitter
+                <a href="https://twitter.com/Osa_Soft" class="page-footer__link" target="_blank" rel="noopener">@Osa_Soft</a>
+                or report issues on
+                <a href="https://github.com/OsaSoft/youtube-better-subscriptions/issues" class="page-footer__link" target="_blank" rel="noopener">GitHub</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>
