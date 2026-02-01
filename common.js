@@ -15,6 +15,7 @@ const DEFAULT_SETTINGS = {
     "settings.hide.premieres": false,
     "settings.hide.shorts": false,
     "settings.hide.lives": false,
+    "settings.hide.members.only": false,
 };
 
 const SETTINGS_KEY = "settings";

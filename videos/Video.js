@@ -71,6 +71,13 @@ function isLivestream(item) {
     return liveBadge != null;
 }
 
+function isMembersOnly(item) {
+    // Check for membership badge using CSS class (language-independent)
+    // The class yt-badge-shape--membership is used for members-only content
+    let memberBadge = item.containingDiv.querySelector(".yt-badge-shape--membership");
+    return memberBadge != null;
+}
+
 function changeMarkWatchedToMarkUnwatched(item) {
     // find Mark as watched button and change it to Unmark as watched
     let metaDataLine = item.querySelector("#" + METADATA_LINE);
@@ -94,6 +101,10 @@ class Video {
         // Detect livestream first (language-independent via CSS class)
         this.isLivestream = isLivestream(this);
         logDebug("Checking video " + this.videoId + " for livestream: " + this.isLivestream);
+
+        // Detect members-only content (language-independent via CSS class)
+        this.isMembersOnly = isMembersOnly(this);
+        logDebug("Checking video " + this.videoId + " for members-only: " + this.isMembersOnly);
 
         // Only mark as premiere if no duration AND not a livestream
         logDebug("Checking video " + this.videoId + " for premiere: duration = " + this.videoDuration);
@@ -124,7 +135,8 @@ class Video {
                 (hideWatched && this.isStored) ||
                 (hidePremieres && this.isPremiere) ||
                 (hideShorts && this.isShort) ||
-                (hideLives && this.isLivestream)
+                (hideLives && this.isLivestream) ||
+                (hideMembersOnly && this.isMembersOnly)
         );
     }
 
