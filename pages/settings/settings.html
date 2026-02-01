@@ -1,177 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Better Subscriptions for YouTube</title>
 
-  <title>Settings for Better Subscriptions for YouTube&trade;</title>
+    <link rel="stylesheet" type="text/css" href="../../common.css"/>
+    <link rel="stylesheet" type="text/css" href="settings.css"/>
 
-  <link rel="stylesheet" type="text/css" href="../../common.css"/>
-  <link rel="stylesheet" type="text/css" href="settings.css"/>
-
-  <script src="../../common.js"></script>
-  <script src="../../settingsLoader.js"></script>
-  <script src="../../util.js"></script>
-  <script src="settings.js"></script>
+    <script src="../../common.js"></script>
+    <script src="../../settingsLoader.js"></script>
+    <script src="../../util.js"></script>
+    <script src="settings.js"></script>
 </head>
 <body>
-<div class="settings__container">
-  <h1>Settings for Better Subscriptions for YouTube&trade;</h1>
+    <div class="settings-container">
+        <!-- Header -->
+        <header class="settings-header">
+            <img src="../../icons/ic_video_library_black_48dp_1x.png" alt="Extension icon" class="settings-header__logo">
+            <div class="settings-header__content">
+                <h1 class="settings-header__title">Better Subscriptions for YouTube</h1>
+                <p class="settings-header__subtitle">Customize your subscription feed experience</p>
+            </div>
+        </header>
 
-  <h2>Subscriptions Feed</h2>
+        <!-- Subscriptions Feed Card -->
+        <section class="settings-card" id="settings-subscriptions">
+            <div class="settings-card__header">
+                <svg class="settings-card__icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8 12.5v-9l6 4.5-6 4.5z"/>
+                </svg>
+                <h2 class="settings-card__title">Subscriptions Feed</h2>
+            </div>
+            <div class="settings-card__content">
+                <!-- Loading spinner (single instance) -->
+                <div class="sk-circle loading-spinner">
+                    <div class="sk-circle1 sk-child"></div>
+                    <div class="sk-circle2 sk-child"></div>
+                    <div class="sk-circle3 sk-child"></div>
+                    <div class="sk-circle4 sk-child"></div>
+                    <div class="sk-circle5 sk-child"></div>
+                    <div class="sk-circle6 sk-child"></div>
+                    <div class="sk-circle7 sk-child"></div>
+                    <div class="sk-circle8 sk-child"></div>
+                    <div class="sk-circle9 sk-child"></div>
+                    <div class="sk-circle10 sk-child"></div>
+                    <div class="sk-circle11 sk-child"></div>
+                    <div class="sk-circle12 sk-child"></div>
+                </div>
 
-  <div class="sk-circle">
-    <div class="sk-circle1 sk-child"></div>
-    <div class="sk-circle2 sk-child"></div>
-    <div class="sk-circle3 sk-child"></div>
-    <div class="sk-circle4 sk-child"></div>
-    <div class="sk-circle5 sk-child"></div>
-    <div class="sk-circle6 sk-child"></div>
-    <div class="sk-circle7 sk-child"></div>
-    <div class="sk-circle8 sk-child"></div>
-    <div class="sk-circle9 sk-child"></div>
-    <div class="sk-circle10 sk-child"></div>
-    <div class="sk-circle11 sk-child"></div>
-    <div class="sk-circle12 sk-child"></div>
-  </div>
+                <div class="settings-list hidden">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-title" id="setting-hide-watched-label-title">Show "Hide Watched" label</span>
+                            <span class="setting-description" id="setting-hide-watched-label-desc">Display the label text next to the hide watched button</span>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="settings.hide.watched.label" aria-labelledby="setting-hide-watched-label-title" aria-describedby="setting-hide-watched-label-desc">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
 
-  <div id="settings-subscriptions" class="hidden">
-    <form>
-      <input id="settings.hide.watched.label" type="checkbox"/>
-      <label for="settings.hide.watched.label">Show "Hide Watched" label</label><br/>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-title" id="setting-hide-watched-all-label-title">Show "Mark all as watched" label</span>
+                            <span class="setting-description" id="setting-hide-watched-all-label-desc">Display the label text next to the mark all button</span>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="settings.hide.watched.all.label" aria-labelledby="setting-hide-watched-all-label-title" aria-describedby="setting-hide-watched-all-label-desc">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
 
-      <input id="settings.hide.watched.all.label" type="checkbox"/>
-      <label for="settings.hide.watched.all.label">Show "Mark all as watched" label</label><br/>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-title" id="setting-ui-stick-right-title">Stick UI to the right menu</span>
+                            <span class="setting-description" id="setting-ui-stick-right-desc">Position the extension controls on the right side of the page</span>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="settings.hide.watched.ui.stick.right" aria-labelledby="setting-ui-stick-right-title" aria-describedby="setting-ui-stick-right-desc">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
 
-      <input id="settings.hide.watched.ui.stick.right" type="checkbox"/>
-      <label for="settings.hide.watched.ui.stick.right">Stick UI to the right menu</label><br/>
-      <br/>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-title" id="setting-hide-watched-default-title">Hide watched by default</span>
+                            <span class="setting-description" id="setting-hide-watched-default-desc">Automatically hide watched videos when loading the subscriptions page</span>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="settings.hide.watched.default" aria-labelledby="setting-hide-watched-default-title" aria-describedby="setting-hide-watched-default-desc">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
 
-      <input id="settings.hide.watched.default" type="checkbox"/>
-      <label for="settings.hide.watched.default">Hide watched default state</label><br/>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-title" id="setting-keep-state-title">Keep hide state through navigation</span>
+                            <span class="setting-description" id="setting-keep-state-desc">Preserve the "Hide Watched" checkbox state when navigating to other pages and back</span>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="settings.hide.watched.keep.state" aria-labelledby="setting-keep-state-title" aria-describedby="setting-keep-state-desc">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
 
-      <input id="settings.hide.watched.keep.state" type="checkbox"/>
-      <label for="settings.hide.watched.keep.state">
-        Keep the state of "Hide Watched" checkbox through navigation
-        (allows you to go on video/channel/sub/etc pages and save the state of "Hide Watched" checkbox despite the
-        default value (it will be applied on reload).)
-      </label><br/>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-title" id="setting-youtube-watched-title">Use YouTube's watched indicator</span>
+                            <span class="setting-description" id="setting-youtube-watched-desc">Mark videos as watched based on YouTube's red progress bar. Requires page reload to apply.</span>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="settings.mark.watched.youtube.watched" aria-labelledby="setting-youtube-watched-title" aria-describedby="setting-youtube-watched-desc">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
 
-      <!--TODO allow percentage selection -->
-      <input id="settings.mark.watched.youtube.watched" type="checkbox"/>
-      <label for="settings.mark.watched.youtube.watched">
-        Use YouTube&trade;'s watched gauge (red bar on bottom of thumbnail) to mark as watched.
-        (Unchecking will NOT affect videos already marked using this. Requires sub feed page reload to be applied)
-      </label><br/>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-title" id="setting-hide-premieres-title">Hide Premieres</span>
+                            <span class="setting-description" id="setting-hide-premieres-desc">Hide premiere videos until they are available to watch</span>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="settings.hide.premieres" aria-labelledby="setting-hide-premieres-title" aria-describedby="setting-hide-premieres-desc">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
 
-      <input id="settings.hide.premieres" type="checkbox"/>
-      <label for="settings.hide.premieres">Hide Premieres until they are available to watch</label><br/>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-title" id="setting-hide-shorts-title">Hide Shorts</span>
+                            <span class="setting-description" id="setting-hide-shorts-desc">Automatically hide YouTube Shorts from your feed</span>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="settings.hide.shorts" aria-labelledby="setting-hide-shorts-title" aria-describedby="setting-hide-shorts-desc">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
 
-      <input id="settings.hide.shorts" type="checkbox"/>
-      <label for="settings.hide.shorts">Hide Shorts automatically</label><br/>
-      <br/>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-title">Feed refresh rate</span>
+                            <span class="setting-description">How often to check for and hide watched videos (only when "Hide Watched" is active)</span>
+                        </div>
+                        <div class="input-group">
+                            <input type="number" id="settings.hide.watched.refresh.rate" class="input-number" min="100" step="100">
+                            <span class="input-unit">ms</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-      <label for="settings.hide.watched.refresh.rate">Refresh rate for feed clearing (milliseconds)</label>
-      <input id="settings.hide.watched.refresh.rate" type="number"/><br/>
-      <label for="settings.hide.watched.refresh.rate">(currently works only in "hide watched" state)</label>
+        <!-- Other Pages Card -->
+        <section class="settings-card" id="settings-support-pages">
+            <div class="settings-card__header">
+                <svg class="settings-card__icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                </svg>
+                <h2 class="settings-card__title">Other YouTube Pages</h2>
+            </div>
+            <div class="settings-card__content">
+                <div class="sk-circle loading-spinner">
+                    <div class="sk-circle1 sk-child"></div>
+                    <div class="sk-circle2 sk-child"></div>
+                    <div class="sk-circle3 sk-child"></div>
+                    <div class="sk-circle4 sk-child"></div>
+                    <div class="sk-circle5 sk-child"></div>
+                    <div class="sk-circle6 sk-child"></div>
+                    <div class="sk-circle7 sk-child"></div>
+                    <div class="sk-circle8 sk-child"></div>
+                    <div class="sk-circle9 sk-child"></div>
+                    <div class="sk-circle10 sk-child"></div>
+                    <div class="sk-circle11 sk-child"></div>
+                    <div class="sk-circle12 sk-child"></div>
+                </div>
 
-    </form>
-  </div>
+                <div class="settings-list hidden">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-title" id="setting-support-channel-title">Enable on channel pages</span>
+                            <span class="setting-description" id="setting-support-channel-desc">Show extension controls on channel video pages</span>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="settings.hide.watched.support.channel" aria-labelledby="setting-support-channel-title" aria-describedby="setting-support-channel-desc">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
 
-  <h2>Other YouTube&trade; pages</h2>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-title" id="setting-support-home-title">Enable on homepage</span>
+                            <span class="setting-description" id="setting-support-home-desc">Show extension controls on the YouTube homepage</span>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="settings.hide.watched.support.home" aria-labelledby="setting-support-home-title" aria-describedby="setting-support-home-desc">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-  <div class="sk-circle">
-    <div class="sk-circle1 sk-child"></div>
-    <div class="sk-circle2 sk-child"></div>
-    <div class="sk-circle3 sk-child"></div>
-    <div class="sk-circle4 sk-child"></div>
-    <div class="sk-circle5 sk-child"></div>
-    <div class="sk-circle6 sk-child"></div>
-    <div class="sk-circle7 sk-child"></div>
-    <div class="sk-circle8 sk-child"></div>
-    <div class="sk-circle9 sk-child"></div>
-    <div class="sk-circle10 sk-child"></div>
-    <div class="sk-circle11 sk-child"></div>
-    <div class="sk-circle12 sk-child"></div>
-  </div>
+        <!-- General Settings Card -->
+        <section class="settings-card" id="settings-general">
+            <div class="settings-card__header">
+                <svg class="settings-card__icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+                </svg>
+                <h2 class="settings-card__title">General</h2>
+            </div>
+            <div class="settings-card__content">
+                <div class="sk-circle loading-spinner">
+                    <div class="sk-circle1 sk-child"></div>
+                    <div class="sk-circle2 sk-child"></div>
+                    <div class="sk-circle3 sk-child"></div>
+                    <div class="sk-circle4 sk-child"></div>
+                    <div class="sk-circle5 sk-child"></div>
+                    <div class="sk-circle6 sk-child"></div>
+                    <div class="sk-circle7 sk-child"></div>
+                    <div class="sk-circle8 sk-child"></div>
+                    <div class="sk-circle9 sk-child"></div>
+                    <div class="sk-circle10 sk-child"></div>
+                    <div class="sk-circle11 sk-child"></div>
+                    <div class="sk-circle12 sk-child"></div>
+                </div>
 
-  <div id="settings-support-pages" class="hidden">
-    <form>
-      <input id="settings.hide.watched.support.channel" type="checkbox"/>
-      <label for="settings.hide.watched.support.channel">Enable extension for channel videos page</label><br/>
-      <input id="settings.hide.watched.support.home" type="checkbox"/>
-      <label for="settings.hide.watched.support.home">Enable extension for YouTube&trade; Homepage</label>
-    </form>
-  </div>
+                <div class="settings-list hidden">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-title" id="setting-auto-store-title">Auto-mark videos as watched</span>
+                            <span class="setting-description" id="setting-auto-store-desc">Automatically mark videos as watched when you click on them</span>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="settings.hide.watched.auto.store" aria-labelledby="setting-auto-store-title" aria-describedby="setting-auto-store-desc">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
 
-  <h2>General settings</h2>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-title">Log level</span>
+                            <span class="setting-description">Control how much information is logged to the browser console</span>
+                        </div>
+                        <div class="select-wrapper">
+                            <select id="settings.log.level" class="select-dropdown">
+                                <option value="1">Errors only</option>
+                                <option value="2">Warnings</option>
+                                <option value="3">Info</option>
+                                <option value="4">Debug (verbose)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-  <div class="sk-circle">
-    <div class="sk-circle1 sk-child"></div>
-    <div class="sk-circle2 sk-child"></div>
-    <div class="sk-circle3 sk-child"></div>
-    <div class="sk-circle4 sk-child"></div>
-    <div class="sk-circle5 sk-child"></div>
-    <div class="sk-circle6 sk-child"></div>
-    <div class="sk-circle7 sk-child"></div>
-    <div class="sk-circle8 sk-child"></div>
-    <div class="sk-circle9 sk-child"></div>
-    <div class="sk-circle10 sk-child"></div>
-    <div class="sk-circle11 sk-child"></div>
-    <div class="sk-circle12 sk-child"></div>
-  </div>
+        <!-- Save Button -->
+        <div class="save-container">
+            <button id="settings-save" class="btn btn-primary">
+                <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
+                </svg>
+                Save Settings
+            </button>
+        </div>
 
-  <div id="settings-general" class="hidden">
-    <form>
-      <input id="settings.hide.watched.auto.store" type="checkbox"/>
-      <label for="settings.hide.watched.auto.store">
-        Set video as watched when you click on it.
-        (Disabling this means videos are only marked as watched when you click the 'Mark as watched' icon)
-      </label><br/>
+        <!-- Data Management Card -->
+        <section class="settings-card" id="settings-watched-manipulation">
+            <div class="settings-card__header">
+                <svg class="settings-card__icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                </svg>
+                <h2 class="settings-card__title">Data Management</h2>
+            </div>
+            <div class="settings-card__content">
+                <div class="sk-circle loading-spinner">
+                    <div class="sk-circle1 sk-child"></div>
+                    <div class="sk-circle2 sk-child"></div>
+                    <div class="sk-circle3 sk-child"></div>
+                    <div class="sk-circle4 sk-child"></div>
+                    <div class="sk-circle5 sk-child"></div>
+                    <div class="sk-circle6 sk-child"></div>
+                    <div class="sk-circle7 sk-child"></div>
+                    <div class="sk-circle8 sk-child"></div>
+                    <div class="sk-circle9 sk-child"></div>
+                    <div class="sk-circle10 sk-child"></div>
+                    <div class="sk-circle11 sk-child"></div>
+                    <div class="sk-circle12 sk-child"></div>
+                </div>
 
-      <label for="settings.log.level">Log level</label>
-      <select id="settings.log.level">
-        <option value="1">Errors only</option>
-        <option value="2">Warnings</option>
-        <option value="3">Info</option>
-        <option value="4">Debug (verbose)</option>
-      </select><br/>
-    </form>
-  </div>
+                <div class="settings-list hidden">
+                    <div class="data-action">
+                        <div class="data-action__info">
+                            <span class="data-action__title">Export watched videos</span>
+                            <span class="data-action__description">Download a backup of all your watched videos as a JSON file</span>
+                        </div>
+                        <button id="watched.export" class="btn btn-secondary">
+                            <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                            </svg>
+                            Export
+                        </button>
+                    </div>
 
-  <button id="settings-save">Save Settings</button>
+                    <div class="data-action">
+                        <div class="data-action__info">
+                            <span class="data-action__title">Import watched videos</span>
+                            <span class="data-action__description">Restore watched videos from a previously exported JSON file</span>
+                            <div class="data-action__controls">
+                                <input id="watched.import.file" type="file" accept=".json" class="file-input">
+                            </div>
+                        </div>
+                        <button id="watched.import" class="btn btn-secondary">
+                            <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/>
+                            </svg>
+                            Import
+                        </button>
+                    </div>
 
-  <h2>Watched videos list actions</h2>
+                    <div class="data-action">
+                        <div class="data-action__info">
+                            <span class="data-action__title">Clear all watched videos</span>
+                            <span class="data-action__description">Permanently delete all watched video data. This action cannot be undone.</span>
+                        </div>
+                        <button id="watched.clear" class="btn btn-danger">
+                            <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                            </svg>
+                            Clear Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-  <div class="sk-circle">
-    <div class="sk-circle1 sk-child"></div>
-    <div class="sk-circle2 sk-child"></div>
-    <div class="sk-circle3 sk-child"></div>
-    <div class="sk-circle4 sk-child"></div>
-    <div class="sk-circle5 sk-child"></div>
-    <div class="sk-circle6 sk-child"></div>
-    <div class="sk-circle7 sk-child"></div>
-    <div class="sk-circle8 sk-child"></div>
-    <div class="sk-circle9 sk-child"></div>
-    <div class="sk-circle10 sk-child"></div>
-    <div class="sk-circle11 sk-child"></div>
-    <div class="sk-circle12 sk-child"></div>
-  </div>
+        <!-- Footer -->
+        <footer class="settings-footer">
+            <p class="settings-footer__text">
+                Have a suggestion or found a bug?
+                <a href="https://github.com/OsaSoft/youtube-better-subscriptions/issues" class="settings-footer__link" target="_blank" rel="noopener">
+                    Open an issue on GitHub
+                </a>
+            </p>
+            <p class="settings-footer__version">Version <span id="extension-version"></span></p>
+        </footer>
+    </div>
 
-  <div id="settings-watched-manipulation" class="hidden">
-    <button id="watched.export">Export watched videos</button>
-    <br/>
-    <br/>
-    <button id="watched.import">Import watched videos</button>
-    <input id="watched.import.file" type="file"/><br/>
-    <br/>
-    <button id="watched.clear">Clear watched videos</button>
-  </div>
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
 
-  <br/>
-  <br/>
-  <br/>
-  <br/>
-  <br/>
-  <h4>Have a suggestion what else could go into the settings page or overall improve the addon? Something doesn't work
-    as it should? Please feel free to raise an issue on <a
-      href="https://github.com/OsaSoft/youtube-better-subscriptions/issues">GitHub</a></h4>
-</div>
+    <!-- Confirm Modal -->
+    <div id="confirm-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title">
+        <div class="modal__backdrop"></div>
+        <div class="modal__dialog">
+            <div class="modal__header">
+                <h3 class="modal__title" id="confirm-modal-title">Clear Watched Videos</h3>
+            </div>
+            <div class="modal__body">
+                <p>This will permanently delete all your watched video data.</p>
+                <p><strong>This action cannot be undone.</strong></p>
+            </div>
+            <div class="modal__footer">
+                <button id="modal-cancel" class="btn btn-secondary">Cancel</button>
+                <button id="modal-confirm" class="btn btn-danger">Clear Data</button>
+            </div>
+        </div>
+    </div>
 </body>
+</html>
