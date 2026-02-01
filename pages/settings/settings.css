@@ -1,5 +1,4 @@
-/* Import shared styles */
-@import url('../common-pages.css');
+/* Shared styles are loaded via HTML <link> (no CSS @import for performance) */
 
 /* Container */
 .settings-container {
