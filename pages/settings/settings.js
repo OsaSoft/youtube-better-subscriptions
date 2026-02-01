@@ -52,7 +52,7 @@ function saveSettings() {
         if (elem.matches('input[type="checkbox"]')) {
             values[elem.id] = elem.checked;
         } else if (elem.matches('select')) {
-            values[elem.id] = parseInt(elem.value);
+            values[elem.id] = parseInt(elem.value, 10);
         } else {
             values[elem.id] = elem.value;
         }
