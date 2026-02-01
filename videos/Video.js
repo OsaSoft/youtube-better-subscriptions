@@ -64,6 +64,13 @@ function getVideoDuration(item) {
     return null;
 }
 
+function isLivestream(item) {
+    // Check for LIVE badge using CSS class (language-independent)
+    // The class yt-badge-shape--thumbnail-live is used for live badges
+    let liveBadge = item.containingDiv.querySelector(".yt-badge-shape--thumbnail-live");
+    return liveBadge != null;
+}
+
 function changeMarkWatchedToMarkUnwatched(item) {
     // find Mark as watched button and change it to Unmark as watched
     let metaDataLine = item.querySelector("#" + METADATA_LINE);
@@ -84,8 +91,13 @@ class Video {
         this.buttonId = this.isStored ? MARK_UNWATCHED_BTN : MARK_WATCHED_BTN;
         this.videoDuration = getVideoDuration(this);
 
+        // Detect livestream first (language-independent via CSS class)
+        this.isLivestream = isLivestream(this);
+        logDebug("Checking video " + this.videoId + " for livestream: " + this.isLivestream);
+
+        // Only mark as premiere if no duration AND not a livestream
         logDebug("Checking video " + this.videoId + " for premiere: duration = " + this.videoDuration);
-        if (this.videoDuration == null) {
+        if (this.videoDuration == null && !this.isLivestream) {
             this.isPremiere = true;
         }
 
@@ -105,6 +117,15 @@ class Video {
 
     addButton() {
         throw Error("Subclasses must implement addButton method");
+    }
+
+    shouldHide() {
+        return Boolean(
+                (hideWatched && this.isStored) ||
+                (hidePremieres && this.isPremiere) ||
+                (hideShorts && this.isShort) ||
+                (hideLives && this.isLivestream)
+        );
     }
 
     hide() {

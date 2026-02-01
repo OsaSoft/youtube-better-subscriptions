@@ -2,6 +2,7 @@ let hidden = [];
 let hideWatched = null;
 let hidePremieres = null;
 let hideShorts = null;
+let hideLives = null;
 let intervalId = null;
 
 function isYouTubeWatched(item) {
@@ -108,6 +109,9 @@ async function initSubs() {
     }
     if (hideShorts == null) {
         hideShorts = settings["settings.hide.shorts"];
+    }
+    if (hideLives == null) {
+        hideLives = settings["settings.hide.lives"];
     }
 
     buildUI();

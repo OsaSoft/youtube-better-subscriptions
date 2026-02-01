@@ -262,11 +262,7 @@ function removeWatchedAndAddButton() {
 
         if (!vid.isStored && isYouTubeWatched(item)) {
             vid.markWatched();
-        } else if (
-            (hideWatched && vid.isStored) ||
-            (hidePremieres && vid.isPremiere) ||
-            (hideShorts && vid.isShort)
-        ) {
+        } else if (vid.shouldHide()) {
             vid.hide();
             hiddenCount++;
         }
