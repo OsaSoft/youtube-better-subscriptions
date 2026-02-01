@@ -44,13 +44,12 @@ function initExtension() {
     }
 
     function initPageHandler() {
+        // Method 1: Try the old progress bar element (for old layout)
         let pageLoader = document.querySelector("yt-page-navigation-progress");
 
-        //if the page loader element isnt ready, wait for it
-        if (pageLoader == null) {
-            window.requestAnimationFrame(initPageHandler);
-        } else {
-            log("Found page loader");
+        if (pageLoader != null) {
+            // Old layout - use existing MutationObserver approach
+            log("Found page loader (old layout)");
 
             let pageChangeObserver = new MutationObserver((mutations) => {
                 mutations.forEach((mutationRecord) => {
@@ -63,10 +62,14 @@ function initExtension() {
 
             //observe when the page loader becomes visible or hidden
             pageChangeObserver.observe(pageLoader, {attributes: true, attributeFilter: ['hidden']});
-
-            //first page doesnt trigger the event, so lets do it manually
-            handlePageChange();
+        } else {
+            // Method 2: New layout - use yt-navigate-finish event
+            log("Using yt-navigate-finish event (new layout)");
+            document.addEventListener('yt-navigate-finish', handlePageChange);
         }
+
+        // Handle initial page load regardless of method
+        handlePageChange();
     }
 
     log("Initializing...");

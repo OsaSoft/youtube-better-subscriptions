@@ -17,6 +17,7 @@ const DEFAULT_SETTINGS = {
 };
 
 const SETTINGS_KEY = "settings";
+const SETTINGS_LOCAL_KEY = "settings_cache";
 const VIDEO_WATCH_KEY = "vw_";
 
 // Storage sync set operations may be throttled https://developer.chrome.com/docs/extensions/reference/storage/#property-sync

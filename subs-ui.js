@@ -125,15 +125,31 @@ function addHideWatchedCheckbox() {
 function addElementToMenuUI(element) {
     log("Adding element to menu UI");
 
-    let topMenuEnd = document.getElementById("end");
-    if (topMenuEnd != null) { //just in case...
-        if (settings["settings.hide.watched.ui.stick.right"])
-            topMenuEnd.prepend(element);
-        else
-            topMenuEnd.parentNode.insertBefore(element, topMenuEnd);
-    }
+    // Try multiple possible insertion points for different YouTube layouts
+    let insertionPoint = document.getElementById("end") ||                              // Old layout
+                         document.querySelector("ytd-feed-filter-chip-bar-renderer") || // New layout chip bar
+                         document.querySelector("#primary ytd-rich-grid-renderer") ||   // Grid container
+                         document.querySelector("ytd-browse[page-subtype='subscriptions']"); // Page container
 
-    addedElems.push(element);
+    if (insertionPoint != null) {
+        if (insertionPoint.id === "end") {
+            // Old layout behavior
+            if (settings["settings.hide.watched.ui.stick.right"])
+                insertionPoint.prepend(element);
+            else
+                insertionPoint.parentNode.insertBefore(element, insertionPoint);
+        } else {
+            // New layout behavior - respect stick-right setting
+            if (settings["settings.hide.watched.ui.stick.right"]) {
+                insertionPoint.appendChild(element);
+            } else {
+                insertionPoint.insertBefore(element, insertionPoint.firstChild);
+            }
+        }
+        addedElems.push(element);
+    } else {
+        logError({"message": "Could not find UI insertion point", "stack": "subs-ui.js:addElementToMenuUI"});
+    }
 }
 
 function buildMarkWatchedButton(dismissibleDiv, item, videoId, isMarkWatchedBtn = true) {
@@ -286,7 +302,7 @@ function removeWatchedAndAddButton() {
 
 function removeUI() {
     addedElems.forEach((elem) => {
-        elem.parentNode.removeChild(elem);
+        elem.remove();  // Safe - doesn't throw if already removed from DOM
     });
 
     addedElems = [];
@@ -300,4 +316,15 @@ function removeUI() {
         item.classList.remove(HIDDEN_CLASS);
     }
     hidden = [];
+}
+
+function rebuildUI() {
+    if (getCurrentPage() === "/feed/subscriptions") {
+        try {
+            removeUI();
+            buildUI();
+        } catch (e) {
+            logError(e);
+        }
+    }
 }
