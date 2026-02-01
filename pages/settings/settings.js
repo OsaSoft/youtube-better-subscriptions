@@ -2,6 +2,7 @@ log("Initializing settings page...");
 
 document.addEventListener("DOMContentLoaded", setupButtons);
 document.addEventListener("DOMContentLoaded", initSettings);
+document.addEventListener("DOMContentLoaded", displayVersion);
 
 function initSettings() {
     if (settingsLoaded) {
@@ -34,13 +35,13 @@ function updateSettings() {
 }
 
 function showSettings() {
-    for (let elem of document.querySelectorAll("[id^='settings-']")) {
+    for (let elem of document.querySelectorAll(".settings-list")) {
         elem.classList.remove("hidden");
     }
 }
 
 function hideSpinners() {
-    for (let elem of document.getElementsByClassName("sk-circle")) {
+    for (let elem of document.querySelectorAll(".loading-spinner")) {
         elem.classList.add("hidden");
     }
 }
@@ -64,6 +65,9 @@ function saveSettings() {
     brwsr.storage.sync.set({[SETTINGS_KEY]: values}, () => {
         if (brwsr.runtime.lastError) {
             logError("Warning: Failed to sync settings: " + brwsr.runtime.lastError.message);
+            showToast("Failed to sync settings", "error");
+        } else {
+            showToast("Settings saved successfully", "success");
         }
     });
     brwsr.storage.local.set({[SETTINGS_LOCAL_KEY]: values});
@@ -73,20 +77,27 @@ function setupButtons() {
     document.getElementById("settings-save").addEventListener("click", saveSettings);
     document.getElementById("watched.export").addEventListener("click", exportVideos);
     document.getElementById("watched.import").addEventListener("click", importVideos);
-    document.getElementById("watched.clear").addEventListener("click", clearVideos);
+    document.getElementById("watched.clear").addEventListener("click", showConfirmModal);
+
+    // Modal event listeners
+    document.getElementById("modal-cancel").addEventListener("click", hideConfirmModal);
+    document.getElementById("modal-confirm").addEventListener("click", performClearVideos);
+    document.getElementById("confirm-modal").querySelector(".modal__backdrop").addEventListener("click", hideConfirmModal);
 }
 
 async function exportVideos() {
     await loadWatchedVideos();
 
+    const videoCount = Object.keys(watchedVideos).length;
     download("[Better Subs] video export " + new Date() + ".json", JSON.stringify(watchedVideos), "application/json");
+    showToast(`Exported ${videoCount} videos`, "success");
 }
 
 async function importVideos() {
     const file = document.getElementById("watched.import.file").files[0];
 
     if (!file) {
-        window.alert("No file selected!");
+        showToast("Please select a file first", "error");
         return;
     }
 
@@ -114,28 +125,73 @@ async function importVideos() {
         const syncedVideos = await syncWatchedVideos();
 
         if (syncedVideos < parsedVideos) {
-            window.alert(`Imported ${parsedVideos} watched videos successfully. Only the most recent ${syncedVideos} watched videos have been synced.`);
+            showToast(`Imported ${parsedVideos} videos (${syncedVideos} synced)`, "success");
         }
         else {
-            window.alert(`Imported ${parsedVideos} watched videos successfully. All watched videos have been synced.`);
+            showToast(`Imported ${parsedVideos} videos successfully`, "success");
         }
+
+        // Clear the file input
+        document.getElementById("watched.import.file").value = "";
     } catch (e) {
-        window.alert("Error parsing import file!");
+        showToast("Error parsing import file", "error");
     }
 }
 
-async function clearVideos() {
-    if (window.confirm("This is a destructive operation and will remove all of your marked as watched videos! \nAre you sure?")) {
-        brwsr.storage.local.clear();
+function showConfirmModal() {
+    document.getElementById("confirm-modal").classList.remove("hidden");
+}
 
-        await Promise.all(
-            Object.keys((await syncStorageGet(null)) || {}).map(key => {
-                if (key.indexOf(VIDEO_WATCH_KEY) === 0) {
-                    brwsr.storage.sync.remove(key);
-                }
-            })
-        );
+function hideConfirmModal() {
+    document.getElementById("confirm-modal").classList.add("hidden");
+}
 
-        await loadWatchedVideos();
+async function performClearVideos() {
+    hideConfirmModal();
+
+    brwsr.storage.local.clear();
+
+    await Promise.all(
+        Object.keys((await syncStorageGet(null)) || {}).map(key => {
+            if (key.indexOf(VIDEO_WATCH_KEY) === 0) {
+                brwsr.storage.sync.remove(key);
+            }
+        })
+    );
+
+    await loadWatchedVideos();
+    showToast("All watched videos cleared", "success");
+}
+
+function displayVersion() {
+    const versionElement = document.getElementById("extension-version");
+    if (versionElement && brwsr.runtime.getManifest) {
+        const manifest = brwsr.runtime.getManifest();
+        versionElement.textContent = manifest.version;
     }
+}
+
+// Toast notification system
+function showToast(message, type = "success") {
+    const container = document.getElementById("toast-container");
+    if (!container) return;
+
+    const toast = document.createElement("div");
+    toast.className = `toast toast--${type}`;
+
+    // Add icon based on type
+    const iconSvg = type === "success"
+        ? '<svg class="toast__icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>'
+        : '<svg class="toast__icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>';
+
+    toast.innerHTML = `${iconSvg}<span>${message}</span>`;
+    container.appendChild(toast);
+
+    // Auto-remove after delay
+    setTimeout(() => {
+        toast.classList.add("toast--hiding");
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+    }, 3000);
 }
