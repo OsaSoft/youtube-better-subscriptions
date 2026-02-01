@@ -1,0 +1,175 @@
+/* Changelog Page Specific Styles */
+
+/* Hero Card */
+.card--hero {
+    border: 2px solid var(--color-primary);
+    box-shadow: 0 2px 8px rgba(255, 0, 0, 0.1), var(--shadow-card);
+}
+
+.card--hero .card__header {
+    background: linear-gradient(to bottom, #fff5f5, #ffffff);
+}
+
+/* Badge */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border-radius: var(--radius-sm);
+    text-transform: uppercase;
+    margin-left: auto;
+}
+
+.badge--latest {
+    background: var(--color-primary);
+    color: white;
+}
+
+/* Feature List (for What's New section) */
+.feature-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.feature-list__item {
+    position: relative;
+    padding: var(--spacing-sm) 0 var(--spacing-sm) var(--spacing-lg);
+    color: var(--color-text);
+    font-size: var(--font-size-base);
+    line-height: 1.5;
+}
+
+.feature-list__item::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 12px;
+    width: 8px;
+    height: 8px;
+    background: var(--color-primary);
+    border-radius: 50%;
+}
+
+.feature-list__item + .feature-list__item {
+    border-top: 1px solid #f5f5f5;
+}
+
+/* Card content paragraphs */
+.card__content p {
+    margin: 0 0 var(--spacing-md);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+}
+
+.card__content p:last-child {
+    margin-bottom: 0;
+}
+
+/* Changelog Card */
+.changelog-card .card__content {
+    padding: 0;
+}
+
+.changelog-content {
+    max-height: none;
+}
+
+/* Version Entry */
+.version-entry {
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.version-entry:last-child {
+    border-bottom: none;
+}
+
+.version-entry:hover {
+    background-color: rgba(0, 0, 0, 0.01);
+}
+
+.version-entry__title {
+    display: inline-flex;
+    align-items: center;
+    margin: 0 0 var(--spacing-sm);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-text);
+    background: #f0f0f0;
+    border-radius: var(--radius-sm);
+}
+
+.version-entry__title::before {
+    content: "v";
+    color: var(--color-text-secondary);
+    margin-right: 1px;
+}
+
+.version-entry__changes {
+    margin: 0;
+    padding: 0 0 0 var(--spacing-lg);
+    list-style: none;
+}
+
+.version-entry__changes li {
+    position: relative;
+    padding: var(--spacing-xs) 0;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+}
+
+.version-entry__changes li::before {
+    content: "";
+    position: absolute;
+    left: calc(-1 * var(--spacing-md));
+    top: 10px;
+    width: 4px;
+    height: 4px;
+    background: var(--color-text-secondary);
+    border-radius: 50%;
+}
+
+.version-entry__changes li a {
+    color: var(--color-primary);
+    font-weight: 500;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .badge {
+        font-size: 9px;
+        padding: 2px 6px;
+    }
+
+    .card__header {
+        flex-wrap: wrap;
+        gap: var(--spacing-xs);
+    }
+
+    .card--hero .card__title {
+        font-size: var(--font-size-base);
+    }
+
+    .badge--latest {
+        margin-left: 0;
+        margin-top: var(--spacing-xs);
+    }
+
+    .feature-list__item {
+        font-size: var(--font-size-sm);
+    }
+
+    .version-entry {
+        padding: var(--spacing-md);
+    }
+
+    .version-entry__changes li {
+        font-size: var(--font-size-sm);
+    }
+}
