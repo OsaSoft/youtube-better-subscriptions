@@ -6,3 +6,7 @@ chrome_promo_tiles/tile-1400x560.jpg
 chrome_promo_tiles/tile-440x280.jpg
 CLAUDE.local.md
 .local/
+
+# Node.js
+node_modules/
+coverage/

@@ -1,0 +1,128 @@
+<!-- YouTube Subscription Feed Mock Structure -->
+<div id="page-manager">
+    <ytd-browse page-subtype="subscriptions">
+        <div id="primary">
+            <ytd-rich-grid-renderer>
+                <!-- Old layout menu area -->
+                <div id="menu-container">
+                    <div id="end">
+                        <!-- Extension buttons get inserted here -->
+                    </div>
+                </div>
+
+                <!-- New layout chip bar -->
+                <ytd-feed-filter-chip-bar-renderer>
+                    <!-- Extension buttons may also be inserted here -->
+                </ytd-feed-filter-chip-bar-renderer>
+
+                <div id="contents">
+                    <!-- Section with multiple videos -->
+                    <ytd-item-section-renderer class="style-scope ytd-section-list-renderer">
+                        <div id="title">Today</div>
+                        <div id="dismissible">
+                            <div id="contents">
+                                <!-- Video 1 -->
+                                <ytd-rich-item-renderer class="style-scope ytd-rich-grid-renderer">
+                                    <div class="ytd-rich-item-renderer">
+                                        <a id="video-title" href="/watch?v=video1234567">
+                                            <span>Video 1</span>
+                                        </a>
+                                        <div class="yt-badge-shape__text">5:30</div>
+                                    </div>
+                                </ytd-rich-item-renderer>
+
+                                <!-- Video 2 -->
+                                <ytd-rich-item-renderer class="style-scope ytd-rich-grid-renderer">
+                                    <div class="ytd-rich-item-renderer">
+                                        <a id="video-title" href="/watch?v=video2345678">
+                                            <span>Video 2</span>
+                                        </a>
+                                        <div class="yt-badge-shape__text">10:00</div>
+                                    </div>
+                                </ytd-rich-item-renderer>
+
+                                <!-- Video 3 - Live -->
+                                <ytd-rich-item-renderer class="style-scope ytd-rich-grid-renderer">
+                                    <div class="ytd-rich-item-renderer">
+                                        <a id="video-title" href="/watch?v=liveStream123">
+                                            <span>Live Stream</span>
+                                        </a>
+                                        <div class="yt-badge-shape--thumbnail-live">LIVE</div>
+                                    </div>
+                                </ytd-rich-item-renderer>
+                            </div>
+                        </div>
+                    </ytd-item-section-renderer>
+
+                    <!-- Section: Yesterday -->
+                    <ytd-item-section-renderer class="style-scope ytd-section-list-renderer">
+                        <div id="title">Yesterday</div>
+                        <div id="dismissible">
+                            <div id="contents">
+                                <!-- Video 4 - Members only -->
+                                <ytd-rich-item-renderer class="style-scope ytd-rich-grid-renderer">
+                                    <div class="ytd-rich-item-renderer">
+                                        <a id="video-title" href="/watch?v=members12345">
+                                            <span>Members Only Video</span>
+                                        </a>
+                                        <div class="yt-badge-shape--membership">Members only</div>
+                                        <div class="yt-badge-shape__text">20:00</div>
+                                    </div>
+                                </ytd-rich-item-renderer>
+
+                                <!-- Video 5 - Premiere -->
+                                <ytd-rich-item-renderer class="style-scope ytd-rich-grid-renderer">
+                                    <div class="ytd-rich-item-renderer">
+                                        <a id="video-title" href="/watch?v=premiere1234">
+                                            <span>Upcoming Premiere</span>
+                                        </a>
+                                        <!-- No duration = premiere -->
+                                    </div>
+                                </ytd-rich-item-renderer>
+                            </div>
+                        </div>
+                    </ytd-item-section-renderer>
+
+                    <!-- Shorts shelf -->
+                    <ytd-rich-section-renderer>
+                        <div id="content">
+                            <ytd-rich-shelf-renderer>
+                                <div id="dismissible">
+                                    <div id="contents">
+                                        <ytd-rich-item-renderer class="style-scope ytd-rich-shelf-renderer">
+                                            <div class="ytd-rich-item-renderer">
+                                                <a id="video-title" href="/shorts/short1234567">
+                                                    <span>Short 1</span>
+                                                </a>
+                                            </div>
+                                        </ytd-rich-item-renderer>
+                                        <ytd-rich-item-renderer class="style-scope ytd-rich-shelf-renderer">
+                                            <div class="ytd-rich-item-renderer">
+                                                <a id="video-title" href="/shorts/short2345678">
+                                                    <span>Short 2</span>
+                                                </a>
+                                            </div>
+                                        </ytd-rich-item-renderer>
+                                    </div>
+                                </div>
+                            </ytd-rich-shelf-renderer>
+                        </div>
+                    </ytd-rich-section-renderer>
+
+                    <!-- New layout section with lockupViewModel -->
+                    <ytd-rich-item-renderer class="style-scope ytd-rich-grid-renderer">
+                        <lockup-view-model>
+                            <a href="/watch?v=newLayout123">
+                                <span>New Layout Video</span>
+                            </a>
+                            <lockup-metadata-view-model class="metadata">
+                                <span>Channel Name</span>
+                            </lockup-metadata-view-model>
+                            <thumbnail-badge-view-model>8:30</thumbnail-badge-view-model>
+                        </lockup-view-model>
+                    </ytd-rich-item-renderer>
+                </div>
+            </ytd-rich-grid-renderer>
+        </div>
+    </ytd-browse>
+</div>

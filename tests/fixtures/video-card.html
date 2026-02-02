@@ -1,0 +1,94 @@
+<!-- Standard video card (old layout) -->
+<div id="video-card-standard" class="ytd-rich-item-renderer style-scope ytd-rich-grid-renderer">
+    <div class="ytd-rich-item-renderer">
+        <a id="video-title" href="/watch?v=dQw4w9WgXcQ">
+            <span>Test Video Title</span>
+        </a>
+        <div class="yt-badge-shape__text">10:30</div>
+    </div>
+</div>
+
+<!-- Video card with live badge -->
+<div id="video-card-live" class="ytd-rich-item-renderer style-scope ytd-rich-grid-renderer">
+    <div class="ytd-rich-item-renderer">
+        <a id="video-title" href="/watch?v=liveVIDEO123">
+            <span>Live Stream Title</span>
+        </a>
+        <div class="yt-badge-shape--thumbnail-live">LIVE</div>
+    </div>
+</div>
+
+<!-- Video card with members-only badge -->
+<div id="video-card-members" class="ytd-rich-item-renderer style-scope ytd-rich-grid-renderer">
+    <div class="ytd-rich-item-renderer">
+        <a id="video-title" href="/watch?v=membersONLY1">
+            <span>Members Only Video</span>
+        </a>
+        <div class="yt-badge-shape--membership">Members only</div>
+        <div class="yt-badge-shape__text">15:00</div>
+    </div>
+</div>
+
+<!-- Video card - premiere (no duration, not live) -->
+<div id="video-card-premiere" class="ytd-rich-item-renderer style-scope ytd-rich-grid-renderer">
+    <div class="ytd-rich-item-renderer">
+        <a id="video-title" href="/watch?v=premiere1234">
+            <span>Upcoming Premiere</span>
+        </a>
+        <!-- No duration badge, no live badge = premiere -->
+    </div>
+</div>
+
+<!-- Video card - short -->
+<div id="video-card-short" class="ytd-rich-item-renderer style-scope ytd-rich-grid-renderer">
+    <div class="ytd-rich-item-renderer">
+        <a id="video-title" href="/shorts/shortVID123">
+            <span>Short Video</span>
+        </a>
+    </div>
+</div>
+
+<!-- New January 2026 lockupViewModel layout -->
+<div id="video-card-new-layout" class="ytd-rich-item-renderer style-scope ytd-rich-grid-renderer">
+    <lockup-view-model>
+        <a href="/watch?v=newLayout123">
+            <span>New Layout Video</span>
+        </a>
+        <lockup-metadata-view-model class="metadata">
+            <span>Channel Name</span>
+        </lockup-metadata-view-model>
+        <thumbnail-badge-view-model>12:45</thumbnail-badge-view-model>
+    </lockup-view-model>
+</div>
+
+<!-- New layout with live badge -->
+<div id="video-card-new-layout-live" class="ytd-rich-item-renderer style-scope ytd-rich-grid-renderer">
+    <lockup-view-model>
+        <a href="/watch?v=newLive12345">
+            <span>New Layout Live Stream</span>
+        </a>
+        <lockup-metadata-view-model class="metadata">
+            <span>Channel Name</span>
+        </lockup-metadata-view-model>
+        <div class="yt-badge-shape--thumbnail-live">LIVE</div>
+    </lockup-view-model>
+</div>
+
+<!-- Video with ad URL (should be treated as short/hidden) -->
+<div id="video-card-ad" class="ytd-rich-item-renderer style-scope ytd-rich-grid-renderer">
+    <div class="ytd-rich-item-renderer">
+        <a id="video-title" href="/watch?v=ad123&adurl=something">
+            <span>Sponsored Content</span>
+        </a>
+    </div>
+</div>
+
+<!-- List view video (old layout) -->
+<div id="video-card-list-view" class="ytd-video-renderer style-scope ytd-expanded-shelf-contents-renderer">
+    <!-- first child is a comment node in list view -->
+    <div class="text-wrapper style-scope ytd-video-renderer">
+        <a id="video-title" href="/watch?v=listView1234">
+            <span>List View Video</span>
+        </a>
+    </div>
+</div>
