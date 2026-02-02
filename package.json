@@ -1,0 +1,18 @@
+{
+  "name": "youtube-better-subscriptions",
+  "version": "1.0.0",
+  "description": "This plugin aims to make navigating YouTube's subscription grid easier by allowing users to hide watched videos. This plugin is in early development and will often change and (hopefully) include new features.",
+  "main": "common.js",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^30.2.0",
+    "jest-environment-jsdom": "^30.2.0"
+  }
+}

@@ -1,4 +1,8 @@
 # Youtube better subscriptions
+
+[![Tests](https://github.com/OsaSoft/youtube-better-subscriptions/actions/workflows/test.yml/badge.svg)](https://github.com/OsaSoft/youtube-better-subscriptions/actions/workflows/test.yml)
+[![GitHub release](https://img.shields.io/github/v/release/OsaSoft/youtube-better-subscriptions)](https://github.com/OsaSoft/youtube-better-subscriptions/releases/latest)
+
 This plugin aims to make navigating YouTube's subscription grid easier by allowing users to hide watched videos.
 This plugin is in early development and will often change and (hopefully) include new features.
 

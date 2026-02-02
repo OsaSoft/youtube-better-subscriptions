@@ -1,0 +1,88 @@
+<!-- YouTube Better Subscriptions Settings Page Mock -->
+<div id="settings-container">
+    <h1>Settings</h1>
+
+    <div class="setting-group">
+        <h2>Hide Options</h2>
+
+        <label>
+            <input type="checkbox" id="settings-hide-watched-label" checked>
+            Show "Hide watched" label
+        </label>
+
+        <label>
+            <input type="checkbox" id="settings-hide-watched-all-label" checked>
+            Show "Mark all as watched" button
+        </label>
+
+        <label>
+            <input type="checkbox" id="settings-hide-watched-ui-stick-right" checked>
+            Stick UI to right side
+        </label>
+
+        <label>
+            <input type="checkbox" id="settings-hide-watched-default" checked>
+            Hide watched by default
+        </label>
+
+        <label>
+            <input type="checkbox" id="settings-hide-premieres">
+            Hide premieres
+        </label>
+
+        <label>
+            <input type="checkbox" id="settings-hide-shorts">
+            Hide shorts
+        </label>
+
+        <label>
+            <input type="checkbox" id="settings-hide-lives">
+            Hide livestreams
+        </label>
+
+        <label>
+            <input type="checkbox" id="settings-hide-members-only">
+            Hide members-only videos
+        </label>
+    </div>
+
+    <div class="setting-group">
+        <h2>Logging</h2>
+
+        <label>
+            Log level:
+            <select id="settings-log-level">
+                <option value="1">Error</option>
+                <option value="2">Warning</option>
+                <option value="3">Info</option>
+                <option value="4">Debug</option>
+            </select>
+        </label>
+    </div>
+
+    <div class="setting-group">
+        <h2>Advanced</h2>
+
+        <label>
+            Refresh rate (ms):
+            <input type="number" id="settings-refresh-rate" value="3000" min="1000" max="10000">
+        </label>
+
+        <label>
+            <input type="checkbox" id="settings-mark-youtube-watched">
+            Auto-mark YouTube watched videos
+        </label>
+
+        <label>
+            <input type="checkbox" id="settings-auto-store" checked>
+            Auto-store watched state
+        </label>
+    </div>
+
+    <div class="buttons">
+        <button id="save-settings">Save</button>
+        <button id="reset-settings">Reset to Defaults</button>
+        <button id="export-data">Export Data</button>
+        <button id="import-data">Import Data</button>
+    </div>
+</div>
