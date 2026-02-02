@@ -27,6 +27,11 @@ jobs:
           filename: yt-better-subscriptions-latest.zip
           exclusions: '*.git* .editorconfig chrome_promo_tiles tests node_modules package.json package-lock.json jest.config.js coverage CLAUDE.md'
 
+      - name: Generate checksums
+        run: |
+          sha256sum yt-better-subscriptions-latest.zip > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
       - name: Get the version
         id: get_version
         run: echo "VERSION=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_OUTPUT
@@ -52,6 +57,16 @@ jobs:
           asset_path: ./yt-better-subscriptions-latest.zip
           asset_name: yt-better-subscriptions-${{ steps.get_version.outputs.VERSION }}.zip
           asset_content_type: application/zip
+
+      - name: Upload checksums
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./SHA256SUMS.txt
+          asset_name: SHA256SUMS.txt
+          asset_content_type: text/plain
 
         # Publish to stores - disabled as its not working atm
 
