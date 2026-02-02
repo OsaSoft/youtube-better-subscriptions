@@ -25,7 +25,7 @@ jobs:
         uses: TheDoctor0/zip-release@v0.3.0
         with:
           filename: yt-better-subscriptions-latest.zip
-          exclusions: '*.git* .editorconfig chrome_promo_tiles'
+          exclusions: '*.git* .editorconfig chrome_promo_tiles tests node_modules package.json package-lock.json jest.config.js coverage CLAUDE.md'
 
       - name: Get the version
         id: get_version
