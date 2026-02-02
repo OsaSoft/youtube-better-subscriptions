@@ -29,6 +29,8 @@ Each release includes a `SHA256SUMS.txt` file containing the checksum of the ext
 
 ### On Linux/macOS
 
+Replace `X.X.X` with the actual version number (e.g., `1.2.3`):
+
 ```bash
 # Download both files from the release
 wget https://github.com/nickyout/youtube-better-subscriptions/releases/download/vX.X.X/yt-better-subscriptions-X.X.X.zip
@@ -40,10 +42,13 @@ sha256sum -c SHA256SUMS.txt
 
 ### On Windows (PowerShell)
 
+Replace `X.X.X` with the actual version number (e.g., `1.2.3`):
+
 ```powershell
 # After downloading both files
 $hash = (Get-FileHash yt-better-subscriptions-X.X.X.zip -Algorithm SHA256).Hash.ToLower()
-$expected = (Get-Content SHA256SUMS.txt).Split(" ")[0]
+$expectedLine = Get-Content SHA256SUMS.txt | Select-Object -First 1
+$expected = ($expectedLine -split '\s+') | Select-Object -First 1
 if ($hash -eq $expected) { "OK" } else { "MISMATCH" }
 ```
 
@@ -118,7 +123,9 @@ If you want to verify that the store version matches the GitHub release:
 
 ## Reporting Security Issues
 
-If you discover a security vulnerability, please report it by:
+If you discover a security vulnerability, please report it through a private channel:
 
-1. **GitHub Issues**: Open an issue at https://github.com/nickyout/youtube-better-subscriptions/issues
-2. **Private disclosure**: If the issue is sensitive, please note that in the issue title and avoid including exploit details publicly
+1. **GitHub Security Advisories (preferred)**: Submit a private report at https://github.com/nickyout/youtube-better-subscriptions/security/advisories/new. This will notify the maintainer without publicly disclosing the issue.
+2. **Private contact**: If you cannot use Security Advisories, please contact the maintainer privately (for example, via the email address listed on their GitHub profile), and do not share details of the vulnerability in any public forum.
+
+Please use **GitHub Issues** (https://github.com/nickyout/youtube-better-subscriptions/issues) only for non-security bugs, feature requests, or discussions.
