@@ -110,6 +110,13 @@
     margin-right: 1px;
 }
 
+.version-entry__date {
+    margin-left: var(--spacing-sm);
+    font-weight: 400;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-xs);
+}
+
 .version-entry__changes {
     margin: 0;
     padding: 0 0 0 var(--spacing-lg);
