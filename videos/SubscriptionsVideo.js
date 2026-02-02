@@ -16,6 +16,11 @@ class SubscriptionVideo extends Video {
     }
 
     addButton() {
+        // Check if button should be hidden
+        if (settings["settings.hide.mark.watched.button"]) {
+            return;
+        }
+
         if (!this.contentDiv) {
             return;
         }

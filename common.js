@@ -16,6 +16,7 @@ const DEFAULT_SETTINGS = {
     "settings.hide.shorts": false,
     "settings.hide.lives": false,
     "settings.hide.members.only": false,
+    "settings.hide.mark.watched.button": false,
 };
 
 const SETTINGS_KEY = "settings";
