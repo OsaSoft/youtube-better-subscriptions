@@ -148,6 +148,7 @@ function loadVideo() {
         hideShorts: global.hideShorts,
         hideLives: global.hideLives,
         hideMembersOnly: global.hideMembersOnly,
+        hideMostRelevant: global.hideMostRelevant,
         watchVideo: global.watchVideo,
         unwatchVideo: global.unwatchVideo,
         syncWatchedVideos: global.syncWatchedVideos,
