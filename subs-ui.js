@@ -282,12 +282,20 @@ function removeWatchedAndAddButton() {
                 return;
             }
 
-            // Hide "Most relevant" shelf if setting is enabled
+            // Hide algorithmic recommendation shelf if setting is enabled
+            // Detection: channel-specific shelves show an avatar, algorithmic shelves have both
+            // #avatar and #icon hidden
             if (hideMostRelevant) {
-                const titleElement = richShelfRenderer.querySelector('#dismissible #rich-shelf-header #title-container #title-text #title');
-                if (titleElement && titleElement.textContent.trim() === 'Most relevant') {
-                    richSectionElement.style.display = 'none';
-                    return;
+                const header = richShelfRenderer.querySelector('#dismissible #rich-shelf-header');
+                if (header) {
+                    const avatar = header.querySelector('#avatar');
+                    const icon = header.querySelector('#icon');
+                    const isAlgorithmicShelf = (avatar && avatar.hasAttribute('hidden')) &&
+                                               (icon && icon.hasAttribute('hidden'));
+                    if (isAlgorithmicShelf) {
+                        richSectionElement.style.display = 'none';
+                        return;
+                    }
                 }
             }
 
