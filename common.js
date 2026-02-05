@@ -97,9 +97,10 @@ async function loadWatchedVideos() {
 
     watchedVideos = (await localStorageGet(null)) || {};
 
-    const now = Date.now() - operations.length;
+    // Assign timestamps preserving order: first in batches = newest = highest timestamp
+    const now = Date.now();
     for (const [index, operation] of operations.entries()) {
-        saveVideoOperation(operation, now + index);
+        saveVideoOperation(operation, now - index);
     }
 
     // old format
