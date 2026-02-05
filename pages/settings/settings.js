@@ -84,6 +84,7 @@ function setupButtons() {
     document.getElementById("watched.clear").addEventListener("click", showConfirmModal);
     document.getElementById("test-sync").addEventListener("click", testSyncConnectivity);
     document.getElementById("force-sync").addEventListener("click", forceSyncAll);
+    document.getElementById("clear-oldest").addEventListener("click", clearOldestVideosHandler);
 
     // Modal event listeners
     document.getElementById("modal-cancel").addEventListener("click", hideConfirmModal);
@@ -173,14 +174,26 @@ function hideConfirmModal() {
 
 // Helper to promisify storage operations for Chrome compatibility
 function storageLocalRemove(keys) {
-    return new Promise((resolve) => {
-        brwsr.storage.local.remove(keys, resolve);
+    return new Promise((resolve, reject) => {
+        brwsr.storage.local.remove(keys, () => {
+            if (brwsr.runtime.lastError) {
+                reject(new Error(brwsr.runtime.lastError.message));
+            } else {
+                resolve();
+            }
+        });
     });
 }
 
 function storageSyncRemove(key) {
-    return new Promise((resolve) => {
-        brwsr.storage.sync.remove(key, resolve);
+    return new Promise((resolve, reject) => {
+        brwsr.storage.sync.remove(key, () => {
+            if (brwsr.runtime.lastError) {
+                reject(new Error(brwsr.runtime.lastError.message));
+            } else {
+                resolve();
+            }
+        });
     });
 }
 
@@ -188,32 +201,41 @@ async function performClearVideos() {
     hideConfirmModal();
 
     // Clear only watched-video-related data from local storage, preserving settings
+    // Local keys are 12-char video operations (e.g., "wABC123xyz01" or "nABC123xyz01")
     const localData = await new Promise((resolve) => {
         brwsr.storage.local.get(null, resolve);
     });
     const localKeys = Object.keys(localData || {});
     const localWatchedKeys = localKeys.filter(key => {
-        // Keys for watched videos use VIDEO_WATCH_KEY prefix
-        // Preserve settings keys (SETTINGS_LOCAL_KEY, etc.)
-        if (typeof VIDEO_WATCH_KEY === "string" && VIDEO_WATCH_KEY.length > 0) {
-            return key.indexOf(VIDEO_WATCH_KEY) === 0;
-        }
-        return false;
+        return key.length === 12 && (key[0] === 'w' || key[0] === 'n');
     });
-    if (localWatchedKeys.length > 0) {
-        await storageLocalRemove(localWatchedKeys);
+
+    // Remove local keys in chunks to avoid potential limits
+    const chunkSize = 500;
+    for (let i = 0; i < localWatchedKeys.length; i += chunkSize) {
+        const chunk = localWatchedKeys.slice(i, i + chunkSize);
+        await storageLocalRemove(chunk);
     }
 
-    // Clear watched videos from sync storage
+    // Clear watched videos from sync storage (vw_* batch keys)
     const syncData = await syncStorageGet(null);
     const syncKeys = Object.keys(syncData || {});
-    const removePromises = syncKeys
-        .filter(key => key.indexOf(VIDEO_WATCH_KEY) === 0)
-        .map(key => storageSyncRemove(key));
-    await Promise.all(removePromises);
+    const syncWatchedKeys = syncKeys.filter(key => key.indexOf(VIDEO_WATCH_KEY) === 0);
+    for (const key of syncWatchedKeys) {
+        await storageSyncRemove(key);
+    }
 
-    await loadWatchedVideos();
+    // Clear in-memory watched videos (remove video keys, keep other data)
+    for (const key of Object.keys(watchedVideos)) {
+        if (key.length === 12 && (key[0] === 'w' || key[0] === 'n')) {
+            delete watchedVideos[key];
+        }
+    }
+
     showToast("All watched videos cleared", "success");
+
+    // Refresh diagnostics display
+    await runSyncDiagnostics();
 }
 
 function displayVersion() {
@@ -285,10 +307,30 @@ async function runSyncDiagnostics() {
             .length;
 
         // Update UI
-        document.getElementById("sync-storage-usage").textContent =
-            (syncBytes / 1024).toFixed(1) + " KB / 100 KB";
+        const usagePercent = (syncBytes / 102400) * 100;
+        const usageEl = document.getElementById("sync-storage-usage");
+        usageEl.textContent = (syncBytes / 1024).toFixed(1) + " KB / 100 KB";
+
+        // Color-code usage based on quota usage
+        if (usagePercent > 95) {
+            usageEl.style.color = "#c62828";  // Red
+        } else if (usagePercent > 80) {
+            usageEl.style.color = "#f57c00";  // Orange
+        } else {
+            usageEl.style.color = "";  // Reset to default
+        }
+
         document.getElementById("sync-video-count").textContent = syncVideoCount;
         document.getElementById("local-video-count").textContent = localVideoCount;
+
+        // Show warning if videos not syncing
+        const resultEl = document.getElementById("sync-result");
+        if (localVideoCount > syncVideoCount) {
+            const notSynced = localVideoCount - syncVideoCount;
+            resultEl.textContent = "Warning: " + notSynced + " videos not synced due to storage quota limit. " +
+                "These older videos will only exist on this device. Use 'Clear oldest videos' to free up space.";
+            resultEl.className = "sync-result sync-result--warning";
+        }
     } catch (error) {
         document.getElementById("sync-storage-usage").textContent = "Error";
         document.getElementById("sync-video-count").textContent = "Error";
@@ -353,6 +395,29 @@ async function forceSyncAll() {
         await runSyncDiagnostics();
     } catch (error) {
         resultEl.textContent = "Force sync failed: " + error.message;
+        resultEl.className = "sync-result sync-result--error";
+    }
+}
+
+async function clearOldestVideosHandler() {
+    const countInput = document.getElementById("clear-oldest-count");
+    const count = parseInt(countInput.value, 10) || 500;
+    const resultEl = document.getElementById("sync-result");
+
+    resultEl.textContent = "Clearing " + count + " oldest videos...";
+    resultEl.className = "sync-result sync-result--info";
+
+    try {
+        await loadWatchedVideos();
+        const removed = await clearOldestVideos(count);
+
+        resultEl.textContent = "Cleared " + removed + " oldest videos. Quota freed up.";
+        resultEl.className = "sync-result sync-result--success";
+
+        // Refresh diagnostics display
+        await runSyncDiagnostics();
+    } catch (error) {
+        resultEl.textContent = "Failed to clear videos: " + error.message;
         resultEl.className = "sync-result sync-result--error";
     }
 }

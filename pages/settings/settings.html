@@ -341,6 +341,18 @@
                         <button id="force-sync" class="btn btn-secondary">Force Sync</button>
                     </div>
 
+                    <div class="data-action">
+                        <div class="data-action__info">
+                            <span class="data-action__title">Clear oldest videos</span>
+                            <span class="data-action__description">Remove the oldest watched videos to free up sync quota</span>
+                            <div class="data-action__controls">
+                                <input type="number" id="clear-oldest-count" class="input-number" value="500" min="1" max="5000" style="width: 80px;">
+                                <span class="input-unit">videos</span>
+                            </div>
+                        </div>
+                        <button id="clear-oldest" class="btn btn-secondary">Clear Oldest</button>
+                    </div>
+
                     <div id="sync-result" class="sync-result"></div>
                 </div>
             </div>

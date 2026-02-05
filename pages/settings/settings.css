@@ -262,6 +262,9 @@
 .file-input {
     font-size: var(--font-size-sm);
     color: var(--color-text-secondary);
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .file-input::file-selector-button {
@@ -289,12 +292,18 @@
     padding: var(--spacing-md) var(--spacing-lg);
 }
 
+.data-action > .btn {
+    flex-shrink: 0;
+}
+
 .data-action + .data-action {
     border-top: 1px solid #f0f0f0;
 }
 
 .data-action__info {
     flex: 1;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .data-action__title {
@@ -364,6 +373,12 @@
     display: block;
     background: #ffebee;
     color: #c62828;
+}
+
+.sync-result--warning {
+    display: block;
+    background: #fff3e0;
+    color: #e65100;
 }
 
 .sync-result--info {
