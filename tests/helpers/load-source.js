@@ -100,8 +100,10 @@ function loadCommon() {
     global.unwatchVideo = context.unwatchVideo;
     global.loadWatchedVideos = context.loadWatchedVideos;
     global.syncWatchedVideos = context.syncWatchedVideos;
+    global.clearOldestVideos = context.clearOldestVideos;
     global.getCurrentPage = context.getCurrentPage;
     global.lastSyncUpdate = context.lastSyncUpdate;
+    global.lastSyncError = context.lastSyncError;
 
     return context;
 }
