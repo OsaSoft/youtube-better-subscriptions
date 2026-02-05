@@ -3,6 +3,7 @@ log("Initializing settings page...");
 document.addEventListener("DOMContentLoaded", setupButtons);
 document.addEventListener("DOMContentLoaded", initSettings);
 document.addEventListener("DOMContentLoaded", displayVersion);
+document.addEventListener("DOMContentLoaded", runSyncDiagnostics);
 
 // Track the element that opened the modal for focus restoration
 let previouslyFocusedElement = null;
@@ -81,6 +82,8 @@ function setupButtons() {
     document.getElementById("watched.export").addEventListener("click", exportVideos);
     document.getElementById("watched.import").addEventListener("click", importVideos);
     document.getElementById("watched.clear").addEventListener("click", showConfirmModal);
+    document.getElementById("test-sync").addEventListener("click", testSyncConnectivity);
+    document.getElementById("force-sync").addEventListener("click", forceSyncAll);
 
     // Modal event listeners
     document.getElementById("modal-cancel").addEventListener("click", hideConfirmModal);
@@ -257,4 +260,99 @@ function showToast(message, type = "success") {
             toast.remove();
         }, 300);
     }, 3000);
+}
+
+// Sync Diagnostics Functions
+async function runSyncDiagnostics() {
+    try {
+        // Get sync storage data
+        const syncData = await syncStorageGet(null);
+        const syncBytes = JSON.stringify(syncData).length;
+
+        // Count videos in sync (vw_* batched format)
+        let syncVideoCount = 0;
+        for (const key of Object.keys(syncData)) {
+            if (key.indexOf(VIDEO_WATCH_KEY) === 0 && Array.isArray(syncData[key])) {
+                syncVideoCount += syncData[key].length;
+            }
+        }
+
+        // Get local storage data
+        const localData = await localStorageGet(null);
+        // Count videos in local (w* or n* format, 12 chars)
+        const localVideoCount = Object.keys(localData || {})
+            .filter(key => key.length === 12 && (key[0] === 'w' || key[0] === 'n'))
+            .length;
+
+        // Update UI
+        document.getElementById("sync-storage-usage").textContent =
+            (syncBytes / 1024).toFixed(1) + " KB / 100 KB";
+        document.getElementById("sync-video-count").textContent = syncVideoCount;
+        document.getElementById("local-video-count").textContent = localVideoCount;
+    } catch (error) {
+        document.getElementById("sync-storage-usage").textContent = "Error";
+        document.getElementById("sync-video-count").textContent = "Error";
+        document.getElementById("local-video-count").textContent = "Error";
+        logError({message: "Failed to run sync diagnostics", stack: error?.stack || ""});
+    }
+}
+
+async function testSyncConnectivity() {
+    const resultEl = document.getElementById("sync-result");
+    const testKey = "_sync_test_" + Date.now();
+    const testValue = "test_" + Math.random();
+
+    resultEl.textContent = "Testing sync connectivity...";
+    resultEl.className = "sync-result sync-result--info";
+
+    try {
+        // Write to sync
+        await new Promise((resolve, reject) => {
+            brwsr.storage.sync.set({ [testKey]: testValue }, () => {
+                if (brwsr.runtime.lastError) {
+                    reject(new Error(brwsr.runtime.lastError.message));
+                } else {
+                    resolve();
+                }
+            });
+        });
+
+        // Read back
+        const result = await syncStorageGet(testKey);
+
+        // Cleanup
+        await new Promise(resolve => brwsr.storage.sync.remove(testKey, resolve));
+
+        if (result[testKey] === testValue) {
+            resultEl.textContent = "Sync storage is working correctly";
+            resultEl.className = "sync-result sync-result--success";
+        } else {
+            resultEl.textContent = "Sync read/write mismatch - data may not be syncing properly";
+            resultEl.className = "sync-result sync-result--error";
+        }
+    } catch (error) {
+        resultEl.textContent = "Sync failed: " + error.message;
+        resultEl.className = "sync-result sync-result--error";
+    }
+}
+
+async function forceSyncAll() {
+    const resultEl = document.getElementById("sync-result");
+
+    resultEl.textContent = "Syncing all watched videos...";
+    resultEl.className = "sync-result sync-result--info";
+
+    try {
+        await loadWatchedVideos();
+        const syncedCount = await syncWatchedVideos();
+
+        resultEl.textContent = "Synced " + syncedCount + " videos to cloud storage";
+        resultEl.className = "sync-result sync-result--success";
+
+        // Refresh diagnostics display
+        await runSyncDiagnostics();
+    } catch (error) {
+        resultEl.textContent = "Force sync failed: " + error.message;
+        resultEl.className = "sync-result sync-result--error";
+    }
 }
