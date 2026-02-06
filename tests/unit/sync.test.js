@@ -15,11 +15,6 @@
 
 const { loadUtil, loadCommon } = require('../helpers/load-source');
 
-// Helper: find a packed entry in a batch by its operation prefix
-function findEntry(batch, operationPrefix) {
-    return batch.find(e => e.startsWith(operationPrefix + ':') || e === operationPrefix);
-}
-
 // Helper: check if batch contains an entry starting with the given operation
 function batchHasEntry(batch, operationPrefix) {
     return batch.some(e => e.startsWith(operationPrefix + ':') || e === operationPrefix);
