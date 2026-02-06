@@ -97,9 +97,10 @@ async function loadWatchedVideos() {
 
     watchedVideos = (await localStorageGet(null)) || {};
 
-    const now = Date.now() - operations.length;
+    // Assign timestamps preserving order: first in batches = newest = highest timestamp
+    const now = Date.now();
     for (const [index, operation] of operations.entries()) {
-        saveVideoOperation(operation, now + index);
+        saveVideoOperation(operation, now - index);
     }
 
     // old format
@@ -117,6 +118,8 @@ async function loadWatchedVideos() {
 
 let lastSyncUpdate = Date.now();
 let saveTimeout;
+let lastSyncError = null;
+
 async function syncWatchedVideos() {
     if (Date.now() - lastSyncUpdate < WATCHED_SYNC_THROTTLE) {
         clearTimeout(saveTimeout);
@@ -125,6 +128,7 @@ async function syncWatchedVideos() {
     }
     const batches = {};
     let currentBatch = [];
+    let droppedCount = 0;
 
     const sortedVideoOperations = (
         Object.keys(watchedVideos)
@@ -144,7 +148,10 @@ async function syncWatchedVideos() {
             ...batches,
             [batchKey]: potentialBatch
         }).length > 100000) {
-            // quota exhausted, older entries will be discarded
+            // quota exhausted, count remaining as dropped
+            droppedCount = sortedVideoOperations.length -
+                Object.values(batches).reduce((sum, b) => sum + b.length, 0) -
+                currentBatch.length;
             break;
         }
 
@@ -161,16 +168,80 @@ async function syncWatchedVideos() {
     }
 
     try {
-        await new Promise(resolve => {
-            brwsr.storage.sync.set(batches, resolve);
+        // Get existing batch keys to clean up stale ones after write
+        const existingSyncData = await syncStorageGet(null);
+        const existingBatchKeys = Object.keys(existingSyncData)
+            .filter(key => key.indexOf(VIDEO_WATCH_KEY) === 0);
+
+        // Write new batches
+        await new Promise((resolve, reject) => {
+            brwsr.storage.sync.set(batches, () => {
+                if (brwsr.runtime.lastError) {
+                    reject(new Error(brwsr.runtime.lastError.message));
+                } else {
+                    resolve();
+                }
+            });
         });
+
+        // Remove old batch keys that are no longer needed
+        const newBatchKeys = Object.keys(batches);
+        const keysToRemove = existingBatchKeys.filter(key => !newBatchKeys.includes(key));
+        if (keysToRemove.length > 0) {
+            await new Promise((resolve, reject) => {
+                brwsr.storage.sync.remove(keysToRemove, () => {
+                    if (brwsr.runtime.lastError) {
+                        reject(new Error(brwsr.runtime.lastError.message));
+                    } else {
+                        resolve();
+                    }
+                });
+            });
+        }
+
         lastSyncUpdate = Date.now();
+        lastSyncError = null;
     }
     catch (error) {
-        logError({message: "Sync failed", stack: error?.stack || ""});
+        lastSyncError = error.message;
+        logError({message: "Sync failed: " + error.message, stack: error?.stack || ""});
+        throw error;
     }
 
-    return Object.values(batches).map(batch => batch.length).reduce((acc, batchLength) => acc + batchLength, 0);
+    const syncedCount = Object.values(batches).reduce((acc, batch) => acc + batch.length, 0);
+
+    if (droppedCount > 0) {
+        logWarn("Sync quota full: " + droppedCount + " older videos not synced");
+    }
+
+    return syncedCount;
+}
+
+async function clearOldestVideos(count) {
+    const sortedByAge = Object.keys(watchedVideos)
+        .filter(key => key.length === 12 && typeof watchedVideos[key] === 'number')
+        .sort((a, b) => watchedVideos[a] - watchedVideos[b]);  // Oldest first
+
+    const toRemove = sortedByAge.slice(0, count);
+
+    for (const key of toRemove) {
+        delete watchedVideos[key];
+    }
+
+    // Remove from local storage
+    await new Promise(resolve => {
+        brwsr.storage.local.remove(toRemove, () => {
+            if (brwsr.runtime && brwsr.runtime.lastError) {
+                console.error("Failed to remove watched videos from local storage:", toRemove, brwsr.runtime.lastError);
+            }
+            resolve();
+        });
+    });
+
+    // Sync the changes
+    await syncWatchedVideos();
+
+    return toRemove.length;
 }
 
 brwsr.storage.onChanged.addListener((changes, areaName) => {

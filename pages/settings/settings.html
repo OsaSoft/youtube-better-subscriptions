@@ -300,6 +300,64 @@
             </button>
         </div>
 
+        <!-- Sync Diagnostics Card -->
+        <section class="settings-card" id="settings-sync-diagnostics">
+            <div class="settings-card__header">
+                <svg class="settings-card__icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>
+                </svg>
+                <h2 class="settings-card__title">Sync Diagnostics</h2>
+            </div>
+            <div class="settings-card__content">
+                <div class="settings-list">
+                    <div class="sync-status">
+                        <div class="sync-status__row">
+                            <span class="sync-status__label">Sync storage:</span>
+                            <span class="sync-status__value" id="sync-storage-usage">Loading...</span>
+                        </div>
+                        <div class="sync-status__row">
+                            <span class="sync-status__label">Videos in sync:</span>
+                            <span class="sync-status__value" id="sync-video-count">Loading...</span>
+                        </div>
+                        <div class="sync-status__row">
+                            <span class="sync-status__label">Videos in local:</span>
+                            <span class="sync-status__value" id="local-video-count">Loading...</span>
+                        </div>
+                    </div>
+
+                    <div class="data-action">
+                        <div class="data-action__info">
+                            <span class="data-action__title">Test sync connectivity</span>
+                            <span class="data-action__description">Write and read a test value to verify sync storage is working</span>
+                        </div>
+                        <button id="test-sync" class="btn btn-secondary">Test Sync</button>
+                    </div>
+
+                    <div class="data-action">
+                        <div class="data-action__info">
+                            <span class="data-action__title">Force re-sync</span>
+                            <span class="data-action__description">Push all local watched videos to sync storage</span>
+                        </div>
+                        <button id="force-sync" class="btn btn-secondary">Force Sync</button>
+                    </div>
+
+                    <div class="data-action">
+                        <div class="data-action__info">
+                            <span class="data-action__title">Clear oldest videos</span>
+                            <span class="data-action__description">Remove the oldest watched videos to free up sync quota</span>
+                            <div class="data-action__controls">
+                                <input type="number" id="clear-oldest-count" class="input-number" value="500" min="1" max="5000" style="width: 80px;" aria-label="Number of videos to clear">
+                                <span class="input-unit">videos</span>
+                            </div>
+                        </div>
+                        <button id="clear-oldest" class="btn btn-secondary">Clear Oldest</button>
+                    </div>
+
+                    <div id="sync-result" class="sync-result"></div>
+                </div>
+            </div>
+        </section>
+
         <!-- Data Management Card -->
         <section class="settings-card" id="settings-watched-manipulation">
             <div class="settings-card__header">
