@@ -208,10 +208,10 @@ async function performClearVideos() {
 
     if (clearLocal) {
         // Clear only watched-video-related data from local storage, preserving settings
-        const localData = await new Promise((resolve) => {
-            brwsr.storage.local.get(null, resolve);
-        });
-        const localWatchedKeys = Object.keys(localData || {}).filter(isVideoKey);
+        const localData = await localStorageGet(null);
+        const localWatchedKeys = Object.keys(localData || {}).filter(
+            key => isVideoKey(key) || key.length === 11
+        );
 
         const chunkSize = 500;
         for (let i = 0; i < localWatchedKeys.length; i += chunkSize) {
@@ -219,8 +219,10 @@ async function performClearVideos() {
             await storageLocalRemove(chunk);
         }
 
-        // Clear in-memory watched videos
-        for (const key of Object.keys(watchedVideos).filter(isVideoKey)) {
+        // Clear in-memory watched videos (current + legacy format)
+        for (const key of Object.keys(watchedVideos).filter(
+            k => isVideoKey(k) || k.length === 11
+        )) {
             delete watchedVideos[key];
         }
     }
@@ -449,9 +451,11 @@ async function forcePullFromSync() {
     resultEl.className = "sync-result sync-result--info";
 
     try {
-        // Clear all local video keys so loadWatchedVideos re-imports everything from sync
+        // Clear all local video keys (current + legacy format) so loadWatchedVideos re-imports everything from sync
         const localData = await localStorageGet(null);
-        const localVideoKeys = Object.keys(localData || {}).filter(isVideoKey);
+        const localVideoKeys = Object.keys(localData || {}).filter(
+            key => isVideoKey(key) || key.length === 11
+        );
 
         const chunkSize = 500;
         for (let i = 0; i < localVideoKeys.length; i += chunkSize) {
@@ -459,8 +463,10 @@ async function forcePullFromSync() {
             await storageLocalRemove(chunk);
         }
 
-        // Reset in-memory video keys
-        for (const key of Object.keys(watchedVideos).filter(isVideoKey)) {
+        // Reset in-memory video keys (current + legacy format)
+        for (const key of Object.keys(watchedVideos).filter(
+            k => isVideoKey(k) || k.length === 11
+        )) {
             delete watchedVideos[key];
         }
 
