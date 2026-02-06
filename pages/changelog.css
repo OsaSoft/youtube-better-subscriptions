@@ -147,6 +147,17 @@
     font-weight: 500;
 }
 
+.version-entry__note {
+    margin: var(--spacing-sm) 0 0 var(--spacing-lg);
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+    background: #f9f9f9;
+    border-left: 3px solid var(--color-border);
+    border-radius: var(--radius-sm);
+}
+
 /* Responsive adjustments */
 @media (max-width: 600px) {
     .badge {

@@ -26,16 +26,19 @@
                 <svg class="card__icon" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
                 </svg>
-                <h2 class="card__title">What's New in v0.23.0</h2>
+                <h2 class="card__title">What's New in v0.24.0</h2>
                 <span class="badge badge--latest">LATEST</span>
             </div>
             <div class="card__content">
                 <ul class="feature-list">
-                    <li class="feature-list__item">Option to hide livestreams (separate from premieres)</li>
-                    <li class="feature-list__item">Option to hide members-only videos</li>
-                    <li class="feature-list__item">Option to hide the "Mark as watched" button</li>
-                    <li class="feature-list__item">SHA256 checksums added to releases for integrity verification</li>
+                    <li class="feature-list__item">Improved sync storage with real timestamps (v2 format) for accurate cross-device sync</li>
+                    <li class="feature-list__item">Storage diagnostics section in settings page (view video counts, sync batch usage)</li>
+                    <li class="feature-list__item">Ability to clear N oldest watched videos from settings</li>
+                    <li class="feature-list__item">Fixed import button functionality</li>
                 </ul>
+                <p class="version-entry__note"><strong>Note on sync storage upgrade:</strong> If you have full sync storage and videos aren't syncing across devices:
+                    (1) Let old entries naturally get replaced — the new format correctly evicts the oldest videos first.
+                    (2) Or clear all data via Settings → "Clear watched videos" to start fresh. <em>Warning: this removes all "mark as watched" data across all synced devices.</em></p>
             </div>
         </section>
 
@@ -63,14 +66,19 @@
                 <h2 class="card__title">Complete Changelog</h2>
             </div>
             <div class="card__content changelog-content">
-                <!-- TODO next release: Add a note about the sync storage v2 format change.
-                     Users with full sync storage who experience videos not syncing across devices
-                     have two options:
-                     1. Let old entries naturally get replaced over time by newer ones (the v2
-                        format now correctly identifies and evicts the oldest videos first).
-                     2. Clear all watched video data via the Settings page ("Clear watched videos"
-                        button) to start fresh. WARNING: this will cause loss of all existing
-                        "mark as watched" data across all synced devices. -->
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.24.0 <span class="version-entry__date">February 6, 2026</span></h3>
+                    <ul class="version-entry__changes">
+                        <li>Improved sync storage with real timestamps (v2 format) for accurate cross-device sync</li>
+                        <li>Storage diagnostics section in settings page (view video counts, sync batch usage)</li>
+                        <li>Ability to clear N oldest watched videos from settings</li>
+                        <li>Fixed import button functionality</li>
+                    </ul>
+                    <p class="version-entry__note"><strong>Note on sync storage upgrade:</strong> This version upgrades the sync storage format. If you have full sync storage and experience videos not syncing across devices, you have two options:
+                        (1) Let old entries naturally get replaced over time — the new format correctly identifies and evicts the oldest videos first.
+                        (2) Clear all watched video data via Settings → "Clear watched videos" to start fresh. <em>Warning: this will remove all existing "mark as watched" data across all synced devices.</em></p>
+                </article>
+
                 <article class="version-entry">
                     <h3 class="version-entry__title">0.23.0 <span class="version-entry__date">February 3, 2026</span></h3>
                     <ul class="version-entry__changes">
