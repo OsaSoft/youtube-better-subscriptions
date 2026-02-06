@@ -208,9 +208,7 @@ async function performClearVideos() {
         brwsr.storage.local.get(null, resolve);
     });
     const localKeys = Object.keys(localData || {});
-    const localWatchedKeys = localKeys.filter(key => {
-        return key.length === 12 && (key[0] === 'w' || key[0] === 'n');
-    });
+    const localWatchedKeys = localKeys.filter(isVideoKey);
 
     // Remove local keys in chunks to avoid potential limits
     const chunkSize = 500;
@@ -222,11 +220,11 @@ async function performClearVideos() {
     // Clear watched videos from sync storage (vw_* batch keys)
     const syncData = await syncStorageGet(null);
     const syncKeys = Object.keys(syncData || {});
+    const syncBatchKeys = syncKeys.filter(key => key.indexOf(VIDEO_WATCH_KEY) === 0);
 
     if (propagateToDevices) {
         // Remove batch keys but preserve vw_meta
-        const syncBatchKeys = syncKeys.filter(key => key.indexOf(VIDEO_WATCH_KEY) === 0 && key !== SYNC_META_KEY);
-        for (const key of syncBatchKeys) {
+        for (const key of syncBatchKeys.filter(key => key !== SYNC_META_KEY)) {
             await storageSyncRemove(key);
         }
 
@@ -247,17 +245,14 @@ async function performClearVideos() {
         brwsr.storage.local.set({ [CLEAR_SENTINEL_KEY]: clearTimestamp });
     } else {
         // Local-only clear: remove ALL vw_* keys including vw_meta
-        const syncWatchedKeys = syncKeys.filter(key => key.indexOf(VIDEO_WATCH_KEY) === 0);
-        for (const key of syncWatchedKeys) {
+        for (const key of syncBatchKeys) {
             await storageSyncRemove(key);
         }
     }
 
     // Clear in-memory watched videos (remove video keys, keep other data)
-    for (const key of Object.keys(watchedVideos)) {
-        if (key.length === 12 && (key[0] === 'w' || key[0] === 'n')) {
-            delete watchedVideos[key];
-        }
+    for (const key of Object.keys(watchedVideos).filter(isVideoKey)) {
+        delete watchedVideos[key];
     }
 
     showToast("All watched videos cleared", "success");

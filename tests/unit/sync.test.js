@@ -422,8 +422,10 @@ describe('Sync functionality', () => {
             const syncStore = browser._getSyncStore();
             const batch = syncStore['vw_0'];
 
-            // Brand new video should be first in the batch
+            // Brand new video should be first in the batch with a valid timestamp
             expect(batch[0].startsWith('wBRANDNEW001:')).toBe(true);
+            const decodedTs = parseInt(batch[0].split(':')[1], 36) * 1000;
+            expect(Math.abs(decodedTs - now)).toBeLessThan(1000);
         });
 
         test('sync then load preserves timestamp order', async () => {

@@ -31,6 +31,10 @@ const SYNC_FORMAT_VERSION = 2;
 const SYNC_META_KEY = "vw_meta";
 const CLEAR_SENTINEL_KEY = "vw_last_cleared";
 
+function isVideoKey(key) {
+    return key.length === 12 && (key[0] === 'w' || key[0] === 'n');
+}
+
 function encodeTimestamp(ms) {
     return Math.floor(ms / 1000).toString(36);
 }
@@ -136,9 +140,7 @@ async function loadWatchedVideos() {
     const clearedAt = (meta && meta.clearedAt) || 0;
     const lastCleared = watchedVideos[CLEAR_SENTINEL_KEY] || 0;
     if (clearedAt > lastCleared) {
-        const localVideoKeys = Object.keys(watchedVideos).filter(
-            key => key.length === 12 && (key[0] === 'w' || key[0] === 'n')
-        );
+        const localVideoKeys = Object.keys(watchedVideos).filter(isVideoKey);
         for (const key of localVideoKeys) {
             delete watchedVideos[key];
         }
@@ -196,7 +198,7 @@ async function syncWatchedVideos() {
 
     const sortedVideoOperations = (
         Object.keys(watchedVideos)
-            .filter(key => key.length === 12 && typeof watchedVideos[key] === 'number')
+            .filter(key => isVideoKey(key) && typeof watchedVideos[key] === 'number')
             .sort((key1, key2) => watchedVideos[key2] - watchedVideos[key1])
     );
 
@@ -293,7 +295,7 @@ async function syncWatchedVideos() {
 
 async function clearOldestVideos(count) {
     const sortedByAge = Object.keys(watchedVideos)
-        .filter(key => key.length === 12 && typeof watchedVideos[key] === 'number')
+        .filter(key => isVideoKey(key) && typeof watchedVideos[key] === 'number')
         .sort((a, b) => watchedVideos[a] - watchedVideos[b]);  // Oldest first
 
     const toRemove = sortedByAge.slice(0, count);

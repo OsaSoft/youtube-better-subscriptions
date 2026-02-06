@@ -94,6 +94,7 @@ function loadCommon() {
     global.SYNC_FORMAT_VERSION = context.SYNC_FORMAT_VERSION;
     global.SYNC_META_KEY = context.SYNC_META_KEY;
     global.CLEAR_SENTINEL_KEY = context.CLEAR_SENTINEL_KEY;
+    global.isVideoKey = context.isVideoKey;
     global.brwsr = context.brwsr;
     global.watchedVideos = context.watchedVideos;
     global.syncStorageGet = context.syncStorageGet;
