@@ -330,6 +330,9 @@ async function runSyncDiagnostics() {
             resultEl.textContent = "Warning: " + notSynced + " videos not synced due to storage quota limit. " +
                 "These older videos will only exist on this device. Use 'Clear oldest videos' to free up space.";
             resultEl.className = "sync-result sync-result--warning";
+        } else {
+            resultEl.textContent = "";
+            resultEl.className = "sync-result";
         }
     } catch (error) {
         document.getElementById("sync-storage-usage").textContent = "Error";
@@ -363,7 +366,15 @@ async function testSyncConnectivity() {
         const result = await syncStorageGet(testKey);
 
         // Cleanup
-        await new Promise(resolve => brwsr.storage.sync.remove(testKey, resolve));
+        await new Promise((resolve, reject) => {
+            brwsr.storage.sync.remove(testKey, () => {
+                if (brwsr.runtime.lastError) {
+                    reject(new Error(brwsr.runtime.lastError.message));
+                } else {
+                    resolve();
+                }
+            });
+        });
 
         if (result[testKey] === testValue) {
             resultEl.textContent = "Sync storage is working correctly";

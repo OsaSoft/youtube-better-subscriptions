@@ -205,6 +205,7 @@ async function syncWatchedVideos() {
     catch (error) {
         lastSyncError = error.message;
         logError({message: "Sync failed: " + error.message, stack: error?.stack || ""});
+        throw error;
     }
 
     const syncedCount = Object.values(batches).reduce((acc, batch) => acc + batch.length, 0);
@@ -228,7 +229,14 @@ async function clearOldestVideos(count) {
     }
 
     // Remove from local storage
-    await new Promise(resolve => brwsr.storage.local.remove(toRemove, resolve));
+    await new Promise(resolve => {
+        brwsr.storage.local.remove(toRemove, () => {
+            if (brwsr.runtime && brwsr.runtime.lastError) {
+                console.error("Failed to remove watched videos from local storage:", toRemove, brwsr.runtime.lastError);
+            }
+            resolve();
+        });
+    });
 
     // Sync the changes
     await syncWatchedVideos();
