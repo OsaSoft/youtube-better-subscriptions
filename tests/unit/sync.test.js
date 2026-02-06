@@ -689,6 +689,165 @@ describe('Sync functionality', () => {
         });
     });
 
+    describe('Sync-propagated clear', () => {
+        test('detects clearedAt and clears local video data', async () => {
+            const clearTime = Date.now();
+
+            browser._setSyncStore({
+                'vw_meta': { version: 2, clearedAt: clearTime },
+            });
+            browser._setLocalStore({
+                'wVIDEO000001': clearTime - 5000,
+                'wVIDEO000002': clearTime - 3000,
+                'settings_cache': 'preserved',
+            });
+
+            await commonContext.loadWatchedVideos();
+
+            const localStore = browser._getLocalStore();
+            expect(localStore['wVIDEO000001']).toBeUndefined();
+            expect(localStore['wVIDEO000002']).toBeUndefined();
+            expect(localStore['settings_cache']).toBe('preserved');
+            expect(localStore['vw_last_cleared']).toBe(clearTime);
+        });
+
+        test('repeated loads do not re-clear when vw_last_cleared matches', async () => {
+            const clearTime = Date.now();
+
+            browser._setSyncStore({
+                'vw_meta': { version: 2, clearedAt: clearTime },
+            });
+            browser._setLocalStore({
+                'vw_last_cleared': clearTime,
+                'wVIDEO000001': clearTime + 1000,
+            });
+
+            await commonContext.loadWatchedVideos();
+
+            const localStore = browser._getLocalStore();
+            // Video added after the clear should be preserved
+            expect(localStore['wVIDEO000001']).toBe(clearTime + 1000);
+        });
+
+        test('syncWatchedVideos preserves clearedAt in vw_meta', async () => {
+            const clearTime = Date.now() - 5000;
+            const now = Date.now();
+
+            browser._setSyncStore({
+                'vw_meta': { version: 2, clearedAt: clearTime },
+            });
+            browser._setLocalStore({
+                'vw_last_cleared': clearTime,
+                'wVIDEO000001': now,
+            });
+
+            await commonContext.loadWatchedVideos();
+            await new Promise(resolve => setTimeout(resolve, 1100));
+            await commonContext.syncWatchedVideos();
+
+            const syncStore = browser._getSyncStore();
+            expect(syncStore['vw_meta'].version).toBe(2);
+            expect(syncStore['vw_meta'].clearedAt).toBe(clearTime);
+        });
+
+        test('full cross-device flow: Device A has data, Device B clears, Device A loads and clears', async () => {
+            const now = Date.now();
+
+            // Device A: has videos in local
+            browser._setLocalStore({
+                'wVIDEO000001': now - 5000,
+                'wVIDEO000002': now - 3000,
+                'wVIDEO000003': now - 1000,
+            });
+            browser._setSyncStore({});
+
+            await commonContext.loadWatchedVideos();
+            await new Promise(resolve => setTimeout(resolve, 1100));
+            await commonContext.syncWatchedVideos();
+
+            // Device B clears with propagation: writes clearedAt to sync, removes batches
+            const clearTime = Date.now();
+            browser._setSyncStore({
+                'vw_meta': { version: 2, clearedAt: clearTime },
+            });
+
+            // Device A reloads (still has local data)
+            commonContext = loadCommon();
+            await commonContext.loadWatchedVideos();
+
+            const localStore = browser._getLocalStore();
+            expect(localStore['wVIDEO000001']).toBeUndefined();
+            expect(localStore['wVIDEO000002']).toBeUndefined();
+            expect(localStore['wVIDEO000003']).toBeUndefined();
+            expect(localStore['vw_last_cleared']).toBe(clearTime);
+        });
+
+        test('new videos added after clear by another device are preserved', async () => {
+            const clearTime = Date.now() - 2000;
+            const now = Date.now();
+            const encoded = Math.floor(now / 1000).toString(36);
+
+            // Sync has clearedAt AND a new video added after the clear
+            browser._setSyncStore({
+                'vw_meta': { version: 2, clearedAt: clearTime },
+                'vw_0': ['wNEWVIDEO001:' + encoded],
+            });
+            // Local has old videos that should be cleared
+            browser._setLocalStore({
+                'wOLDVIDEO001': clearTime - 5000,
+                'wOLDVIDEO002': clearTime - 3000,
+            });
+
+            await commonContext.loadWatchedVideos();
+
+            const localStore = browser._getLocalStore();
+            // Old videos should be cleared
+            expect(localStore['wOLDVIDEO001']).toBeUndefined();
+            expect(localStore['wOLDVIDEO002']).toBeUndefined();
+            // New video from sync should be preserved (added after clear ran)
+            expect(localStore['wNEWVIDEO001']).toBeDefined();
+        });
+
+        test('same-device clear does not re-trigger', async () => {
+            const clearTime = Date.now();
+
+            // Simulate same device already cleared: vw_last_cleared matches clearedAt
+            browser._setSyncStore({
+                'vw_meta': { version: 2, clearedAt: clearTime },
+            });
+            browser._setLocalStore({
+                'vw_last_cleared': clearTime,
+                'wNEWVIDEO001': clearTime + 500,
+            });
+
+            await commonContext.loadWatchedVideos();
+
+            const localStore = browser._getLocalStore();
+            // Should not have cleared the new video
+            expect(localStore['wNEWVIDEO001']).toBe(clearTime + 500);
+        });
+
+        test('device coming online much later still detects clearedAt', async () => {
+            const clearTime = Date.now() - 7 * 86400000; // 1 week ago
+
+            browser._setSyncStore({
+                'vw_meta': { version: 2, clearedAt: clearTime },
+            });
+            // Device has no vw_last_cleared (never seen the clear before)
+            browser._setLocalStore({
+                'wOLDVIDEO001': clearTime - 30 * 86400000,
+                'wOLDVIDEO002': clearTime - 20 * 86400000,
+            });
+
+            await commonContext.loadWatchedVideos();
+
+            const localStore = browser._getLocalStore();
+            expect(localStore['wOLDVIDEO001']).toBeUndefined();
+            expect(localStore['wOLDVIDEO002']).toBeUndefined();
+            expect(localStore['vw_last_cleared']).toBe(clearTime);
+        });
+    });
+
     describe('Malformed entry handling', () => {
         test('v2 entry without timestamp uses current time', async () => {
             const before = Date.now();

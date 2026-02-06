@@ -29,6 +29,7 @@ const WATCHED_SYNC_THROTTLE = 1000;
 // Sync format v2: embed real timestamps in sync entries
 const SYNC_FORMAT_VERSION = 2;
 const SYNC_META_KEY = "vw_meta";
+const CLEAR_SENTINEL_KEY = "vw_last_cleared";
 
 function encodeTimestamp(ms) {
     return Math.floor(ms / 1000).toString(36);
@@ -132,6 +133,20 @@ async function loadWatchedVideos() {
 
     watchedVideos = (await localStorageGet(null)) || {};
 
+    const clearedAt = (meta && meta.clearedAt) || 0;
+    const lastCleared = watchedVideos[CLEAR_SENTINEL_KEY] || 0;
+    if (clearedAt > lastCleared) {
+        const localVideoKeys = Object.keys(watchedVideos).filter(
+            key => key.length === 12 && (key[0] === 'w' || key[0] === 'n')
+        );
+        for (const key of localVideoKeys) {
+            delete watchedVideos[key];
+        }
+        brwsr.storage.local.remove(localVideoKeys);
+        watchedVideos[CLEAR_SENTINEL_KEY] = clearedAt;
+        brwsr.storage.local.set({ [CLEAR_SENTINEL_KEY]: clearedAt });
+    }
+
     if (syncVersion >= 2) {
         // v2: extract real timestamps from packed entries
         for (const entry of operations) {
@@ -224,6 +239,11 @@ async function syncWatchedVideos() {
         const existingSyncData = await syncStorageGet(null);
         const existingBatchKeys = Object.keys(existingSyncData)
             .filter(key => key.indexOf(VIDEO_WATCH_KEY) === 0);
+
+        const existingMeta = existingSyncData[SYNC_META_KEY];
+        if (existingMeta && existingMeta.clearedAt) {
+            batches[SYNC_META_KEY].clearedAt = existingMeta.clearedAt;
+        }
 
         // Write new batches
         await new Promise((resolve, reject) => {

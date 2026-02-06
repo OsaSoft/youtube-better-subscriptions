@@ -165,6 +165,7 @@ function showConfirmModal() {
 
 function hideConfirmModal() {
     document.getElementById("confirm-modal").classList.add("hidden");
+    document.getElementById("modal-clear-all-devices").checked = false;
     // Restore focus to the element that opened the modal
     if (previouslyFocusedElement) {
         previouslyFocusedElement.focus();
@@ -198,6 +199,7 @@ function storageSyncRemove(key) {
 }
 
 async function performClearVideos() {
+    const propagateToDevices = document.getElementById("modal-clear-all-devices").checked;
     hideConfirmModal();
 
     // Clear only watched-video-related data from local storage, preserving settings
@@ -220,9 +222,35 @@ async function performClearVideos() {
     // Clear watched videos from sync storage (vw_* batch keys)
     const syncData = await syncStorageGet(null);
     const syncKeys = Object.keys(syncData || {});
-    const syncWatchedKeys = syncKeys.filter(key => key.indexOf(VIDEO_WATCH_KEY) === 0);
-    for (const key of syncWatchedKeys) {
-        await storageSyncRemove(key);
+
+    if (propagateToDevices) {
+        // Remove batch keys but preserve vw_meta
+        const syncBatchKeys = syncKeys.filter(key => key.indexOf(VIDEO_WATCH_KEY) === 0 && key !== SYNC_META_KEY);
+        for (const key of syncBatchKeys) {
+            await storageSyncRemove(key);
+        }
+
+        // Write clearedAt sentinel to vw_meta
+        const clearTimestamp = Date.now();
+        await new Promise((resolve, reject) => {
+            brwsr.storage.sync.set({ [SYNC_META_KEY]: { version: SYNC_FORMAT_VERSION, clearedAt: clearTimestamp } }, () => {
+                if (brwsr.runtime.lastError) {
+                    reject(new Error(brwsr.runtime.lastError.message));
+                } else {
+                    resolve();
+                }
+            });
+        });
+
+        // Store sentinel locally so this device doesn't re-clear
+        watchedVideos[CLEAR_SENTINEL_KEY] = clearTimestamp;
+        brwsr.storage.local.set({ [CLEAR_SENTINEL_KEY]: clearTimestamp });
+    } else {
+        // Local-only clear: remove ALL vw_* keys including vw_meta
+        const syncWatchedKeys = syncKeys.filter(key => key.indexOf(VIDEO_WATCH_KEY) === 0);
+        for (const key of syncWatchedKeys) {
+            await storageSyncRemove(key);
+        }
     }
 
     // Clear in-memory watched videos (remove video keys, keep other data)
