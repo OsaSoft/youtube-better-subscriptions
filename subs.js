@@ -70,6 +70,7 @@ function loadMoreVideos() {
 
     // workaround to load more videos, slightly scroll in the sidebar :)
     let sidebar = document.getElementById("guide-inner-content");
+    if (!sidebar) return;
     let top = sidebar.scrollTop;
     // +1 -1 so the scroll moves a bit even if its at complete bottom or top
     sidebar.scrollTop += 1;

@@ -851,6 +851,37 @@ describe('Sync functionality', () => {
     });
 
     describe('Malformed entry handling', () => {
+        test('unpackSyncEntry returns null operation for non-string inputs', () => {
+            for (const input of [null, undefined, 42, {}, []]) {
+                const result = commonContext.unpackSyncEntry(input);
+                expect(result.operation).toBeNull();
+                expect(result.timestamp).toBeNull();
+            }
+        });
+
+        test('loadWatchedVideos skips non-string entries in v2 batches', async () => {
+            browser._setSyncStore({
+                'vw_meta': { version: 2 },
+                'vw_0': [
+                    commonContext.packSyncEntry('wGOODVIDEO01', 1700000000000),
+                    null,
+                    undefined,
+                    42,
+                ],
+            });
+            browser._setLocalStore({});
+
+            await commonContext.loadWatchedVideos();
+
+            const localStore = browser._getLocalStore();
+            // Good entry should be persisted
+            expect(localStore['wGOODVIDEO01']).toBeDefined();
+            // Corrupted entries should NOT be persisted
+            expect(localStore['null']).toBeUndefined();
+            expect(localStore['undefined']).toBeUndefined();
+            expect(localStore['42']).toBeUndefined();
+        });
+
         test('v2 entry without timestamp uses current time', async () => {
             const before = Date.now();
 

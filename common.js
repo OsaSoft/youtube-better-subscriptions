@@ -48,6 +48,10 @@ function packSyncEntry(operation, timestampMs) {
 }
 
 function unpackSyncEntry(entry) {
+    if (typeof entry !== 'string') {
+        logWarn("Invalid sync entry (expected string, got " + typeof entry + ")");
+        return { operation: null, timestamp: null };
+    }
     const colonIndex = entry.indexOf(':');
     if (colonIndex === -1) {
         // v1 format: no timestamp embedded
@@ -106,7 +110,7 @@ function unwatchVideo(videoId, now) {
 }
 
 async function loadWatchedVideos() {
-    const items = await syncStorageGet(null);
+    const items = await syncStorageGet(null) || {};
     const batches = [];
 
     // Detect sync format version
@@ -132,6 +136,7 @@ async function loadWatchedVideos() {
 
     const operations = [];
     for (const batch of batches) {
+        if (!batch) continue;
         operations.push(...batch);
     }
 
@@ -153,6 +158,7 @@ async function loadWatchedVideos() {
         // v2: extract real timestamps from packed entries
         for (const entry of operations) {
             const { operation, timestamp } = unpackSyncEntry(entry);
+            if (!operation) continue;
             if (timestamp !== null) {
                 saveVideoOperation(operation, timestamp);
             } else {
@@ -238,7 +244,7 @@ async function syncWatchedVideos() {
 
     try {
         // Get existing batch keys to clean up stale ones after write
-        const existingSyncData = await syncStorageGet(null);
+        const existingSyncData = await syncStorageGet(null) || {};
         const existingBatchKeys = Object.keys(existingSyncData)
             .filter(key => key.indexOf(VIDEO_WATCH_KEY) === 0);
 
