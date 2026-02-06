@@ -84,6 +84,7 @@ function setupButtons() {
     document.getElementById("watched.clear").addEventListener("click", showConfirmModal);
     document.getElementById("test-sync").addEventListener("click", testSyncConnectivity);
     document.getElementById("force-sync").addEventListener("click", forceSyncAll);
+    document.getElementById("force-pull").addEventListener("click", forcePullFromSync);
     document.getElementById("clear-oldest").addEventListener("click", clearOldestVideosHandler);
 
     // Modal event listeners
@@ -165,7 +166,7 @@ function showConfirmModal() {
 
 function hideConfirmModal() {
     document.getElementById("confirm-modal").classList.add("hidden");
-    document.getElementById("modal-clear-all-devices").checked = false;
+    document.querySelector('input[name="clear-scope"][value="both"]').checked = true;
     // Restore focus to the element that opened the modal
     if (previouslyFocusedElement) {
         previouslyFocusedElement.focus();
@@ -199,63 +200,73 @@ function storageSyncRemove(key) {
 }
 
 async function performClearVideos() {
-    const propagateToDevices = document.getElementById("modal-clear-all-devices").checked;
+    const scope = document.querySelector('input[name="clear-scope"]:checked').value;
     hideConfirmModal();
 
-    // Clear only watched-video-related data from local storage, preserving settings
-    // Local keys are 12-char video operations (e.g., "wABC123xyz01" or "nABC123xyz01")
-    const localData = await new Promise((resolve) => {
-        brwsr.storage.local.get(null, resolve);
-    });
-    const localKeys = Object.keys(localData || {});
-    const localWatchedKeys = localKeys.filter(isVideoKey);
+    const clearLocal = scope === "both" || scope === "propagate" || scope === "local";
+    const clearSync = scope === "both" || scope === "propagate" || scope === "sync";
 
-    // Remove local keys in chunks to avoid potential limits
-    const chunkSize = 500;
-    for (let i = 0; i < localWatchedKeys.length; i += chunkSize) {
-        const chunk = localWatchedKeys.slice(i, i + chunkSize);
-        await storageLocalRemove(chunk);
-    }
+    if (clearLocal) {
+        // Clear only watched-video-related data from local storage, preserving settings
+        const localData = await localStorageGet(null);
+        const localWatchedKeys = Object.keys(localData || {}).filter(
+            key => isVideoKey(key) || key.length === 11
+        );
 
-    // Clear watched videos from sync storage (vw_* batch keys)
-    const syncData = await syncStorageGet(null);
-    const syncKeys = Object.keys(syncData || {});
-    const syncBatchKeys = syncKeys.filter(key => key.indexOf(VIDEO_WATCH_KEY) === 0);
-
-    if (propagateToDevices) {
-        // Remove batch keys but preserve vw_meta
-        for (const key of syncBatchKeys.filter(key => key !== SYNC_META_KEY)) {
-            await storageSyncRemove(key);
+        const chunkSize = 500;
+        for (let i = 0; i < localWatchedKeys.length; i += chunkSize) {
+            const chunk = localWatchedKeys.slice(i, i + chunkSize);
+            await storageLocalRemove(chunk);
         }
 
-        // Write clearedAt sentinel to vw_meta
-        const clearTimestamp = Date.now();
-        await new Promise((resolve, reject) => {
-            brwsr.storage.sync.set({ [SYNC_META_KEY]: { version: SYNC_FORMAT_VERSION, clearedAt: clearTimestamp } }, () => {
-                if (brwsr.runtime.lastError) {
-                    reject(new Error(brwsr.runtime.lastError.message));
-                } else {
-                    resolve();
-                }
+        // Clear in-memory watched videos (current + legacy format)
+        for (const key of Object.keys(watchedVideos).filter(
+            k => isVideoKey(k) || k.length === 11
+        )) {
+            delete watchedVideos[key];
+        }
+    }
+
+    if (clearSync) {
+        const syncData = await syncStorageGet(null);
+        const syncBatchKeys = Object.keys(syncData || {}).filter(key => key.indexOf(VIDEO_WATCH_KEY) === 0);
+
+        if (scope === "propagate") {
+            // Remove batch keys but preserve vw_meta
+            for (const key of syncBatchKeys.filter(key => key !== SYNC_META_KEY)) {
+                await storageSyncRemove(key);
+            }
+
+            // Write clearedAt sentinel to vw_meta
+            const clearTimestamp = Date.now();
+            await new Promise((resolve, reject) => {
+                brwsr.storage.sync.set({ [SYNC_META_KEY]: { version: SYNC_FORMAT_VERSION, clearedAt: clearTimestamp } }, () => {
+                    if (brwsr.runtime.lastError) {
+                        reject(new Error(brwsr.runtime.lastError.message));
+                    } else {
+                        resolve();
+                    }
+                });
             });
-        });
 
-        // Store sentinel locally so this device doesn't re-clear
-        watchedVideos[CLEAR_SENTINEL_KEY] = clearTimestamp;
-        brwsr.storage.local.set({ [CLEAR_SENTINEL_KEY]: clearTimestamp });
-    } else {
-        // Local-only clear: remove ALL vw_* keys including vw_meta
-        for (const key of syncBatchKeys) {
-            await storageSyncRemove(key);
+            // Store sentinel locally so this device doesn't re-clear
+            watchedVideos[CLEAR_SENTINEL_KEY] = clearTimestamp;
+            brwsr.storage.local.set({ [CLEAR_SENTINEL_KEY]: clearTimestamp });
+        } else {
+            // Remove ALL vw_* keys including vw_meta
+            for (const key of syncBatchKeys) {
+                await storageSyncRemove(key);
+            }
         }
     }
 
-    // Clear in-memory watched videos (remove video keys, keep other data)
-    for (const key of Object.keys(watchedVideos).filter(isVideoKey)) {
-        delete watchedVideos[key];
-    }
-
-    showToast("All watched videos cleared", "success");
+    const scopeLabels = {
+        both: "local and sync",
+        propagate: "all (propagated to synced devices)",
+        local: "local",
+        sync: "sync",
+    };
+    showToast("Cleared " + scopeLabels[scope] + " watched video data", "success");
 
     // Refresh diagnostics display
     await runSyncDiagnostics();
@@ -429,6 +440,46 @@ async function forceSyncAll() {
         await runSyncDiagnostics();
     } catch (error) {
         resultEl.textContent = "Force sync failed: " + error.message;
+        resultEl.className = "sync-result sync-result--error";
+    }
+}
+
+async function forcePullFromSync() {
+    const resultEl = document.getElementById("sync-result");
+
+    resultEl.textContent = "Pulling from sync storage...";
+    resultEl.className = "sync-result sync-result--info";
+
+    try {
+        // Clear all local video keys (current + legacy format) so loadWatchedVideos re-imports everything from sync
+        const localData = await localStorageGet(null);
+        const localVideoKeys = Object.keys(localData || {}).filter(
+            key => isVideoKey(key) || key.length === 11
+        );
+
+        const chunkSize = 500;
+        for (let i = 0; i < localVideoKeys.length; i += chunkSize) {
+            const chunk = localVideoKeys.slice(i, i + chunkSize);
+            await storageLocalRemove(chunk);
+        }
+
+        // Reset in-memory video keys (current + legacy format)
+        for (const key of Object.keys(watchedVideos).filter(
+            k => isVideoKey(k) || k.length === 11
+        )) {
+            delete watchedVideos[key];
+        }
+
+        // Reload from sync — since local video keys are gone, all sync entries will be written
+        await loadWatchedVideos();
+
+        const pulledCount = Object.keys(watchedVideos).filter(isVideoKey).length;
+        resultEl.textContent = "Pulled " + pulledCount + " videos from sync storage";
+        resultEl.className = "sync-result sync-result--success";
+
+        await runSyncDiagnostics();
+    } catch (error) {
+        resultEl.textContent = "Force pull failed: " + error.message;
         resultEl.className = "sync-result sync-result--error";
     }
 }

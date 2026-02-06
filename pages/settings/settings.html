@@ -343,6 +343,14 @@
 
                     <div class="data-action">
                         <div class="data-action__info">
+                            <span class="data-action__title">Force pull from sync</span>
+                            <span class="data-action__description">Overwrite local watched video data with sync storage. Use when this device's watched history is out of date.</span>
+                        </div>
+                        <button id="force-pull" class="btn btn-secondary">Force Pull</button>
+                    </div>
+
+                    <div class="data-action">
+                        <div class="data-action__info">
                             <span class="data-action__title">Clear oldest videos</span>
                             <span class="data-action__description">Remove the oldest watched videos to free up sync quota</span>
                             <div class="data-action__controls">
@@ -451,12 +459,26 @@
                 <h3 class="modal__title" id="confirm-modal-title">Clear Watched Videos</h3>
             </div>
             <div class="modal__body">
-                <p>This will permanently delete all your watched video data.</p>
+                <p>This will permanently delete watched video data from the storage you select below.</p>
                 <p><strong>This action cannot be undone.</strong></p>
-                <label class="modal__checkbox-label">
-                    <input type="checkbox" id="modal-clear-all-devices">
-                    Clear on all synced devices
-                </label>
+                <div class="modal__radio-group">
+                    <label class="modal__radio-label">
+                        <input type="radio" name="clear-scope" value="both" checked>
+                        Clear local and sync storage
+                    </label>
+                    <label class="modal__radio-label">
+                        <input type="radio" name="clear-scope" value="propagate">
+                        Clear all and propagate to synced devices
+                    </label>
+                    <label class="modal__radio-label">
+                        <input type="radio" name="clear-scope" value="local">
+                        Clear local storage only
+                    </label>
+                    <label class="modal__radio-label">
+                        <input type="radio" name="clear-scope" value="sync">
+                        Clear sync storage only
+                    </label>
+                </div>
             </div>
             <div class="modal__footer">
                 <button id="modal-cancel" class="btn btn-secondary">Cancel</button>

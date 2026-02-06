@@ -565,17 +565,23 @@
     margin-bottom: 0;
 }
 
-.modal__checkbox-label {
+.modal__radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-md);
+}
+
+.modal__radio-label {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
-    margin-top: var(--spacing-md);
     font-size: var(--font-size-sm);
     color: var(--color-text);
     cursor: pointer;
 }
 
-.modal__checkbox-label input[type="checkbox"] {
+.modal__radio-label input[type="radio"] {
     width: 16px;
     height: 16px;
     cursor: pointer;
