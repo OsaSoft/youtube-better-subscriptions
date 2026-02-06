@@ -49,7 +49,8 @@ function packSyncEntry(operation, timestampMs) {
 
 function unpackSyncEntry(entry) {
     if (typeof entry !== 'string') {
-        return { operation: String(entry), timestamp: null };
+        logWarn("Invalid sync entry (expected string, got " + typeof entry + ")");
+        return { operation: null, timestamp: null };
     }
     const colonIndex = entry.indexOf(':');
     if (colonIndex === -1) {
@@ -157,6 +158,7 @@ async function loadWatchedVideos() {
         // v2: extract real timestamps from packed entries
         for (const entry of operations) {
             const { operation, timestamp } = unpackSyncEntry(entry);
+            if (!operation) continue;
             if (timestamp !== null) {
                 saveVideoOperation(operation, timestamp);
             } else {
