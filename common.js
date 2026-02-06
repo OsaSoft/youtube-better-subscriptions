@@ -48,6 +48,9 @@ function packSyncEntry(operation, timestampMs) {
 }
 
 function unpackSyncEntry(entry) {
+    if (typeof entry !== 'string') {
+        return { operation: String(entry), timestamp: null };
+    }
     const colonIndex = entry.indexOf(':');
     if (colonIndex === -1) {
         // v1 format: no timestamp embedded
@@ -106,7 +109,7 @@ function unwatchVideo(videoId, now) {
 }
 
 async function loadWatchedVideos() {
-    const items = await syncStorageGet(null);
+    const items = await syncStorageGet(null) || {};
     const batches = [];
 
     // Detect sync format version
@@ -132,6 +135,7 @@ async function loadWatchedVideos() {
 
     const operations = [];
     for (const batch of batches) {
+        if (!batch) continue;
         operations.push(...batch);
     }
 
@@ -238,7 +242,7 @@ async function syncWatchedVideos() {
 
     try {
         // Get existing batch keys to clean up stale ones after write
-        const existingSyncData = await syncStorageGet(null);
+        const existingSyncData = await syncStorageGet(null) || {};
         const existingBatchKeys = Object.keys(existingSyncData)
             .filter(key => key.indexOf(VIDEO_WATCH_KEY) === 0);
 

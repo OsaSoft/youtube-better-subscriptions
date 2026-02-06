@@ -27,8 +27,8 @@ function logWarn(content) {
 
 function logError(error) {
     // Always print errors regardless of log level
-    console.error(prepareMessage("ERROR! "), error.message);
-    console.error(error.stack.substring(0, 1000));
+    console.error(prepareMessage("ERROR! "), error?.message ?? error);
+    if (error?.stack) console.error(error.stack.substring(0, 1000));
 }
 
 function prepareMessage(content = null) {
