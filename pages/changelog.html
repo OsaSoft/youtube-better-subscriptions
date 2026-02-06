@@ -63,6 +63,14 @@
                 <h2 class="card__title">Complete Changelog</h2>
             </div>
             <div class="card__content changelog-content">
+                <!-- TODO next release: Add a note about the sync storage v2 format change.
+                     Users with full sync storage who experience videos not syncing across devices
+                     have two options:
+                     1. Let old entries naturally get replaced over time by newer ones (the v2
+                        format now correctly identifies and evicts the oldest videos first).
+                     2. Clear all watched video data via the Settings page ("Clear watched videos"
+                        button) to start fresh. WARNING: this will cause loss of all existing
+                        "mark as watched" data across all synced devices. -->
                 <article class="version-entry">
                     <h3 class="version-entry__title">0.23.0 <span class="version-entry__date">February 3, 2026</span></h3>
                     <ul class="version-entry__changes">
