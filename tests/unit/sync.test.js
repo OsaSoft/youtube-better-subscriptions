@@ -7,12 +7,28 @@
  * - Cleanup of stale batch keys
  * - Proper timestamp ordering when loading from sync
  * - clearOldestVideos function
+ * - v2 sync format with real timestamps
  *
  * Note: Due to VM context isolation, we primarily verify behavior through
  * the storage mock rather than direct object inspection where necessary.
  */
 
 const { loadUtil, loadCommon } = require('../helpers/load-source');
+
+// Helper: find a packed entry in a batch by its operation prefix
+function findEntry(batch, operationPrefix) {
+    return batch.find(e => e.startsWith(operationPrefix + ':') || e === operationPrefix);
+}
+
+// Helper: check if batch contains an entry starting with the given operation
+function batchHasEntry(batch, operationPrefix) {
+    return batch.some(e => e.startsWith(operationPrefix + ':') || e === operationPrefix);
+}
+
+// Helper: get index of entry by operation prefix
+function entryIndex(batch, operationPrefix) {
+    return batch.findIndex(e => e.startsWith(operationPrefix + ':') || e === operationPrefix);
+}
 
 describe('Sync functionality', () => {
     let commonContext;
@@ -38,9 +54,45 @@ describe('Sync functionality', () => {
 
             expect(syncedCount).toBe(3);
             const syncStore = browser._getSyncStore();
-            expect(syncStore['vw_0']).toContain('wABC12345678');
-            expect(syncStore['vw_0']).toContain('wDEF12345678');
-            expect(syncStore['vw_0']).toContain('wGHI12345678');
+            expect(batchHasEntry(syncStore['vw_0'], 'wABC12345678')).toBe(true);
+            expect(batchHasEntry(syncStore['vw_0'], 'wDEF12345678')).toBe(true);
+            expect(batchHasEntry(syncStore['vw_0'], 'wGHI12345678')).toBe(true);
+        });
+
+        test('writes vw_meta with version 2', async () => {
+            const now = Date.now();
+            browser._setLocalStore({
+                'wVIDEO000001': now,
+            });
+
+            await commonContext.loadWatchedVideos();
+            await new Promise(resolve => setTimeout(resolve, 1100));
+            await commonContext.syncWatchedVideos();
+
+            const syncStore = browser._getSyncStore();
+            expect(syncStore['vw_meta']).toEqual({ version: 2 });
+        });
+
+        test('packs entries with timestamps', async () => {
+            const now = Date.now();
+            browser._setLocalStore({
+                'wVIDEO000001': now,
+            });
+
+            await commonContext.loadWatchedVideos();
+            await new Promise(resolve => setTimeout(resolve, 1100));
+            await commonContext.syncWatchedVideos();
+
+            const syncStore = browser._getSyncStore();
+            const entry = syncStore['vw_0'][0];
+
+            // Entry should be packed: "wVIDEO000001:<base36timestamp>"
+            expect(entry).toMatch(/^wVIDEO000001:/);
+            const parts = entry.split(':');
+            expect(parts.length).toBe(2);
+            // Decode the timestamp and verify it matches (within 1 second)
+            const decoded = parseInt(parts[1], 36) * 1000;
+            expect(Math.abs(decoded - now)).toBeLessThan(1000);
         });
 
         test('sorts videos by timestamp with newest first in sync batches', async () => {
@@ -59,12 +111,12 @@ describe('Sync functionality', () => {
             const batch = syncStore['vw_0'];
 
             // Newest should be first in the batch
-            expect(batch.indexOf('wNEWEST00001')).toBeLessThan(batch.indexOf('wMIDDLE00001'));
-            expect(batch.indexOf('wMIDDLE00001')).toBeLessThan(batch.indexOf('wOLDEST00001'));
+            expect(entryIndex(batch, 'wNEWEST00001')).toBeLessThan(entryIndex(batch, 'wMIDDLE00001'));
+            expect(entryIndex(batch, 'wMIDDLE00001')).toBeLessThan(entryIndex(batch, 'wOLDEST00001'));
         });
 
         test('removes stale batch keys after sync', async () => {
-            // Pre-populate sync with old batches
+            // Pre-populate sync with old batches (v1 format — no vw_meta)
             browser._setSyncStore({
                 'vw_0': ['wOLD00000001', 'wOLD00000002'],
                 'vw_1': ['wOLD00000003', 'wOLD00000004'],
@@ -93,7 +145,7 @@ describe('Sync functionality', () => {
             const syncStore = browser._getSyncStore();
 
             expect(syncStore['vw_0']).toBeDefined();
-            expect(syncStore['vw_0']).toContain('wNEW00000001');
+            expect(batchHasEntry(syncStore['vw_0'], 'wNEW00000001')).toBe(true);
             expect(syncStore['vw_1']).toBeUndefined();
             expect(syncStore['vw_2']).toBeUndefined();
         });
@@ -114,7 +166,7 @@ describe('Sync functionality', () => {
             const syncStore = browser._getSyncStore();
             // Only the valid video key should be synced
             expect(syncStore['vw_0'].length).toBe(1);
-            expect(syncStore['vw_0']).toContain('wVIDEO000001');
+            expect(batchHasEntry(syncStore['vw_0'], 'wVIDEO000001')).toBe(true);
         });
 
         test('handles empty watchedVideos gracefully', async () => {
@@ -129,7 +181,7 @@ describe('Sync functionality', () => {
     });
 
     describe('loadWatchedVideos', () => {
-        test('populates local storage from sync batches', async () => {
+        test('populates local storage from sync batches (v1 format)', async () => {
             browser._setSyncStore({
                 'vw_0': ['wVIDEO000001', 'wVIDEO000002'],
                 'vw_1': ['wVIDEO000003'],
@@ -144,7 +196,7 @@ describe('Sync functionality', () => {
             expect(localStore['wVIDEO000003']).toBeDefined();
         });
 
-        test('assigns decreasing timestamps for batch order (newest first)', async () => {
+        test('assigns decreasing timestamps for v1 batch order (newest first)', async () => {
             browser._setSyncStore({
                 'vw_0': ['wNEWEST00001'],  // first in batch = newest
                 'vw_1': ['wOLDEST00001'],  // later batch = older
@@ -187,7 +239,7 @@ describe('Sync functionality', () => {
             expect(localStore['wVALID000001']).toBeDefined();
         });
 
-        test('preserves relative order within batches', async () => {
+        test('preserves relative order within v1 batches', async () => {
             browser._setSyncStore({
                 'vw_0': ['wFIRST000001', 'wSECOND00001', 'wTHIRD000001'],
             });
@@ -199,6 +251,45 @@ describe('Sync functionality', () => {
             // First in array = highest timestamp
             expect(localStore['wFIRST000001']).toBeGreaterThan(localStore['wSECOND00001']);
             expect(localStore['wSECOND00001']).toBeGreaterThan(localStore['wTHIRD000001']);
+        });
+
+        test('loads v2 format with real timestamps', async () => {
+            const realTimestamp1 = 1700000000000; // Nov 2023
+            const realTimestamp2 = 1600000000000; // Sep 2020
+            const encoded1 = Math.floor(realTimestamp1 / 1000).toString(36);
+            const encoded2 = Math.floor(realTimestamp2 / 1000).toString(36);
+
+            browser._setSyncStore({
+                'vw_meta': { version: 2 },
+                'vw_0': [
+                    'wVIDEO000001:' + encoded1,
+                    'wVIDEO000002:' + encoded2,
+                ],
+            });
+            browser._setLocalStore({});
+
+            await commonContext.loadWatchedVideos();
+
+            const localStore = browser._getLocalStore();
+            // Timestamps should match the originals (within 1s precision)
+            expect(Math.abs(localStore['wVIDEO000001'] - realTimestamp1)).toBeLessThan(1000);
+            expect(Math.abs(localStore['wVIDEO000002'] - realTimestamp2)).toBeLessThan(1000);
+        });
+
+        test('skips vw_meta key during batch iteration', async () => {
+            browser._setSyncStore({
+                'vw_meta': { version: 2 },
+                'vw_0': [
+                    'wVIDEO000001:' + Math.floor(Date.now() / 1000).toString(36),
+                ],
+            });
+            browser._setLocalStore({});
+
+            // Should not throw or produce NaN warnings from parseInt("meta")
+            await expect(commonContext.loadWatchedVideos()).resolves.not.toThrow();
+
+            const localStore = browser._getLocalStore();
+            expect(localStore['wVIDEO000001']).toBeDefined();
         });
     });
 
@@ -241,8 +332,8 @@ describe('Sync functionality', () => {
             await commonContext.clearOldestVideos(1);
 
             const syncStore = browser._getSyncStore();
-            expect(syncStore['vw_0']).toContain('wVIDEO000001');
-            expect(syncStore['vw_0']).not.toContain('wVIDEO000002');
+            expect(batchHasEntry(syncStore['vw_0'], 'wVIDEO000001')).toBe(true);
+            expect(batchHasEntry(syncStore['vw_0'], 'wVIDEO000002')).toBe(false);
         });
 
         test('handles clearing more videos than exist', async () => {
@@ -337,7 +428,7 @@ describe('Sync functionality', () => {
             const batch = syncStore['vw_0'];
 
             // Brand new video should be first in the batch
-            expect(batch[0]).toBe('wBRANDNEW001');
+            expect(batch[0].startsWith('wBRANDNEW001:')).toBe(true);
         });
 
         test('sync then load preserves timestamp order', async () => {
@@ -357,8 +448,8 @@ describe('Sync functionality', () => {
             // Verify sync has correct order (newest first)
             const syncStore = browser._getSyncStore();
             const batch = syncStore['vw_0'];
-            expect(batch.indexOf('wTHIRD000001')).toBeLessThan(batch.indexOf('wSECOND00001'));
-            expect(batch.indexOf('wSECOND00001')).toBeLessThan(batch.indexOf('wFIRST000001'));
+            expect(entryIndex(batch, 'wTHIRD000001')).toBeLessThan(entryIndex(batch, 'wSECOND00001'));
+            expect(entryIndex(batch, 'wSECOND00001')).toBeLessThan(entryIndex(batch, 'wFIRST000001'));
 
             // Device B: clear local, load from sync
             browser._setLocalStore({});
@@ -401,6 +492,65 @@ describe('Sync functionality', () => {
             // Video 2 should still have higher timestamp than Video 1
             expect(localStore['wVIDEO000002']).toBeGreaterThan(localStore['wVIDEO000001']);
         });
+
+        test('cross-device load preserves real timestamps (core bug fix)', async () => {
+            const now = Date.now();
+            const oldTimestamp = now - 86400000; // 1 day ago
+            const newTimestamp = now;
+
+            // Device A: set up videos with real age difference
+            browser._setLocalStore({
+                'wOLDVIDEO001': oldTimestamp,
+                'wNEWVIDEO001': newTimestamp,
+            });
+
+            await commonContext.loadWatchedVideos();
+            await new Promise(resolve => setTimeout(resolve, 1100));
+            await commonContext.syncWatchedVideos();
+
+            // Device B: empty local, load from sync
+            browser._setLocalStore({});
+            commonContext = loadCommon();
+            await commonContext.loadWatchedVideos();
+
+            const localStore = browser._getLocalStore();
+
+            // With v2, the old video should have a timestamp ~1 day ago, not near "now"
+            // The difference should be preserved (within 1s precision from base-36 encoding)
+            const timeDiff = localStore['wNEWVIDEO001'] - localStore['wOLDVIDEO001'];
+            expect(timeDiff).toBeGreaterThan(80000000); // ~22+ hours preserved
+        });
+
+        test('clearOldestVideos correctly identifies truly oldest after cross-device load', async () => {
+            const now = Date.now();
+            const veryOld = now - 7 * 86400000; // 1 week ago
+            const recent = now - 3600000;        // 1 hour ago
+
+            // Device A syncs
+            browser._setLocalStore({
+                'wANCIENT0001': veryOld,
+                'wRECENT00001': recent,
+                'wBRANDNW0001': now,
+            });
+
+            await commonContext.loadWatchedVideos();
+            await new Promise(resolve => setTimeout(resolve, 1100));
+            await commonContext.syncWatchedVideos();
+
+            // Device B loads from sync (empty local)
+            browser._setLocalStore({});
+            commonContext = loadCommon();
+            await commonContext.loadWatchedVideos();
+            await new Promise(resolve => setTimeout(resolve, 1100));
+
+            // Clear 1 oldest — should remove the ancient one, not the new one
+            await commonContext.clearOldestVideos(1);
+
+            const localStore = browser._getLocalStore();
+            expect(localStore['wANCIENT0001']).toBeUndefined(); // oldest removed
+            expect(localStore['wRECENT00001']).toBeDefined();   // kept
+            expect(localStore['wBRANDNW0001']).toBeDefined();   // kept
+        });
     });
 
     describe('Stale batch cleanup', () => {
@@ -436,11 +586,13 @@ describe('Sync functionality', () => {
 
             const syncStore = browser._getSyncStore();
             expect(syncStore['vw_0']).toBeDefined();
-            expect(syncStore['vw_0']).toContain('wNEW00000001');
+            expect(batchHasEntry(syncStore['vw_0'], 'wNEW00000001')).toBe(true);
             expect(syncStore['vw_1']).toBeUndefined();
             expect(syncStore['vw_2']).toBeUndefined();
             expect(syncStore['vw_3']).toBeUndefined();
             expect(syncStore['vw_4']).toBeUndefined();
+            // vw_meta should persist
+            expect(syncStore['vw_meta']).toEqual({ version: 2 });
         });
 
         test('complete clear removes all batch keys using clearOldestVideos', async () => {
@@ -463,6 +615,102 @@ describe('Sync functionality', () => {
             // After clearing all videos, no batch keys should remain
             expect(syncStore['vw_0']).toBeUndefined();
             expect(syncStore['vw_1']).toBeUndefined();
+        });
+    });
+
+    describe('v1 to v2 migration', () => {
+        test('v1 data migrated to v2 on first sync after upgrade', async () => {
+            // Simulate v1 sync data (no vw_meta, plain operation strings)
+            browser._setSyncStore({
+                'vw_0': ['wVIDEO000001', 'wVIDEO000002'],
+            });
+            browser._setLocalStore({});
+
+            // Load (v1 path — synthetic timestamps)
+            await commonContext.loadWatchedVideos();
+            await new Promise(resolve => setTimeout(resolve, 1100));
+
+            // Sync back — should now write v2 format
+            await commonContext.syncWatchedVideos();
+
+            const syncStore = browser._getSyncStore();
+            // Should have vw_meta now
+            expect(syncStore['vw_meta']).toEqual({ version: 2 });
+            // Entries should be packed with timestamps
+            expect(syncStore['vw_0'][0]).toMatch(/^w.+:.+$/);
+        });
+
+        test('v1 synthetic timestamps maintain relative order after migration', async () => {
+            // v1 format: ordered, newest first
+            browser._setSyncStore({
+                'vw_0': ['wNEWER000001', 'wOLDER000001'],
+            });
+            browser._setLocalStore({});
+
+            await commonContext.loadWatchedVideos();
+
+            const localStore = browser._getLocalStore();
+            // v1 should give NEWER a higher timestamp than OLDER
+            expect(localStore['wNEWER000001']).toBeGreaterThan(localStore['wOLDER000001']);
+        });
+    });
+
+    describe('Packed entry helpers', () => {
+        test('encodeTimestamp and decodeTimestamp are inverses', () => {
+            const now = Date.now();
+            const encoded = commonContext.encodeTimestamp(now);
+            const decoded = commonContext.decodeTimestamp(encoded);
+            // Should be within 1 second (sub-second precision lost)
+            expect(Math.abs(decoded - now)).toBeLessThan(1000);
+        });
+
+        test('packSyncEntry creates colon-separated format', () => {
+            const packed = commonContext.packSyncEntry('wABCDEFGH001', 1700000000000);
+            expect(packed).toMatch(/^wABCDEFGH001:.+$/);
+            expect(packed.split(':').length).toBe(2);
+        });
+
+        test('unpackSyncEntry handles v2 packed entry', () => {
+            const ts = 1700000000000;
+            const encoded = Math.floor(ts / 1000).toString(36);
+            const packed = 'wVIDEO000001:' + encoded;
+
+            const result = commonContext.unpackSyncEntry(packed);
+            expect(result.operation).toBe('wVIDEO000001');
+            expect(Math.abs(result.timestamp - ts)).toBeLessThan(1000);
+        });
+
+        test('unpackSyncEntry handles v1 plain entry', () => {
+            const result = commonContext.unpackSyncEntry('wVIDEO000001');
+            expect(result.operation).toBe('wVIDEO000001');
+            expect(result.timestamp).toBeNull();
+        });
+
+        test('packed entries fail old v1 12-char filter', () => {
+            // This verifies backwards compatibility: old code checking key.length === 12
+            // will not match packed entries (which are ~19 chars)
+            const packed = commonContext.packSyncEntry('wVIDEO000001', Date.now());
+            expect(packed.length).toBeGreaterThan(12);
+        });
+    });
+
+    describe('Malformed entry handling', () => {
+        test('v2 entry without timestamp uses current time', async () => {
+            const before = Date.now();
+
+            browser._setSyncStore({
+                'vw_meta': { version: 2 },
+                'vw_0': ['wMALFORMED01'],  // no colon, no timestamp
+            });
+            browser._setLocalStore({});
+
+            await commonContext.loadWatchedVideos();
+
+            const after = Date.now();
+            const localStore = browser._getLocalStore();
+            // Should be saved with current time as fallback
+            expect(localStore['wMALFORMED01']).toBeGreaterThanOrEqual(before);
+            expect(localStore['wMALFORMED01']).toBeLessThanOrEqual(after);
         });
     });
 });

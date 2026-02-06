@@ -91,6 +91,8 @@ function loadCommon() {
     global.SETTINGS_LOCAL_KEY = context.SETTINGS_LOCAL_KEY;
     global.VIDEO_WATCH_KEY = context.VIDEO_WATCH_KEY;
     global.WATCHED_SYNC_THROTTLE = context.WATCHED_SYNC_THROTTLE;
+    global.SYNC_FORMAT_VERSION = context.SYNC_FORMAT_VERSION;
+    global.SYNC_META_KEY = context.SYNC_META_KEY;
     global.brwsr = context.brwsr;
     global.watchedVideos = context.watchedVideos;
     global.syncStorageGet = context.syncStorageGet;
@@ -104,6 +106,10 @@ function loadCommon() {
     global.getCurrentPage = context.getCurrentPage;
     global.lastSyncUpdate = context.lastSyncUpdate;
     global.lastSyncError = context.lastSyncError;
+    global.encodeTimestamp = context.encodeTimestamp;
+    global.decodeTimestamp = context.decodeTimestamp;
+    global.packSyncEntry = context.packSyncEntry;
+    global.unpackSyncEntry = context.unpackSyncEntry;
 
     return context;
 }

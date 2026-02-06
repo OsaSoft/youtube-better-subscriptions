@@ -26,6 +26,34 @@ const VIDEO_WATCH_KEY = "vw_";
 // Storage sync set operations may be throttled https://developer.chrome.com/docs/extensions/reference/storage/#property-sync
 const WATCHED_SYNC_THROTTLE = 1000;
 
+// Sync format v2: embed real timestamps in sync entries
+const SYNC_FORMAT_VERSION = 2;
+const SYNC_META_KEY = "vw_meta";
+
+function encodeTimestamp(ms) {
+    return Math.floor(ms / 1000).toString(36);
+}
+
+function decodeTimestamp(str) {
+    return parseInt(str, 36) * 1000;
+}
+
+function packSyncEntry(operation, timestampMs) {
+    return operation + ':' + encodeTimestamp(timestampMs);
+}
+
+function unpackSyncEntry(entry) {
+    const colonIndex = entry.indexOf(':');
+    if (colonIndex === -1) {
+        // v1 format: no timestamp embedded
+        return { operation: entry, timestamp: null };
+    }
+    return {
+        operation: entry.slice(0, colonIndex),
+        timestamp: decodeTimestamp(entry.slice(colonIndex + 1))
+    };
+}
+
 let brwsr;
 try {
     brwsr = browser;
@@ -76,7 +104,14 @@ async function loadWatchedVideos() {
     const items = await syncStorageGet(null);
     const batches = [];
 
+    // Detect sync format version
+    const meta = items[SYNC_META_KEY];
+    const syncVersion = (meta && meta.version) || 1;
+
     for (const key in items) {
+        if (key === SYNC_META_KEY) {
+            continue;
+        }
         if (key.indexOf(VIDEO_WATCH_KEY) !== 0) {
             continue;
         }
@@ -97,10 +132,23 @@ async function loadWatchedVideos() {
 
     watchedVideos = (await localStorageGet(null)) || {};
 
-    // Assign timestamps preserving order: first in batches = newest = highest timestamp
-    const now = Date.now();
-    for (const [index, operation] of operations.entries()) {
-        saveVideoOperation(operation, now - index);
+    if (syncVersion >= 2) {
+        // v2: extract real timestamps from packed entries
+        for (const entry of operations) {
+            const { operation, timestamp } = unpackSyncEntry(entry);
+            if (timestamp !== null) {
+                saveVideoOperation(operation, timestamp);
+            } else {
+                // Malformed v2 entry without timestamp — use current time
+                saveVideoOperation(operation, Date.now());
+            }
+        }
+    } else {
+        // v1: assign synthetic timestamps preserving order (first in batches = newest)
+        const now = Date.now();
+        for (const [index, operation] of operations.entries()) {
+            saveVideoOperation(operation, now - index);
+        }
     }
 
     // old format
@@ -126,8 +174,9 @@ async function syncWatchedVideos() {
         saveTimeout = setTimeout(syncWatchedVideos, WATCHED_SYNC_THROTTLE - (Date.now() - lastSyncUpdate));
         return;
     }
-    const batches = {};
+    const batches = { [SYNC_META_KEY]: { version: SYNC_FORMAT_VERSION } };
     let currentBatch = [];
+    let batchCount = 0;
     let droppedCount = 0;
 
     const sortedVideoOperations = (
@@ -137,9 +186,10 @@ async function syncWatchedVideos() {
     );
 
     for (const videoOperation of sortedVideoOperations) {
-        const batchKey = VIDEO_WATCH_KEY + Object.keys(batches).length;
+        const batchKey = VIDEO_WATCH_KEY + batchCount;
+        const packedEntry = packSyncEntry(videoOperation, watchedVideos[videoOperation]);
 
-        const potentialBatch = [...currentBatch, videoOperation];
+        const potentialBatch = [...currentBatch, packedEntry];
         const potentialBatchSize = JSON.stringify({
             [batchKey]: potentialBatch
         }).length;
@@ -149,22 +199,24 @@ async function syncWatchedVideos() {
             [batchKey]: potentialBatch
         }).length > 100000) {
             // quota exhausted, count remaining as dropped
-            droppedCount = sortedVideoOperations.length -
-                Object.values(batches).reduce((sum, b) => sum + b.length, 0) -
-                currentBatch.length;
+            const syncedSoFar = Object.values(batches)
+                .filter(v => Array.isArray(v))
+                .reduce((sum, b) => sum + b.length, 0);
+            droppedCount = sortedVideoOperations.length - syncedSoFar - currentBatch.length;
             break;
         }
 
         // theoretical max size is 8192, but it's safer to have some margin
         if (potentialBatchSize >= 8000) {
             batches[batchKey] = currentBatch;
+            batchCount++;
             currentBatch = [];
         }
 
-        currentBatch.push(videoOperation);
+        currentBatch.push(packedEntry);
     }
     if (currentBatch.length > 0) {
-        batches[VIDEO_WATCH_KEY + Object.keys(batches).length] = currentBatch;
+        batches[VIDEO_WATCH_KEY + batchCount] = currentBatch;
     }
 
     try {
@@ -184,9 +236,9 @@ async function syncWatchedVideos() {
             });
         });
 
-        // Remove old batch keys that are no longer needed
+        // Remove old batch keys that are no longer needed (preserve vw_meta)
         const newBatchKeys = Object.keys(batches);
-        const keysToRemove = existingBatchKeys.filter(key => !newBatchKeys.includes(key));
+        const keysToRemove = existingBatchKeys.filter(key => key !== SYNC_META_KEY && !newBatchKeys.includes(key));
         if (keysToRemove.length > 0) {
             await new Promise((resolve, reject) => {
                 brwsr.storage.sync.remove(keysToRemove, () => {
@@ -208,7 +260,9 @@ async function syncWatchedVideos() {
         throw error;
     }
 
-    const syncedCount = Object.values(batches).reduce((acc, batch) => acc + batch.length, 0);
+    const syncedCount = Object.values(batches)
+        .filter(v => Array.isArray(v))
+        .reduce((acc, batch) => acc + batch.length, 0);
 
     if (droppedCount > 0) {
         logWarn("Sync quota full: " + droppedCount + " older videos not synced");
