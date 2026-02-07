@@ -273,12 +273,34 @@ function removeWatchedAndAddButton() {
         }
     }
 
-    // if shorts shelf is empty, hide it
+    // Process rich-section-renderer shelves
     const gridElement = document.querySelector('ytd-two-column-browse-results-renderer ytd-rich-grid-renderer #contents');
     if (gridElement && isRendered(gridElement)) {
         [...gridElement.querySelectorAll(':scope > ytd-rich-section-renderer')].forEach(richSectionElement => {
-            const contents = richSectionElement.querySelector(':scope > #content > ytd-rich-shelf-renderer > #dismissible > #contents');
+            const richShelfRenderer = richSectionElement.querySelector(':scope > #content > ytd-rich-shelf-renderer');
+            if (!richShelfRenderer) {
+                return;
+            }
 
+            // Hide algorithmic recommendation shelf if setting is enabled
+            // Detection: channel-specific shelves show an avatar, algorithmic shelves have both
+            // #avatar and #icon hidden
+            if (hideMostRelevant) {
+                const header = richShelfRenderer.querySelector('#dismissible #rich-shelf-header');
+                if (header) {
+                    const avatar = header.querySelector('#avatar');
+                    const icon = header.querySelector('#icon');
+                    const isAlgorithmicShelf = (avatar && avatar.hasAttribute('hidden')) &&
+                                               (icon && icon.hasAttribute('hidden'));
+                    if (isAlgorithmicShelf) {
+                        richSectionElement.style.display = 'none';
+                        return;
+                    }
+                }
+            }
+
+            // Hide shelf if all videos inside are hidden (empty shelf)
+            const contents = richShelfRenderer.querySelector('#dismissible > #contents');
             if (!contents) {
                 return;
             }
