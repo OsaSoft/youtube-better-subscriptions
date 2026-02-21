@@ -22,19 +22,19 @@ brwsr.runtime.onMessage.addListener(function (message) {
 });
 
 brwsr.runtime.onInstalled.addListener((details) => {
-    brwsr.storage.local.get({LAST_SHOWN_CHANGELOG_KEY}, (data) => {
+    brwsr.storage.local.get({[LAST_SHOWN_CHANGELOG_KEY]: null}, (data) => {
         showChangelog(data, details);
     });
 });
 
 function showChangelog(data, details) {
-    let lastShownChangelog = data.LAST_SHOWN_CHANGELOG_KEY;
+    let lastShownChangelog = data[LAST_SHOWN_CHANGELOG_KEY];
     if (currentVersion === lastShownChangelog) {
         return;
     }
 
     // Always update the last shown version, even if we don't open the tab
-    brwsr.storage.local.set({LAST_SHOWN_CHANGELOG_KEY: currentVersion});
+    brwsr.storage.local.set({[LAST_SHOWN_CHANGELOG_KEY]: currentVersion});
 
     // Always show changelog on first install
     if (details && details.reason === "install") {
