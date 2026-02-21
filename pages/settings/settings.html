@@ -274,6 +274,25 @@
 
                     <div class="setting-item">
                         <div class="setting-info">
+                            <span class="setting-title" id="setting-changelog-auto-open-title">Show changelog on update</span>
+                            <span class="setting-description" id="setting-changelog-auto-open-desc">Automatically open the changelog page when the extension is updated</span>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="settings.changelog.auto.open" aria-labelledby="setting-changelog-auto-open-title" aria-describedby="setting-changelog-auto-open-desc">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="data-action">
+                        <div class="data-action__info">
+                            <span class="data-action__title">View changelog</span>
+                            <span class="data-action__description">Open the changelog page to see what's new</span>
+                        </div>
+                        <button id="view-changelog" class="btn btn-secondary">View Changelog</button>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
                             <span class="setting-title">Log level</span>
                             <span class="setting-description">Control how much information is logged to the browser console</span>
                         </div>

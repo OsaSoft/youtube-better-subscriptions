@@ -86,6 +86,9 @@ function setupButtons() {
     document.getElementById("force-sync").addEventListener("click", forceSyncAll);
     document.getElementById("force-pull").addEventListener("click", forcePullFromSync);
     document.getElementById("clear-oldest").addEventListener("click", clearOldestVideosHandler);
+    document.getElementById("view-changelog").addEventListener("click", () => {
+        brwsr.tabs.create({ url: "../changelog.html" });
+    });
 
     // Modal event listeners
     document.getElementById("modal-cancel").addEventListener("click", hideConfirmModal);
