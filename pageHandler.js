@@ -70,7 +70,7 @@ function initExtension() {
             let pageChangeObserver = new MutationObserver((mutations) => {
                 mutations.forEach((mutationRecord) => {
                     //is page fully loaded?
-                    if (mutationRecord.target.attributes["aria-valuenow"].value === "100") {
+                    if (mutationRecord.target.getAttribute("aria-valuenow") === "100") {
                         schedulePageChange();
                     }
                 });

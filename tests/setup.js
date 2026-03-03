@@ -23,6 +23,8 @@ const DEFAULT_SETTINGS = {
     "settings.hide.most.relevant": false,
     "settings.hide.lives": false,
     "settings.hide.members.only": false,
+    "settings.hide.mark.watched.button": false,
+    "settings.changelog.auto.open": true,
 };
 
 // Constants matching the codebase

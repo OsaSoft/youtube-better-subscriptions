@@ -141,7 +141,8 @@ function createStorageMock() {
                 addListener: jest.fn(),
                 removeListener: jest.fn()
             },
-            lastError: null
+            lastError: null,
+            getManifest: jest.fn(() => ({ version: '1.0.0' }))
         },
         // Helper methods for tests
         _getSyncStore: () => syncStore,
@@ -156,6 +157,12 @@ function createStorageMock() {
             for (const listener of changeListeners) {
                 listener(changes, areaName);
             }
+        },
+        _setLastError: function(message) {
+            this.runtime.lastError = message ? { message } : null;
+        },
+        _clearLastError: function() {
+            this.runtime.lastError = null;
         }
     };
 }
