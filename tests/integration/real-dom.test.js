@@ -14,7 +14,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { loadUtil, loadQueries, loadVideo, loadSubscriptionsVideo, loadSubs } = require('../helpers/load-source');
+const { loadUtil, loadQueries, loadVideo, loadSubscriptionsVideo, loadSubsUI, loadSubs } = require('../helpers/load-source');
 
 const fixtureHTML = fs.readFileSync(
     path.join(__dirname, '../fixtures/subscription-feed-2026.html'),
@@ -387,6 +387,73 @@ describe('Real YouTube DOM - Hide Logic', () => {
             const vid = global.createSubscriptionVideo(items[i]);
             expect(vid.shouldHide()).toBe(false);
         }
+    });
+});
+
+describe('Real YouTube DOM - Most Relevant Section Hiding', () => {
+    beforeEach(() => {
+        document.body.innerHTML = fixtureHTML;
+        global.hideMostRelevant = false;
+        // Provide isYouTubeWatched stub (defined in subs.js, needed by removeWatchedAndAddButton)
+        global.isYouTubeWatched = () => false;
+        loadSubsUI();
+    });
+
+    test('"Most relevant" section is a ytd-rich-shelf-renderer without is-shorts', () => {
+        const gridContents = document.querySelector(
+            'ytd-two-column-browse-results-renderer ytd-rich-grid-renderer #contents'
+        );
+        const sections = gridContents.querySelectorAll(':scope > ytd-rich-section-renderer');
+
+        // "Most relevant" section (first) should match :not([is-shorts])
+        const mostRelevantShelf = sections[0].querySelector(':scope > #content > ytd-rich-shelf-renderer:not([is-shorts])');
+        expect(mostRelevantShelf).not.toBeNull();
+
+        // Shorts section (second) should NOT match :not([is-shorts])
+        const shortsShelf = sections[1].querySelector(':scope > #content > ytd-rich-shelf-renderer:not([is-shorts])');
+        expect(shortsShelf).toBeNull();
+    });
+
+    test('"Most relevant" section is visible by default', () => {
+        const gridContents = document.querySelector(
+            'ytd-two-column-browse-results-renderer ytd-rich-grid-renderer #contents'
+        );
+        const sections = gridContents.querySelectorAll(':scope > ytd-rich-section-renderer');
+        expect(sections[0].style.display).not.toBe('none');
+    });
+
+    test('"Most relevant" section is hidden when hideMostRelevant=true', () => {
+        global.hideMostRelevant = true;
+        // Override vidQuery to return no matches so removeWatchedAndAddButton
+        // skips individual video processing and only runs section-hiding logic
+        global.vidQuery = () => 'ytd-nonexistent-element';
+        loadSubsUI();
+        global.removeWatchedAndAddButton();
+
+        const gridElement = document.querySelector('ytd-two-column-browse-results-renderer ytd-rich-grid-renderer #contents');
+        const sections = gridElement.querySelectorAll(':scope > ytd-rich-section-renderer');
+        expect(sections[0].style.display).toBe('none');
+    });
+
+    test('Shorts section is NOT hidden when hideMostRelevant=true', () => {
+        global.hideMostRelevant = true;
+        // Override vidQuery to return no matches so removeWatchedAndAddButton
+        // skips individual video processing and only runs section-hiding logic
+        global.vidQuery = () => 'ytd-nonexistent-element';
+        loadSubsUI();
+        global.removeWatchedAndAddButton();
+
+        const gridElement = document.querySelector('ytd-two-column-browse-results-renderer ytd-rich-grid-renderer #contents');
+        const sections = gridElement.querySelectorAll(':scope > ytd-rich-section-renderer');
+        expect(sections[1].style.display).not.toBe('none');
+    });
+
+    test('section count remains 2', () => {
+        const gridContents = document.querySelector(
+            'ytd-two-column-browse-results-renderer ytd-rich-grid-renderer #contents'
+        );
+        const sections = gridContents.querySelectorAll(':scope > ytd-rich-section-renderer');
+        expect(sections.length).toBe(2);
     });
 });
 
