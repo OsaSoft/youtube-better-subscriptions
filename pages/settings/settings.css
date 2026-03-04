@@ -82,6 +82,21 @@
     padding: var(--spacing-md) 0;
 }
 
+/* Settings Sub-group */
+.settings-group + .settings-group {
+    border-top: 2px solid var(--color-border);
+}
+
+.settings-group__title {
+    display: block;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: var(--spacing-md) var(--spacing-lg) var(--spacing-xs);
+}
+
 /* Setting Item */
 .setting-item {
     display: flex;
