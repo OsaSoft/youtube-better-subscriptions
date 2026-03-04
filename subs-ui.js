@@ -277,12 +277,12 @@ function removeWatchedAndAddButton() {
     const gridElement = document.querySelector('ytd-two-column-browse-results-renderer ytd-rich-grid-renderer #contents');
     if (gridElement && isRendered(gridElement)) {
         [...gridElement.querySelectorAll(':scope > ytd-rich-section-renderer')].forEach(richSectionElement => {
-            const contents = richSectionElement.querySelector(':scope > #content > ytd-rich-shelf-renderer > #dismissible > #contents');
+            const contents = richSectionElement.querySelector(':scope > #content > ytd-rich-shelf-renderer > #dismissible #contents');
 
             if (!contents) {
                 return;
             }
-            if (![...contents.childNodes].some(child => isRendered(child))) {
+            if (![...contents.children].some(child => isRendered(child))) {
                 richSectionElement.style.display = 'none';
             }
         });
