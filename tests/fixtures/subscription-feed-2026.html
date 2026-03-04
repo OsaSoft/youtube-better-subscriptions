@@ -1,0 +1,406 @@
+<!--
+  Realistic YouTube Subscriptions Feed Fixture (2026 layout)
+  Based on real YouTube DOM structure with yt-lockup-view-model custom elements.
+  Anonymized: video IDs, channel names, and personal data replaced with test values.
+  Extension elements (osasoft-better-subscriptions_metadata-line) stripped.
+-->
+<ytd-two-column-browse-results-renderer class="style-scope ytd-browse" page-subtype="subscriptions">
+  <div id="primary" class="style-scope ytd-two-column-browse-results-renderer">
+    <ytd-rich-grid-renderer class="style-scope ytd-two-column-browse-results-renderer" elements-per-row="4" is-default-grid="">
+      <div id="header" class="style-scope ytd-rich-grid-renderer" hidden=""></div>
+      <div id="contents" class="style-scope ytd-rich-grid-renderer">
+
+        <!-- Section 1: "Most relevant" shelf (ytd-rich-section-renderer > ytd-rich-shelf-renderer) -->
+        <ytd-rich-section-renderer class="style-scope ytd-rich-grid-renderer">
+          <div id="content" class="style-scope ytd-rich-section-renderer">
+            <ytd-rich-shelf-renderer class="style-scope ytd-rich-section-renderer" elements-per-row="4" show-bottom-divider="" has-expansion-button="">
+              <div id="dismissible" class="style-scope ytd-rich-shelf-renderer">
+                <div id="rich-shelf-header-container" class="style-scope ytd-rich-shelf-renderer">
+                  <div id="rich-shelf-header" class="style-scope ytd-rich-shelf-renderer">
+                    <h2 class="style-scope ytd-rich-shelf-renderer">
+                      <div id="title-container" class="style-scope ytd-rich-shelf-renderer">
+                        <div id="title-text" class="style-scope ytd-rich-shelf-renderer">
+                          <span id="title" class="style-scope ytd-rich-shelf-renderer">Most relevant</span>
+                        </div>
+                      </div>
+                    </h2>
+                  </div>
+                </div>
+                <div id="contents-container" class="style-scope ytd-rich-shelf-renderer">
+                  <div id="contents" class="style-scope ytd-rich-shelf-renderer">
+
+                    <!-- Video 1: Regular unwatched (39:36, no progress bar) -->
+                    <ytd-rich-item-renderer class="style-scope ytd-rich-shelf-renderer" items-per-row="4" lockup="true" is-shelf-item="">
+                      <div id="content" class="style-scope ytd-rich-item-renderer">
+                        <yt-lockup-view-model class="ytd-rich-item-renderer lockup yt-lockup-view-model--wrapper">
+                          <div class="yt-lockup-view-model yt-lockup-view-model--vertical content-id-testVid_001">
+                            <a href="/watch?v=testVid_001" class="yt-lockup-view-model__content-image">
+                              <yt-thumbnail-view-model class="ytThumbnailViewModelHost ytThumbnailViewModelAspectRatio16By9 ytThumbnailViewModelLarge">
+                                <div class="ytThumbnailViewModelImage"></div>
+                                <yt-thumbnail-bottom-overlay-view-model class="ytThumbnailBottomOverlayViewModelHost">
+                                  <div class="ytThumbnailBottomOverlayViewModelBadgeContainer ytThumbnailBottomOverlayViewModelBadgeContainerLarge">
+                                    <yt-thumbnail-badge-view-model class="ytThumbnailBadgeViewModelHost ytThumbnailBottomOverlayViewModelBadge">
+                                      <badge-shape class="yt-badge-shape yt-badge-shape--thumbnail-default yt-badge-shape--thumbnail-badge yt-badge-shape--typography">
+                                        <div class="yt-badge-shape__text">39:36</div>
+                                      </badge-shape>
+                                    </yt-thumbnail-badge-view-model>
+                                  </div>
+                                </yt-thumbnail-bottom-overlay-view-model>
+                              </yt-thumbnail-view-model>
+                            </a>
+                            <div class="yt-lockup-view-model__metadata">
+                              <yt-lockup-metadata-view-model class="yt-lockup-metadata-view-model yt-lockup-metadata-view-model--vertical">
+                                <div class="yt-lockup-metadata-view-model__text-container">
+                                  <h3 class="yt-lockup-metadata-view-model__heading-reset" title="Test Video One Title">
+                                    <a href="/watch?v=testVid_001" class="yt-lockup-metadata-view-model__title" title="Test Video One Title">
+                                      <span class="yt-core-attributed-string" role="text">Test Video One Title</span>
+                                    </a>
+                                  </h3>
+                                  <div class="yt-lockup-metadata-view-model__metadata">
+                                    <yt-content-metadata-view-model class="yt-content-metadata-view-model">
+                                      <div class="yt-content-metadata-view-model__metadata-row">
+                                        <span class="yt-core-attributed-string yt-content-metadata-view-model__metadata-text">
+                                          <a href="/@TestChannel_A">TestChannel_A</a>
+                                        </span>
+                                      </div>
+                                      <div class="yt-content-metadata-view-model__metadata-row">
+                                        <span class="yt-core-attributed-string yt-content-metadata-view-model__metadata-text" role="text">171k views</span>
+                                        <span class="yt-content-metadata-view-model__delimiter"> &bull; </span>
+                                        <span class="yt-core-attributed-string yt-content-metadata-view-model__metadata-text" role="text">1 day ago</span>
+                                      </div>
+                                    </yt-content-metadata-view-model>
+                                  </div>
+                                </div>
+                              </yt-lockup-metadata-view-model>
+                            </div>
+                          </div>
+                        </yt-lockup-view-model>
+                      </div>
+                    </ytd-rich-item-renderer>
+
+                    <!-- Video 2: YT-watched with progress bar at 46% (11:20, semitransparent) -->
+                    <ytd-rich-item-renderer class="style-scope ytd-rich-shelf-renderer" items-per-row="4" lockup="true" is-shelf-item="">
+                      <div id="content" class="style-scope ytd-rich-item-renderer">
+                        <yt-lockup-view-model class="ytd-rich-item-renderer lockup yt-lockup-view-model--wrapper semitransparent">
+                          <div class="yt-lockup-view-model yt-lockup-view-model--vertical content-id-testVid_002">
+                            <a href="/watch?v=testVid_002&amp;t=313s" class="yt-lockup-view-model__content-image">
+                              <yt-thumbnail-view-model class="ytThumbnailViewModelHost ytThumbnailViewModelAspectRatio16By9 ytThumbnailViewModelLarge">
+                                <div class="ytThumbnailViewModelImage"></div>
+                                <yt-thumbnail-bottom-overlay-view-model class="ytThumbnailBottomOverlayViewModelHost">
+                                  <yt-thumbnail-overlay-progress-bar-view-model class="ytThumbnailOverlayProgressBarHost ytThumbnailOverlayProgressBarHostLarge">
+                                    <div class="ytThumbnailOverlayProgressBarHostWatchedProgressBar ytThumbnailOverlayProgressBarHostUseLegacyBar">
+                                      <div class="ytThumbnailOverlayProgressBarHostWatchedProgressBarSegment" style="width: 46%;"></div>
+                                    </div>
+                                  </yt-thumbnail-overlay-progress-bar-view-model>
+                                  <div class="ytThumbnailBottomOverlayViewModelBadgeContainer ytThumbnailBottomOverlayViewModelBadgeContainerLarge">
+                                    <yt-thumbnail-badge-view-model class="ytThumbnailBadgeViewModelHost ytThumbnailBottomOverlayViewModelBadge">
+                                      <badge-shape class="yt-badge-shape yt-badge-shape--thumbnail-default yt-badge-shape--thumbnail-badge yt-badge-shape--typography">
+                                        <div class="yt-badge-shape__text">11:20</div>
+                                      </badge-shape>
+                                    </yt-thumbnail-badge-view-model>
+                                  </div>
+                                </yt-thumbnail-bottom-overlay-view-model>
+                              </yt-thumbnail-view-model>
+                            </a>
+                            <div class="yt-lockup-view-model__metadata">
+                              <yt-lockup-metadata-view-model class="yt-lockup-metadata-view-model yt-lockup-metadata-view-model--vertical">
+                                <div class="yt-lockup-metadata-view-model__text-container">
+                                  <h3 class="yt-lockup-metadata-view-model__heading-reset" title="Test Video Two Title">
+                                    <a href="/watch?v=testVid_002&amp;t=313s" class="yt-lockup-metadata-view-model__title" title="Test Video Two Title">
+                                      <span class="yt-core-attributed-string" role="text">Test Video Two Title</span>
+                                    </a>
+                                  </h3>
+                                  <div class="yt-lockup-metadata-view-model__metadata">
+                                    <yt-content-metadata-view-model class="yt-content-metadata-view-model">
+                                      <div class="yt-content-metadata-view-model__metadata-row">
+                                        <span class="yt-core-attributed-string yt-content-metadata-view-model__metadata-text">
+                                          <a href="/@TestChannel_B">TestChannel_B</a>
+                                        </span>
+                                      </div>
+                                    </yt-content-metadata-view-model>
+                                  </div>
+                                </div>
+                              </yt-lockup-metadata-view-model>
+                            </div>
+                          </div>
+                        </yt-lockup-view-model>
+                      </div>
+                    </ytd-rich-item-renderer>
+
+                  </div>
+                </div>
+              </div>
+            </ytd-rich-shelf-renderer>
+          </div>
+        </ytd-rich-section-renderer>
+
+        <!-- Section 2: Shorts shelf (ytd-rich-section-renderer > ytd-rich-shelf-renderer) -->
+        <ytd-rich-section-renderer class="style-scope ytd-rich-grid-renderer">
+          <div id="content" class="style-scope ytd-rich-section-renderer">
+            <ytd-rich-shelf-renderer class="style-scope ytd-rich-section-renderer" elements-per-row="4">
+              <div id="dismissible" class="style-scope ytd-rich-shelf-renderer">
+                <div id="rich-shelf-header-container" class="style-scope ytd-rich-shelf-renderer">
+                  <div id="rich-shelf-header" class="style-scope ytd-rich-shelf-renderer">
+                    <h2 class="style-scope ytd-rich-shelf-renderer">
+                      <div id="title-container" class="style-scope ytd-rich-shelf-renderer">
+                        <div id="title-text" class="style-scope ytd-rich-shelf-renderer">
+                          <span id="title" class="style-scope ytd-rich-shelf-renderer">Shorts</span>
+                        </div>
+                      </div>
+                    </h2>
+                  </div>
+                </div>
+                <div id="contents-container" class="style-scope ytd-rich-shelf-renderer">
+                  <div id="contents" class="style-scope ytd-rich-shelf-renderer">
+
+                    <!-- Video 4: Short in shelf -->
+                    <ytd-rich-item-renderer class="style-scope ytd-rich-shelf-renderer" items-per-row="4" lockup="true" is-shelf-item="" is-slim-media="">
+                      <div id="content" class="style-scope ytd-rich-item-renderer">
+                        <ytm-shorts-lockup-view-model-v2 class="shortsLockupViewModelHost style-scope ytd-rich-item-renderer">
+                          <ytm-shorts-lockup-view-model class="shortsLockupViewModelHost style-scope ytd-rich-item-renderer">
+                            <a href="/shorts/testVid_004" class="shortsLockupViewModelHostEndpoint reel-item-endpoint">
+                              <div class="shortsLockupViewModelHostThumbnailParentContainer shortsLockupViewModelHostThumbnailParentContainerRounded">
+                                <yt-thumbnail-view-model class="ytThumbnailViewModelHost ytThumbnailViewModelAspectRatio2By3 ytThumbnailViewModelMedium">
+                                  <div class="ytThumbnailViewModelImage"></div>
+                                </yt-thumbnail-view-model>
+                              </div>
+                            </a>
+                            <div role="presentation" class="shortsLockupViewModelHostOutsideMetadata shortsLockupViewModelHostMetadataRounded">
+                              <div>
+                                <h3 role="presentation" class="shortsLockupViewModelHostMetadataTitle shortsLockupViewModelHostOutsideMetadataTitle">
+                                  <a href="/shorts/testVid_004" class="shortsLockupViewModelHostEndpoint shortsLockupViewModelHostOutsideMetadataEndpoint" title="Test Short One">
+                                    <span class="yt-core-attributed-string" role="text">Test Short One</span>
+                                  </a>
+                                </h3>
+                                <div class="shortsLockupViewModelHostOutsideMetadataSubhead shortsLockupViewModelHostMetadataSubhead">
+                                  <span class="yt-core-attributed-string" role="text">2.5k views</span>
+                                </div>
+                              </div>
+                            </div>
+                          </ytm-shorts-lockup-view-model>
+                        </ytm-shorts-lockup-view-model-v2>
+                      </div>
+                    </ytd-rich-item-renderer>
+
+                    <!-- Video 5: Short in shelf -->
+                    <ytd-rich-item-renderer class="style-scope ytd-rich-shelf-renderer" items-per-row="4" lockup="true" is-shelf-item="" is-slim-media="">
+                      <div id="content" class="style-scope ytd-rich-item-renderer">
+                        <ytm-shorts-lockup-view-model-v2 class="shortsLockupViewModelHost style-scope ytd-rich-item-renderer">
+                          <ytm-shorts-lockup-view-model class="shortsLockupViewModelHost style-scope ytd-rich-item-renderer">
+                            <a href="/shorts/testVid_005" class="shortsLockupViewModelHostEndpoint reel-item-endpoint">
+                              <div class="shortsLockupViewModelHostThumbnailParentContainer shortsLockupViewModelHostThumbnailParentContainerRounded">
+                                <yt-thumbnail-view-model class="ytThumbnailViewModelHost ytThumbnailViewModelAspectRatio2By3 ytThumbnailViewModelMedium">
+                                  <div class="ytThumbnailViewModelImage"></div>
+                                </yt-thumbnail-view-model>
+                              </div>
+                            </a>
+                            <div role="presentation" class="shortsLockupViewModelHostOutsideMetadata shortsLockupViewModelHostMetadataRounded">
+                              <div>
+                                <h3 role="presentation" class="shortsLockupViewModelHostMetadataTitle shortsLockupViewModelHostOutsideMetadataTitle">
+                                  <a href="/shorts/testVid_005" class="shortsLockupViewModelHostEndpoint shortsLockupViewModelHostOutsideMetadataEndpoint" title="Test Short Two">
+                                    <span class="yt-core-attributed-string" role="text">Test Short Two</span>
+                                  </a>
+                                </h3>
+                                <div class="shortsLockupViewModelHostOutsideMetadataSubhead shortsLockupViewModelHostMetadataSubhead">
+                                  <span class="yt-core-attributed-string" role="text">87k views</span>
+                                </div>
+                              </div>
+                            </div>
+                          </ytm-shorts-lockup-view-model>
+                        </ytm-shorts-lockup-view-model-v2>
+                      </div>
+                    </ytd-rich-item-renderer>
+
+                  </div>
+                </div>
+              </div>
+            </ytd-rich-shelf-renderer>
+          </div>
+        </ytd-rich-section-renderer>
+
+        <!-- Video 3: 100% watched in grid renderer (1:52, progress bar 100%, semitransparent) -->
+        <ytd-rich-item-renderer class="style-scope ytd-rich-grid-renderer" items-per-row="4" lockup="true" rendered-from-rich-grid="">
+          <div id="content" class="style-scope ytd-rich-item-renderer">
+            <yt-lockup-view-model class="ytd-rich-item-renderer lockup yt-lockup-view-model--wrapper semitransparent">
+              <div class="yt-lockup-view-model yt-lockup-view-model--vertical content-id-testVid_003">
+                <a href="/watch?v=testVid_003" class="yt-lockup-view-model__content-image">
+                  <yt-thumbnail-view-model class="ytThumbnailViewModelHost ytThumbnailViewModelAspectRatio16By9 ytThumbnailViewModelLarge">
+                    <div class="ytThumbnailViewModelImage"></div>
+                    <yt-thumbnail-bottom-overlay-view-model class="ytThumbnailBottomOverlayViewModelHost">
+                      <yt-thumbnail-overlay-progress-bar-view-model class="ytThumbnailOverlayProgressBarHost ytThumbnailOverlayProgressBarHostLarge">
+                        <div class="ytThumbnailOverlayProgressBarHostWatchedProgressBar ytThumbnailOverlayProgressBarHostUseLegacyBar">
+                          <div class="ytThumbnailOverlayProgressBarHostWatchedProgressBarSegment" style="width: 100%;"></div>
+                        </div>
+                      </yt-thumbnail-overlay-progress-bar-view-model>
+                      <div class="ytThumbnailBottomOverlayViewModelBadgeContainer ytThumbnailBottomOverlayViewModelBadgeContainerLarge">
+                        <yt-thumbnail-badge-view-model class="ytThumbnailBadgeViewModelHost ytThumbnailBottomOverlayViewModelBadge">
+                          <badge-shape class="yt-badge-shape yt-badge-shape--thumbnail-default yt-badge-shape--thumbnail-badge yt-badge-shape--typography">
+                            <div class="yt-badge-shape__text">1:52</div>
+                          </badge-shape>
+                        </yt-thumbnail-badge-view-model>
+                      </div>
+                    </yt-thumbnail-bottom-overlay-view-model>
+                  </yt-thumbnail-view-model>
+                </a>
+                <div class="yt-lockup-view-model__metadata">
+                  <yt-lockup-metadata-view-model class="yt-lockup-metadata-view-model yt-lockup-metadata-view-model--vertical">
+                    <div class="yt-lockup-metadata-view-model__text-container">
+                      <h3 class="yt-lockup-metadata-view-model__heading-reset" title="Test Video Three Title">
+                        <a href="/watch?v=testVid_003" class="yt-lockup-metadata-view-model__title" title="Test Video Three Title">
+                          <span class="yt-core-attributed-string" role="text">Test Video Three Title</span>
+                        </a>
+                      </h3>
+                      <div class="yt-lockup-metadata-view-model__metadata">
+                        <yt-content-metadata-view-model class="yt-content-metadata-view-model">
+                          <div class="yt-content-metadata-view-model__metadata-row">
+                            <span class="yt-core-attributed-string yt-content-metadata-view-model__metadata-text">
+                              <a href="/@TestChannel_C">TestChannel_C</a>
+                            </span>
+                          </div>
+                        </yt-content-metadata-view-model>
+                      </div>
+                    </div>
+                  </yt-lockup-metadata-view-model>
+                </div>
+              </div>
+            </yt-lockup-view-model>
+          </div>
+        </ytd-rich-item-renderer>
+
+        <!-- Video 6: Livestream (live badge, no duration) -->
+        <ytd-rich-item-renderer class="style-scope ytd-rich-grid-renderer" items-per-row="4" lockup="true" rendered-from-rich-grid="">
+          <div id="content" class="style-scope ytd-rich-item-renderer">
+            <yt-lockup-view-model class="ytd-rich-item-renderer lockup yt-lockup-view-model--wrapper">
+              <div class="yt-lockup-view-model yt-lockup-view-model--vertical content-id-testVid_006">
+                <a href="/watch?v=testVid_006" class="yt-lockup-view-model__content-image">
+                  <yt-thumbnail-view-model class="ytThumbnailViewModelHost ytThumbnailViewModelAspectRatio16By9 ytThumbnailViewModelLarge">
+                    <div class="ytThumbnailViewModelImage"></div>
+                    <yt-thumbnail-bottom-overlay-view-model class="ytThumbnailBottomOverlayViewModelHost">
+                      <div class="ytThumbnailBottomOverlayViewModelBadgeContainer ytThumbnailBottomOverlayViewModelBadgeContainerLarge">
+                        <yt-thumbnail-badge-view-model class="ytThumbnailBadgeViewModelHost ytThumbnailBottomOverlayViewModelBadge">
+                          <badge-shape class="yt-badge-shape yt-badge-shape--thumbnail-live yt-badge-shape--thumbnail-badge yt-badge-shape--typography">
+                            <div class="yt-badge-shape__text">LIVE</div>
+                          </badge-shape>
+                        </yt-thumbnail-badge-view-model>
+                      </div>
+                    </yt-thumbnail-bottom-overlay-view-model>
+                  </yt-thumbnail-view-model>
+                </a>
+                <div class="yt-lockup-view-model__metadata">
+                  <yt-lockup-metadata-view-model class="yt-lockup-metadata-view-model yt-lockup-metadata-view-model--vertical">
+                    <div class="yt-lockup-metadata-view-model__text-container">
+                      <h3 class="yt-lockup-metadata-view-model__heading-reset" title="Test Livestream Title">
+                        <a href="/watch?v=testVid_006" class="yt-lockup-metadata-view-model__title" title="Test Livestream Title">
+                          <span class="yt-core-attributed-string" role="text">Test Livestream Title</span>
+                        </a>
+                      </h3>
+                      <div class="yt-lockup-metadata-view-model__metadata">
+                        <yt-content-metadata-view-model class="yt-content-metadata-view-model">
+                          <div class="yt-content-metadata-view-model__metadata-row">
+                            <span class="yt-core-attributed-string yt-content-metadata-view-model__metadata-text">
+                              <a href="/@TestChannel_D">TestChannel_D</a>
+                            </span>
+                          </div>
+                        </yt-content-metadata-view-model>
+                      </div>
+                    </div>
+                  </yt-lockup-metadata-view-model>
+                </div>
+              </div>
+            </yt-lockup-view-model>
+          </div>
+        </ytd-rich-item-renderer>
+
+        <!-- Video 7: Members-only (membership badge, has duration) -->
+        <ytd-rich-item-renderer class="style-scope ytd-rich-grid-renderer" items-per-row="4" lockup="true" rendered-from-rich-grid="">
+          <div id="content" class="style-scope ytd-rich-item-renderer">
+            <yt-lockup-view-model class="ytd-rich-item-renderer lockup yt-lockup-view-model--wrapper">
+              <div class="yt-lockup-view-model yt-lockup-view-model--vertical content-id-testVid_007">
+                <a href="/watch?v=testVid_007" class="yt-lockup-view-model__content-image">
+                  <yt-thumbnail-view-model class="ytThumbnailViewModelHost ytThumbnailViewModelAspectRatio16By9 ytThumbnailViewModelLarge">
+                    <div class="ytThumbnailViewModelImage"></div>
+                    <yt-thumbnail-bottom-overlay-view-model class="ytThumbnailBottomOverlayViewModelHost">
+                      <div class="ytThumbnailBottomOverlayViewModelBadgeContainer ytThumbnailBottomOverlayViewModelBadgeContainerLarge">
+                        <yt-thumbnail-badge-view-model class="ytThumbnailBadgeViewModelHost ytThumbnailBottomOverlayViewModelBadge">
+                          <badge-shape class="yt-badge-shape yt-badge-shape--membership yt-badge-shape--thumbnail-badge yt-badge-shape--typography">
+                            <div class="yt-badge-shape__text">Members only</div>
+                          </badge-shape>
+                        </yt-thumbnail-badge-view-model>
+                        <yt-thumbnail-badge-view-model class="ytThumbnailBadgeViewModelHost ytThumbnailBottomOverlayViewModelBadge">
+                          <badge-shape class="yt-badge-shape yt-badge-shape--thumbnail-default yt-badge-shape--thumbnail-badge yt-badge-shape--typography">
+                            <div class="yt-badge-shape__text">25:00</div>
+                          </badge-shape>
+                        </yt-thumbnail-badge-view-model>
+                      </div>
+                    </yt-thumbnail-bottom-overlay-view-model>
+                  </yt-thumbnail-view-model>
+                </a>
+                <div class="yt-lockup-view-model__metadata">
+                  <yt-lockup-metadata-view-model class="yt-lockup-metadata-view-model yt-lockup-metadata-view-model--vertical">
+                    <div class="yt-lockup-metadata-view-model__text-container">
+                      <h3 class="yt-lockup-metadata-view-model__heading-reset" title="Test Members Only Title">
+                        <a href="/watch?v=testVid_007" class="yt-lockup-metadata-view-model__title" title="Test Members Only Title">
+                          <span class="yt-core-attributed-string" role="text">Test Members Only Title</span>
+                        </a>
+                      </h3>
+                      <div class="yt-lockup-metadata-view-model__metadata">
+                        <yt-content-metadata-view-model class="yt-content-metadata-view-model">
+                          <div class="yt-content-metadata-view-model__metadata-row">
+                            <span class="yt-core-attributed-string yt-content-metadata-view-model__metadata-text">
+                              <a href="/@TestChannel_D">TestChannel_D</a>
+                            </span>
+                          </div>
+                        </yt-content-metadata-view-model>
+                      </div>
+                    </div>
+                  </yt-lockup-metadata-view-model>
+                </div>
+              </div>
+            </yt-lockup-view-model>
+          </div>
+        </ytd-rich-item-renderer>
+
+        <!-- Video 8: Premiere (no duration badge, no live badge) -->
+        <ytd-rich-item-renderer class="style-scope ytd-rich-grid-renderer" items-per-row="4" lockup="true" rendered-from-rich-grid="">
+          <div id="content" class="style-scope ytd-rich-item-renderer">
+            <yt-lockup-view-model class="ytd-rich-item-renderer lockup yt-lockup-view-model--wrapper">
+              <div class="yt-lockup-view-model yt-lockup-view-model--vertical content-id-testVid_008">
+                <a href="/watch?v=testVid_008" class="yt-lockup-view-model__content-image">
+                  <yt-thumbnail-view-model class="ytThumbnailViewModelHost ytThumbnailViewModelAspectRatio16By9 ytThumbnailViewModelLarge">
+                    <div class="ytThumbnailViewModelImage"></div>
+                    <yt-thumbnail-bottom-overlay-view-model class="ytThumbnailBottomOverlayViewModelHost">
+                      <div class="ytThumbnailBottomOverlayViewModelBadgeContainer ytThumbnailBottomOverlayViewModelBadgeContainerLarge">
+                        <!-- No badge at all for premiere -->
+                      </div>
+                    </yt-thumbnail-bottom-overlay-view-model>
+                  </yt-thumbnail-view-model>
+                </a>
+                <div class="yt-lockup-view-model__metadata">
+                  <yt-lockup-metadata-view-model class="yt-lockup-metadata-view-model yt-lockup-metadata-view-model--vertical">
+                    <div class="yt-lockup-metadata-view-model__text-container">
+                      <h3 class="yt-lockup-metadata-view-model__heading-reset" title="Test Premiere Title">
+                        <a href="/watch?v=testVid_008" class="yt-lockup-metadata-view-model__title" title="Test Premiere Title">
+                          <span class="yt-core-attributed-string" role="text">Test Premiere Title</span>
+                        </a>
+                      </h3>
+                      <div class="yt-lockup-metadata-view-model__metadata">
+                        <yt-content-metadata-view-model class="yt-content-metadata-view-model">
+                          <div class="yt-content-metadata-view-model__metadata-row">
+                            <span class="yt-core-attributed-string yt-content-metadata-view-model__metadata-text">
+                              <a href="/@TestChannel_E">TestChannel_E</a>
+                            </span>
+                          </div>
+                        </yt-content-metadata-view-model>
+                      </div>
+                    </div>
+                  </yt-lockup-metadata-view-model>
+                </div>
+              </div>
+            </yt-lockup-view-model>
+          </div>
+        </ytd-rich-item-renderer>
+
+      </div>
+    </ytd-rich-grid-renderer>
+  </div>
+</ytd-two-column-browse-results-renderer>
