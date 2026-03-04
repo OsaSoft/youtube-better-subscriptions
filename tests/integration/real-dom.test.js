@@ -14,7 +14,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { loadUtil, loadQueries, loadVideo, loadSubscriptionsVideo, loadSubs } = require('../helpers/load-source');
+const { loadUtil, loadQueries, loadVideo, loadSubscriptionsVideo, loadSubsUI, loadSubs } = require('../helpers/load-source');
 
 const fixtureHTML = fs.readFileSync(
     path.join(__dirname, '../fixtures/subscription-feed-2026.html'),
@@ -393,9 +393,10 @@ describe('Real YouTube DOM - Hide Logic', () => {
 describe('Real YouTube DOM - Most Relevant Section Hiding', () => {
     beforeEach(() => {
         document.body.innerHTML = fixtureHTML;
-        loadUtil();
-        loadQueries();
         global.hideMostRelevant = false;
+        // Provide isYouTubeWatched stub (defined in subs.js, needed by removeWatchedAndAddButton)
+        global.isYouTubeWatched = () => false;
+        loadSubsUI();
     });
 
     test('"Most relevant" section is a ytd-rich-shelf-renderer without is-shorts', () => {
@@ -423,28 +424,26 @@ describe('Real YouTube DOM - Most Relevant Section Hiding', () => {
 
     test('"Most relevant" section is hidden when hideMostRelevant=true', () => {
         global.hideMostRelevant = true;
-        const gridElement = document.querySelector('ytd-two-column-browse-results-renderer ytd-rich-grid-renderer #contents');
-        [...gridElement.querySelectorAll(':scope > ytd-rich-section-renderer')].forEach(section => {
-            const richShelf = section.querySelector(':scope > #content > ytd-rich-shelf-renderer:not([is-shorts])');
-            if (richShelf) {
-                section.style.display = 'none';
-            }
-        });
+        // Override vidQuery to return no matches so removeWatchedAndAddButton
+        // skips individual video processing and only runs section-hiding logic
+        global.vidQuery = () => 'ytd-nonexistent-element';
+        loadSubsUI();
+        global.removeWatchedAndAddButton();
 
+        const gridElement = document.querySelector('ytd-two-column-browse-results-renderer ytd-rich-grid-renderer #contents');
         const sections = gridElement.querySelectorAll(':scope > ytd-rich-section-renderer');
         expect(sections[0].style.display).toBe('none');
     });
 
     test('Shorts section is NOT hidden when hideMostRelevant=true', () => {
         global.hideMostRelevant = true;
-        const gridElement = document.querySelector('ytd-two-column-browse-results-renderer ytd-rich-grid-renderer #contents');
-        [...gridElement.querySelectorAll(':scope > ytd-rich-section-renderer')].forEach(section => {
-            const richShelf = section.querySelector(':scope > #content > ytd-rich-shelf-renderer:not([is-shorts])');
-            if (richShelf) {
-                section.style.display = 'none';
-            }
-        });
+        // Override vidQuery to return no matches so removeWatchedAndAddButton
+        // skips individual video processing and only runs section-hiding logic
+        global.vidQuery = () => 'ytd-nonexistent-element';
+        loadSubsUI();
+        global.removeWatchedAndAddButton();
 
+        const gridElement = document.querySelector('ytd-two-column-browse-results-renderer ytd-rich-grid-renderer #contents');
         const sections = gridElement.querySelectorAll(':scope > ytd-rich-section-renderer');
         expect(sections[1].style.display).not.toBe('none');
     });

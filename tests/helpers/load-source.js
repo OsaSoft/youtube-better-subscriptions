@@ -361,7 +361,8 @@ function loadSubsUI() {
         collapseSectionChanged: global.collapseSectionChanged,
         loadMoreVideos: global.loadMoreVideos,
         getCurrentPage: global.getCurrentPage,
-        isRendered: global.isRendered
+        isRendered: global.isRendered,
+        hideMostRelevant: global.hideMostRelevant
     });
 
     global.COLLAPSE_CLASS = context.COLLAPSE_CLASS;
