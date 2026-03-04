@@ -179,20 +179,82 @@ function loadVideo() {
 }
 
 /**
- * Load SubscriptionsVideo.js with dependencies
+ * Load SubscriptionsVideo.js with dependencies.
+ * Loads both Video.js and SubscriptionsVideo.js in the same VM context
+ * to avoid cross-context class inheritance issues.
  */
 function loadSubscriptionsVideo() {
-    if (!global.Video) {
-        loadVideo();
+    if (!global.log) {
+        loadUtil();
     }
 
-    const context = loadSource('videos/SubscriptionsVideo.js', {
-        Video: global.Video,
-        buildMarkWatchedButton: global.buildMarkWatchedButton,
-        getVideoId: global.getVideoId
-    });
+    const projectRoot = path.join(__dirname, '../..');
+    const videoCode = fs.readFileSync(path.join(projectRoot, 'videos/Video.js'), 'utf8');
+    const subsVideoCode = fs.readFileSync(path.join(projectRoot, 'videos/SubscriptionsVideo.js'), 'utf8');
 
+    const context = {
+        ...global,
+        console,
+        document,
+        window,
+        setTimeout,
+        clearTimeout,
+        setInterval,
+        clearInterval,
+        Date,
+        Promise,
+        JSON,
+        Object,
+        Array,
+        Error,
+        ReferenceError,
+        Node,
+        settings: global.settings,
+        log: global.log,
+        logDebug: global.logDebug,
+        logWarn: global.logWarn,
+        logError: global.logError,
+        watchedVideos: global.watchedVideos,
+        METADATA_LINE: global.METADATA_LINE,
+        MARK_WATCHED_BTN: global.MARK_WATCHED_BTN,
+        MARK_UNWATCHED_BTN: global.MARK_UNWATCHED_BTN,
+        HIDDEN_CLASS: global.HIDDEN_CLASS,
+        hidden: global.hidden,
+        hideWatched: global.hideWatched,
+        hidePremieres: global.hidePremieres,
+        hideShorts: global.hideShorts,
+        hideLives: global.hideLives,
+        hideMembersOnly: global.hideMembersOnly,
+        watchVideo: global.watchVideo,
+        unwatchVideo: global.unwatchVideo,
+        syncWatchedVideos: global.syncWatchedVideos,
+        processSections: global.processSections,
+        buildMarkWatchedButton: global.buildMarkWatchedButton,
+        changeMarkWatchedToMarkUnwatched: global.changeMarkWatchedToMarkUnwatched,
+        getVideoId: global.getVideoId
+    };
+
+    vm.createContext(context);
+    vm.runInContext(videoCode, context, { filename: path.join(projectRoot, 'videos/Video.js') });
+    vm.runInContext(subsVideoCode, context, { filename: path.join(projectRoot, 'videos/SubscriptionsVideo.js') });
+
+    // Create factory function inside the VM context to avoid cross-realm prototype issues
+    vm.runInContext(
+        'function createSubscriptionVideo(elem) { return new SubscriptionVideo(elem); }',
+        context
+    );
+
+    // Export Video.js globals
+    global.getVideoIdFromUrl = context.getVideoIdFromUrl;
+    global.getVideoUrl = context.getVideoUrl;
+    global.getVideoId = context.getVideoId;
+    global.getVideoDuration = context.getVideoDuration;
+    global.isLivestream = context.isLivestream;
+    global.isMembersOnly = context.isMembersOnly;
+    global.changeMarkWatchedToMarkUnwatched = context.changeMarkWatchedToMarkUnwatched;
+    global.Video = context.Video;
     global.SubscriptionVideo = context.SubscriptionVideo;
+    global.createSubscriptionVideo = context.createSubscriptionVideo;
 
     return context;
 }
@@ -263,6 +325,12 @@ function loadSubsUI() {
     if (!global.log) {
         loadUtil();
     }
+    if (!global.vidQuery) {
+        loadQueries();
+    }
+    if (!global.SubscriptionVideo) {
+        loadSubscriptionsVideo();
+    }
 
     const context = loadSource('subs-ui.js', {
         settings: global.settings,
@@ -314,6 +382,15 @@ function loadSubsUI() {
 function loadSubs() {
     if (!global.log) {
         loadUtil();
+    }
+    if (!global.vidQuery) {
+        loadQueries();
+    }
+    if (!global.SubscriptionVideo) {
+        loadSubscriptionsVideo();
+    }
+    if (!global.buildUI) {
+        loadSubsUI();
     }
 
     const context = loadSource('subs.js', {

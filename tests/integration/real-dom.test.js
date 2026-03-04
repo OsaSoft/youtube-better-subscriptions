@@ -5,16 +5,16 @@
  * subscriptions page, anonymized and stripped of noise. It uses the actual
  * yt-lockup-view-model custom element structure that YouTube shipped in 2026.
  *
- * Key discovery: queries.js line 9 has `:has(lockup-view-model)` and Video.js
- * uses `querySelector("lockup-view-model")` — neither matches the real
+ * Key discovery: vidQuery() includes a `:has(lockup-view-model)` clause and
+ * Video.js uses `querySelector("lockup-view-model")` — neither matches the real
  * `<yt-lockup-view-model>` element. This is harmless because other selectors
  * (e.g. `ytd-rich-item-renderer.style-scope.ytd-rich-grid-renderer`) match first.
- * Tests document this behavior.
+ * These tests document and lock in that behavior.
  */
 
 const fs = require('fs');
 const path = require('path');
-const { loadUtil, loadQueries, loadVideo, loadSubs } = require('../helpers/load-source');
+const { loadUtil, loadQueries, loadVideo, loadSubscriptionsVideo, loadSubs } = require('../helpers/load-source');
 
 const fixtureHTML = fs.readFileSync(
     path.join(__dirname, '../fixtures/subscription-feed-2026.html'),
@@ -266,26 +266,26 @@ describe('Real YouTube DOM - Video Type Classification', () => {
         global.unwatchVideo = jest.fn();
         global.syncWatchedVideos = jest.fn();
         global.changeMarkWatchedToMarkUnwatched = jest.fn();
-        loadVideo();
+        loadSubscriptionsVideo();
         items = document.querySelectorAll(vidQuery());
     });
 
-    // Helper: classify a video item using the same logic as Video constructor
+    // Helper: classify a video item using the real SubscriptionVideo logic
     function classifyItem(item) {
-        const videoUrl = getVideoUrl(item);
-        const mockItem = { containingDiv: item };
-        const duration = getVideoDuration(mockItem);
-        const live = isLivestream(mockItem);
-        const members = isMembersOnly(mockItem);
-        const isShort = videoUrl ? (videoUrl.includes("shorts") || videoUrl.includes("adurl")) : true;
-        const isPremiere = duration == null && !live;
-        return { duration, live, members, isShort, isPremiere };
+        const video = global.createSubscriptionVideo(item);
+        return {
+            duration: video.videoDuration,
+            live: video.isLivestream,
+            members: video.isMembersOnly,
+            isShort: video.isShort,
+            isPremiere: video.isPremiere,
+        };
     }
 
     test('regular video: not short, not premiere, not live, not members-only', () => {
         const props = classifyItem(items[0]); // Video 1
         expect(props.isShort).toBe(false);
-        expect(props.isPremiere).toBe(false);
+        expect(props.isPremiere).toBeFalsy();
         expect(props.live).toBe(false);
         expect(props.members).toBe(false);
         expect(props.duration).toBe('39:36');
@@ -307,7 +307,7 @@ describe('Real YouTube DOM - Video Type Classification', () => {
         const props = classifyItem(items[5]); // Video 6 (livestream)
         expect(props.live).toBe(true);
         // Livestream has no duration but isPremiere should be false because it's live
-        expect(props.isPremiere).toBe(false);
+        expect(props.isPremiere).toBeFalsy();
     });
 
     test('members-only: isMembersOnly when has membership badge', () => {
@@ -341,60 +341,51 @@ describe('Real YouTube DOM - Hide Logic', () => {
         global.hideShorts = false;
         global.hideLives = false;
         global.hideMembersOnly = false;
-        loadVideo();
         items = document.querySelectorAll(vidQuery());
     });
 
-    // Inline shouldHide logic mirroring Video.shouldHide()
-    function shouldHide(item) {
-        const videoUrl = getVideoUrl(item);
-        const mockItem = { containingDiv: item };
-        const videoId = getVideoId(item);
-        const duration = getVideoDuration(mockItem);
-        const live = isLivestream(mockItem);
-        const members = isMembersOnly(mockItem);
-        const isShort = videoUrl ? (videoUrl.includes("shorts") || videoUrl.includes("adurl")) : true;
-        const isPremiere = duration == null && !live;
-        const isStored = watchedVideos['w' + videoId];
-
-        return Boolean(
-            (hideWatched && isStored) ||
-            (hidePremieres && isPremiere) ||
-            (hideShorts && isShort) ||
-            (hideLives && live) ||
-            (hideMembersOnly && members)
-        );
+    // Helper: reload Video+SubscriptionsVideo with current global flags, then construct
+    function makeVideo(item) {
+        loadSubscriptionsVideo();
+        return global.createSubscriptionVideo(item);
     }
 
     test('shouldHide: stored video hidden when hideWatched=true', () => {
         global.hideWatched = true;
         global.watchedVideos = { 'wtestVid_001': true };
-        expect(shouldHide(items[0])).toBe(true);
+        const vid = makeVideo(items[0]);
+        expect(vid.shouldHide()).toBe(true);
     });
 
     test('shouldHide: short hidden when hideShorts=true', () => {
         global.hideShorts = true;
-        expect(shouldHide(items[2])).toBe(true); // Short 1
+        const vid = makeVideo(items[2]); // Short 1
+        expect(vid.shouldHide()).toBe(true);
     });
 
     test('shouldHide: premiere hidden when hidePremieres=true', () => {
         global.hidePremieres = true;
-        expect(shouldHide(items[7])).toBe(true); // Video 8 (premiere)
+        const vid = makeVideo(items[7]); // Video 8 (premiere)
+        expect(vid.shouldHide()).toBe(true);
     });
 
     test('shouldHide: livestream hidden when hideLives=true', () => {
         global.hideLives = true;
-        expect(shouldHide(items[5])).toBe(true); // Video 6 (livestream)
+        const vid = makeVideo(items[5]); // Video 6 (livestream)
+        expect(vid.shouldHide()).toBe(true);
     });
 
     test('shouldHide: members-only hidden when hideMembersOnly=true', () => {
         global.hideMembersOnly = true;
-        expect(shouldHide(items[6])).toBe(true); // Video 7 (members)
+        const vid = makeVideo(items[6]); // Video 7 (members)
+        expect(vid.shouldHide()).toBe(true);
     });
 
     test('shouldHide: nothing hidden when all flags off', () => {
+        loadSubscriptionsVideo();
         for (let i = 0; i < items.length; i++) {
-            expect(shouldHide(items[i])).toBe(false);
+            const vid = global.createSubscriptionVideo(items[i]);
+            expect(vid.shouldHide()).toBe(false);
         }
     });
 });
@@ -420,29 +411,26 @@ describe('Real YouTube DOM - UI & SubscriptionVideo fallback', () => {
     });
 
     test('SubscriptionVideo contentDiv falls back to .ytd-rich-item-renderer', () => {
+        loadSubscriptionsVideo();
         const items = document.querySelectorAll(vidQuery());
-        const item = items[0]; // Regular video
-
-        // Simulate what SubscriptionVideo constructor does:
-        // 1. Try .ytd-rich-item-renderer (old layout) — matches <div id="content" class="style-scope ytd-rich-item-renderer">
-        let contentDiv = item.querySelector(".ytd-rich-item-renderer, ytd-video-renderer.style-scope.ytd-expanded-shelf-contents-renderer");
-
-        // 2. Try lockup-view-model (new layout) — won't match <yt-lockup-view-model>
-        if (!contentDiv) {
-            contentDiv = item.querySelector("lockup-view-model");
-        }
+        const vid = global.createSubscriptionVideo(items[0]);
 
         // The .ytd-rich-item-renderer fallback should have matched
-        expect(contentDiv).not.toBeNull();
+        expect(vid.contentDiv).not.toBeNull();
         // It should be the #content div, not the yt-lockup-view-model
-        expect(contentDiv.tagName).not.toBe('LOCKUP-VIEW-MODEL');
+        expect(vid.contentDiv.tagName).not.toBe('LOCKUP-VIEW-MODEL');
     });
 
     test('querySelector("lockup-view-model") does NOT match yt-lockup-view-model', () => {
+        loadSubscriptionsVideo();
         const items = document.querySelectorAll(vidQuery());
-        const item = items[0];
-        const lockup = item.querySelector("lockup-view-model");
+        const vid = global.createSubscriptionVideo(items[0]);
+        // The lockup-view-model selector doesn't match <yt-lockup-view-model>,
+        // so contentDiv should NOT be a lockup-view-model element
+        const lockup = items[0].querySelector("lockup-view-model");
         expect(lockup).toBeNull();
+        // contentDiv was found via the .ytd-rich-item-renderer fallback instead
+        expect(vid.contentDiv).not.toBeNull();
     });
 
     test('"Most relevant" section title exists in shelf', () => {
