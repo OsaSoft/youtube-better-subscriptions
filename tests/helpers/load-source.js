@@ -256,6 +256,101 @@ function loadSettingsLoader(autoLoad = false) {
     return context;
 }
 
+/**
+ * Load subs-ui.js with dependencies
+ */
+function loadSubsUI() {
+    if (!global.log) {
+        loadUtil();
+    }
+
+    const context = loadSource('subs-ui.js', {
+        settings: global.settings,
+        log: global.log,
+        logDebug: global.logDebug,
+        logWarn: global.logWarn,
+        logError: global.logError,
+        PREFIX: global.PREFIX,
+        HIDDEN_CLASS: global.HIDDEN_CLASS,
+        METADATA_LINE: global.METADATA_LINE,
+        MARK_WATCHED_BTN: global.MARK_WATCHED_BTN,
+        MARK_UNWATCHED_BTN: global.MARK_UNWATCHED_BTN,
+        HIDE_WATCHED_TOGGLE: global.HIDE_WATCHED_TOGGLE,
+        HIDE_WATCHED_LABEL: global.HIDE_WATCHED_LABEL,
+        MARK_ALL_WATCHED_BTN: global.MARK_ALL_WATCHED_BTN,
+        SETTINGS_BTN: global.SETTINGS_BTN,
+        brwsr: global.brwsr || global.browser,
+        hidden: global.hidden,
+        hideWatched: global.hideWatched,
+        SubscriptionVideo: global.SubscriptionVideo,
+        sectionsQuery: global.sectionsQuery,
+        sectionTitleQuery: global.sectionTitleQuery,
+        sectionDismissableQuery: global.sectionDismissableQuery,
+        sectionContentsQuery: global.sectionContentsQuery,
+        vidQuery: global.vidQuery,
+        markAllAsWatched: global.markAllAsWatched,
+        hideWatchedChanged: global.hideWatchedChanged,
+        collapseSectionChanged: global.collapseSectionChanged,
+        loadMoreVideos: global.loadMoreVideos,
+        getCurrentPage: global.getCurrentPage,
+        isRendered: global.isRendered
+    });
+
+    global.COLLAPSE_CLASS = context.COLLAPSE_CLASS;
+    global.buildMarkWatchedButton = context.buildMarkWatchedButton;
+    global.processSections = context.processSections;
+    global.removeWatchedAndAddButton = context.removeWatchedAndAddButton;
+    global.buildUI = context.buildUI;
+    global.removeUI = context.removeUI;
+    global.rebuildUI = context.rebuildUI;
+    global.showWatched = context.showWatched;
+
+    return context;
+}
+
+/**
+ * Load subs.js with dependencies
+ */
+function loadSubs() {
+    if (!global.log) {
+        loadUtil();
+    }
+
+    const context = loadSource('subs.js', {
+        settings: global.settings,
+        log: global.log,
+        logDebug: global.logDebug,
+        logWarn: global.logWarn,
+        logError: global.logError,
+        vidQuery: global.vidQuery,
+        SubscriptionVideo: global.SubscriptionVideo,
+        loadWatchedVideos: global.loadWatchedVideos,
+        buildUI: global.buildUI,
+        removeUI: global.removeUI,
+        removeWatchedAndAddButton: global.removeWatchedAndAddButton,
+        processSections: global.processSections,
+        loadMoreVideos: global.loadMoreVideos,
+        isRendered: global.isRendered,
+        getCurrentPage: global.getCurrentPage,
+        HIDDEN_CLASS: global.HIDDEN_CLASS,
+        sectionDismissableQuery: global.sectionDismissableQuery,
+        sectionContentsQuery: global.sectionContentsQuery
+    });
+
+    global.isYouTubeWatched = context.isYouTubeWatched;
+    global.getVideoTitle = context.getVideoTitle;
+    global.initSubs = context.initSubs;
+    global.stopSubs = context.stopSubs;
+    global.hidden = context.hidden;
+    global.hideWatched = context.hideWatched;
+    global.hidePremieres = context.hidePremieres;
+    global.hideShorts = context.hideShorts;
+    global.hideLives = context.hideLives;
+    global.hideMembersOnly = context.hideMembersOnly;
+
+    return context;
+}
+
 module.exports = {
     loadSource,
     loadUtil,
@@ -263,5 +358,7 @@ module.exports = {
     loadQueries,
     loadVideo,
     loadSubscriptionsVideo,
-    loadSettingsLoader
+    loadSettingsLoader,
+    loadSubsUI,
+    loadSubs
 };
