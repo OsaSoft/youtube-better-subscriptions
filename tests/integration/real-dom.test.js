@@ -390,6 +390,74 @@ describe('Real YouTube DOM - Hide Logic', () => {
     });
 });
 
+describe('Real YouTube DOM - Most Relevant Section Hiding', () => {
+    beforeEach(() => {
+        document.body.innerHTML = fixtureHTML;
+        loadUtil();
+        loadQueries();
+        global.hideMostRelevant = false;
+    });
+
+    test('"Most relevant" section is a ytd-rich-shelf-renderer without is-shorts', () => {
+        const gridContents = document.querySelector(
+            'ytd-two-column-browse-results-renderer ytd-rich-grid-renderer #contents'
+        );
+        const sections = gridContents.querySelectorAll(':scope > ytd-rich-section-renderer');
+
+        // "Most relevant" section (first) should match :not([is-shorts])
+        const mostRelevantShelf = sections[0].querySelector(':scope > #content > ytd-rich-shelf-renderer:not([is-shorts])');
+        expect(mostRelevantShelf).not.toBeNull();
+
+        // Shorts section (second) should NOT match :not([is-shorts])
+        const shortsShelf = sections[1].querySelector(':scope > #content > ytd-rich-shelf-renderer:not([is-shorts])');
+        expect(shortsShelf).toBeNull();
+    });
+
+    test('"Most relevant" section is visible by default', () => {
+        const gridContents = document.querySelector(
+            'ytd-two-column-browse-results-renderer ytd-rich-grid-renderer #contents'
+        );
+        const sections = gridContents.querySelectorAll(':scope > ytd-rich-section-renderer');
+        expect(sections[0].style.display).not.toBe('none');
+    });
+
+    test('"Most relevant" section is hidden when hideMostRelevant=true', () => {
+        global.hideMostRelevant = true;
+        const gridElement = document.querySelector('ytd-two-column-browse-results-renderer ytd-rich-grid-renderer #contents');
+        [...gridElement.querySelectorAll(':scope > ytd-rich-section-renderer')].forEach(section => {
+            const richShelf = section.querySelector(':scope > #content > ytd-rich-shelf-renderer:not([is-shorts])');
+            if (richShelf) {
+                section.style.display = 'none';
+            }
+        });
+
+        const sections = gridElement.querySelectorAll(':scope > ytd-rich-section-renderer');
+        expect(sections[0].style.display).toBe('none');
+    });
+
+    test('Shorts section is NOT hidden when hideMostRelevant=true', () => {
+        global.hideMostRelevant = true;
+        const gridElement = document.querySelector('ytd-two-column-browse-results-renderer ytd-rich-grid-renderer #contents');
+        [...gridElement.querySelectorAll(':scope > ytd-rich-section-renderer')].forEach(section => {
+            const richShelf = section.querySelector(':scope > #content > ytd-rich-shelf-renderer:not([is-shorts])');
+            if (richShelf) {
+                section.style.display = 'none';
+            }
+        });
+
+        const sections = gridElement.querySelectorAll(':scope > ytd-rich-section-renderer');
+        expect(sections[1].style.display).not.toBe('none');
+    });
+
+    test('section count remains 2', () => {
+        const gridContents = document.querySelector(
+            'ytd-two-column-browse-results-renderer ytd-rich-grid-renderer #contents'
+        );
+        const sections = gridContents.querySelectorAll(':scope > ytd-rich-section-renderer');
+        expect(sections.length).toBe(2);
+    });
+});
+
 describe('Real YouTube DOM - UI & SubscriptionVideo fallback', () => {
     beforeEach(() => {
         document.body.innerHTML = fixtureHTML;

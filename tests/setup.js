@@ -22,6 +22,7 @@ const DEFAULT_SETTINGS = {
     "settings.hide.shorts": false,
     "settings.hide.lives": false,
     "settings.hide.members.only": false,
+    "settings.hide.most.relevant": false,
     "settings.hide.mark.watched.button": false,
     "settings.changelog.auto.open": true,
 };
@@ -71,6 +72,7 @@ beforeEach(() => {
     global.hideShorts = false;
     global.hideLives = false;
     global.hideMembersOnly = false;
+    global.hideMostRelevant = false;
 
     // Expose constants
     global.PREFIX = PREFIX;
