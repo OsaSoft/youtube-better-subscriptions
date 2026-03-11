@@ -91,6 +91,21 @@ ytd-grid-video-renderer.style-scope.ytd-grid-renderer:hover .subs-btn-mark-watch
   vertical-align: -3px;
 }
 
+/* Toolbar strip between thumbnail and metadata */
+.subs-btn-strip {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  height: 28px;
+  padding: 0 4px;
+}
+
+/* When inside strip, buttons use static positioning */
+.subs-btn-strip .subs-btn-mark-watched,
+.subs-btn-strip .subs-btn-mark-unwatched {
+  position: static;
+}
+
 #end.ytd-masthead {
   min-width: auto !important;
 }

@@ -47,6 +47,29 @@ class SubscriptionVideo extends Video {
         // stored = false - build "Mark as watched"
         // stored = true  - build "Mark as unwatched"
         let markButton = buildMarkWatchedButton(buttonContainer, this.containingDiv, this.videoId, !this.isStored);
-        buttonContainer.appendChild(markButton);
+
+        if (settings["settings.mark.watched.button.strip"]) {
+            // Strip mode: insert between thumbnail and metadata
+            let strip = document.createElement("div");
+            strip.classList.add("subs-btn-strip");
+            strip.appendChild(markButton);
+
+            if (this.contentDiv.tagName === 'LOCKUP-VIEW-MODEL') {
+                // New layout: insert before metadata div
+                let verticalDiv = this.contentDiv.querySelector(".yt-lockup-view-model--vertical") || this.contentDiv;
+                let metadataDiv = verticalDiv.querySelector(".yt-lockup-view-model__metadata");
+                if (metadataDiv) {
+                    verticalDiv.insertBefore(strip, metadataDiv);
+                } else {
+                    verticalDiv.appendChild(strip);
+                }
+            } else {
+                // Old layout: insert before title area
+                buttonContainer.insertBefore(strip, buttonContainer.querySelector("#video-title")?.parentElement || buttonContainer.firstChild);
+            }
+        } else {
+            // Default: current behavior
+            buttonContainer.appendChild(markButton);
+        }
     }
 }

@@ -48,6 +48,13 @@ describe('common.js', () => {
     // in the browser environment but are harder to test in isolation.
     // These are skipped to keep the test suite running.
 
+    describe('DEFAULT_SETTINGS', () => {
+        test('includes mark watched button strip setting', () => {
+            expect(Object.keys(commonContext.DEFAULT_SETTINGS)).toContain('settings.mark.watched.button.strip');
+            expect(commonContext.DEFAULT_SETTINGS['settings.mark.watched.button.strip']).toBe(false);
+        });
+    });
+
     describe.skip('saveVideoOperation', () => {
         // Would need to refactor to work with vm context isolation
     });
