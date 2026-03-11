@@ -25,8 +25,9 @@ function migrateSettings(loadedSettings) {
 // Helper to compare settings objects
 function settingsChanged(oldSettings, newSettings) {
     if (!newSettings) return false;
+    const merged = {...DEFAULT_SETTINGS, ...newSettings};
     for (let key in DEFAULT_SETTINGS) {
-        if (oldSettings[key] !== newSettings[key]) return true;
+        if (oldSettings[key] !== merged[key]) return true;
     }
     // Detect new keys from newer extension versions
     for (let key in newSettings) {
