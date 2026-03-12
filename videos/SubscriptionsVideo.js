@@ -44,20 +44,25 @@ class SubscriptionVideo extends Video {
         // stored = true  - build "Mark as unwatched"
         let markButton = buildMarkWatchedButton(buttonContainer, this.containingDiv, this.videoId, !this.isStored);
 
-        // Insert button in a strip between thumbnail and metadata
+        // Insert button in a container
         let strip = document.createElement("div");
-        strip.classList.add("subs-btn-strip");
+        strip.classList.add("subs-btn-container");
         strip.appendChild(markButton);
 
         // Detect new lockup layout by presence of vertical container
         let verticalDiv = this.contentDiv.querySelector(".yt-lockup-view-model--vertical");
         if (verticalDiv) {
-            // New layout: insert after metadata div (below description)
-            let metadataDiv = verticalDiv.querySelector(":scope > .yt-lockup-view-model__metadata");
-            if (metadataDiv) {
-                metadataDiv.after(strip);
+            // New layout: place inside the menu button container (next to triple dots)
+            let menuButtonDiv = verticalDiv.querySelector(".yt-lockup-metadata-view-model__menu-button");
+            if (menuButtonDiv) {
+                menuButtonDiv.appendChild(strip);
             } else {
-                verticalDiv.appendChild(strip);
+                let metadataDiv = verticalDiv.querySelector(":scope > .yt-lockup-view-model__metadata");
+                if (metadataDiv) {
+                    metadataDiv.appendChild(strip);
+                } else {
+                    verticalDiv.appendChild(strip);
+                }
             }
         } else {
             // Old layout: insert before title area
