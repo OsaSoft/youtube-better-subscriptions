@@ -18,6 +18,7 @@ const DEFAULT_SETTINGS = {
     "settings.hide.members.only": false,
     "settings.hide.most.relevant": false,
     "settings.hide.mark.watched.button": false,
+    "settings.mark.watched.button.compact": false,
     "settings.changelog.auto.open": true,
 };
 

@@ -45,28 +45,34 @@ class SubscriptionVideo extends Video {
         let markButton = buildMarkWatchedButton(buttonContainer, this.containingDiv, this.videoId, !this.isStored);
 
         // Insert button in a container
-        let strip = document.createElement("div");
-        strip.classList.add("subs-btn-container");
-        strip.appendChild(markButton);
+        let container = document.createElement("div");
+        container.classList.add("subs-btn-container");
+        container.appendChild(markButton);
 
         // Detect new lockup layout by presence of vertical container
         let verticalDiv = this.contentDiv.querySelector(".yt-lockup-view-model--vertical");
         if (verticalDiv) {
-            // New layout: place inside the menu button container (next to triple dots)
-            let menuButtonDiv = verticalDiv.querySelector(".yt-lockup-metadata-view-model__menu-button");
-            if (menuButtonDiv) {
-                menuButtonDiv.appendChild(strip);
+            if (settings["settings.mark.watched.button.compact"]) {
+                // Compact layout: place inside the menu button area (next to triple dots)
+                container.classList.add("subs-btn-container--compact");
+                let menuButtonDiv = verticalDiv.querySelector(".yt-lockup-metadata-view-model__menu-button");
+                if (menuButtonDiv) {
+                    menuButtonDiv.appendChild(container);
+                } else {
+                    verticalDiv.appendChild(container);
+                }
             } else {
+                // Default layout: insert after metadata div
                 let metadataDiv = verticalDiv.querySelector(":scope > .yt-lockup-view-model__metadata");
                 if (metadataDiv) {
-                    metadataDiv.appendChild(strip);
+                    metadataDiv.after(container);
                 } else {
-                    verticalDiv.appendChild(strip);
+                    verticalDiv.appendChild(container);
                 }
             }
         } else {
             // Old layout: insert before title area
-            buttonContainer.insertBefore(strip, buttonContainer.querySelector("#video-title")?.parentElement || buttonContainer.firstChild);
+            buttonContainer.insertBefore(container, buttonContainer.querySelector("#video-title")?.parentElement || buttonContainer.firstChild);
         }
     }
 }

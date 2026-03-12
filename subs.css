@@ -81,19 +81,12 @@ ytd-grid-video-renderer.style-scope.ytd-grid-renderer:hover .subs-btn-mark-watch
   vertical-align: -3px;
 }
 
-/* Make menu button container a positioning context */
-.yt-lockup-metadata-view-model__menu-button {
-  position: relative;
-}
-
-/* Button container positioned below the triple dots menu */
+/* Default button container: row below metadata */
 .subs-btn-container {
-  position: absolute;
-  top: 100%;
-  right: 0;
   display: flex;
+  justify-content: flex-start;
   align-items: center;
-  padding: 0;
+  padding: 4px 0;
 }
 
 /* Button overrides inside container */
@@ -104,8 +97,20 @@ ytd-grid-video-renderer.style-scope.ytd-grid-renderer:hover .subs-btn-mark-watch
   height: 24px;
 }
 
-/* Center the eye icon under the dots */
-.subs-btn-container:has(.subs-btn-mark-watched) {
+/* Compact layout: positioned below the triple dots menu */
+.yt-lockup-metadata-view-model__menu-button {
+  position: relative;
+}
+
+.subs-btn-container--compact {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  padding: 0;
+}
+
+/* Center the eye icon under the dots in compact mode */
+.subs-btn-container--compact:has(.subs-btn-mark-watched) {
   left: 50%;
   right: auto;
   transform: translateX(-50%);
