@@ -52,10 +52,10 @@ class SubscriptionVideo extends Video {
         // Detect new lockup layout by presence of vertical container
         let verticalDiv = this.contentDiv.querySelector(".yt-lockup-view-model--vertical");
         if (verticalDiv) {
-            // New layout: insert before metadata div, after thumbnail
+            // New layout: insert after metadata div (below description)
             let metadataDiv = verticalDiv.querySelector(":scope > .yt-lockup-view-model__metadata");
             if (metadataDiv) {
-                verticalDiv.insertBefore(strip, metadataDiv);
+                metadataDiv.after(strip);
             } else {
                 verticalDiv.appendChild(strip);
             }
