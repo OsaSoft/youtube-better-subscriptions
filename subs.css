@@ -94,16 +94,39 @@ ytd-grid-video-renderer.style-scope.ytd-grid-renderer:hover .subs-btn-mark-watch
 /* Toolbar strip between thumbnail and metadata */
 .subs-btn-strip {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   align-items: center;
-  height: 28px;
-  padding: 0 4px;
+  padding: 4px 0;
 }
 
 /* When inside strip, buttons use static positioning */
 .subs-btn-strip .subs-btn-mark-watched,
 .subs-btn-strip .subs-btn-mark-unwatched {
   position: static;
+  background-color: transparent;
+  height: 24px;
+}
+
+.subs-btn-strip .subs-btn-mark-watched {
+  width: 24px;
+}
+
+.subs-btn-strip .subs-btn-mark-watched:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+}
+
+.subs-btn-strip .subs-btn-mark-watched:active {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.subs-btn-strip .subs-btn-mark-unwatched:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.subs-btn-strip .subs-btn-mark-unwatched:active {
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 #end.ytd-masthead {

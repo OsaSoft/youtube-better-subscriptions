@@ -54,10 +54,11 @@ class SubscriptionVideo extends Video {
             strip.classList.add("subs-btn-strip");
             strip.appendChild(markButton);
 
-            if (this.contentDiv.tagName === 'LOCKUP-VIEW-MODEL') {
-                // New layout: insert before metadata div
-                let verticalDiv = this.contentDiv.querySelector(".yt-lockup-view-model--vertical") || this.contentDiv;
-                let metadataDiv = verticalDiv.querySelector(".yt-lockup-view-model__metadata");
+            // Detect new lockup layout by presence of vertical container
+            let verticalDiv = this.contentDiv.querySelector(".yt-lockup-view-model--vertical");
+            if (verticalDiv) {
+                // New layout: insert before metadata div, after thumbnail
+                let metadataDiv = verticalDiv.querySelector(":scope > .yt-lockup-view-model__metadata");
                 if (metadataDiv) {
                     verticalDiv.insertBefore(strip, metadataDiv);
                 } else {
