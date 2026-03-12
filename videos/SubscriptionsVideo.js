@@ -28,15 +28,11 @@ class SubscriptionVideo extends Video {
         let firstChild = this.contentDiv.firstChild;
         let isListView = firstChild && firstChild.nodeType === Node.COMMENT_NODE;
 
-        // For new lockupViewModel layout, find the metadata container
+        // Find the container for building the button
         let buttonContainer;
         if (this.contentDiv.tagName === 'LOCKUP-VIEW-MODEL') {
-            // New layout: put button in the metadata area
-            buttonContainer = this.contentDiv.querySelector("lockup-metadata-view-model") ||
-                            this.contentDiv.querySelector(".metadata") ||
-                            this.contentDiv;
+            buttonContainer = this.contentDiv;
         } else {
-            // Old layout
             buttonContainer = isListView ? this.contentDiv.querySelector(".text-wrapper.style-scope.ytd-video-renderer") : firstChild;
         }
 
@@ -48,29 +44,24 @@ class SubscriptionVideo extends Video {
         // stored = true  - build "Mark as unwatched"
         let markButton = buildMarkWatchedButton(buttonContainer, this.containingDiv, this.videoId, !this.isStored);
 
-        if (settings["settings.mark.watched.button.strip"]) {
-            // Strip mode: insert between thumbnail and metadata
-            let strip = document.createElement("div");
-            strip.classList.add("subs-btn-strip");
-            strip.appendChild(markButton);
+        // Insert button in a strip between thumbnail and metadata
+        let strip = document.createElement("div");
+        strip.classList.add("subs-btn-strip");
+        strip.appendChild(markButton);
 
-            // Detect new lockup layout by presence of vertical container
-            let verticalDiv = this.contentDiv.querySelector(".yt-lockup-view-model--vertical");
-            if (verticalDiv) {
-                // New layout: insert before metadata div, after thumbnail
-                let metadataDiv = verticalDiv.querySelector(":scope > .yt-lockup-view-model__metadata");
-                if (metadataDiv) {
-                    verticalDiv.insertBefore(strip, metadataDiv);
-                } else {
-                    verticalDiv.appendChild(strip);
-                }
+        // Detect new lockup layout by presence of vertical container
+        let verticalDiv = this.contentDiv.querySelector(".yt-lockup-view-model--vertical");
+        if (verticalDiv) {
+            // New layout: insert before metadata div, after thumbnail
+            let metadataDiv = verticalDiv.querySelector(":scope > .yt-lockup-view-model__metadata");
+            if (metadataDiv) {
+                verticalDiv.insertBefore(strip, metadataDiv);
             } else {
-                // Old layout: insert before title area
-                buttonContainer.insertBefore(strip, buttonContainer.querySelector("#video-title")?.parentElement || buttonContainer.firstChild);
+                verticalDiv.appendChild(strip);
             }
         } else {
-            // Default: current behavior
-            buttonContainer.appendChild(markButton);
+            // Old layout: insert before title area
+            buttonContainer.insertBefore(strip, buttonContainer.querySelector("#video-title")?.parentElement || buttonContainer.firstChild);
         }
     }
 }
