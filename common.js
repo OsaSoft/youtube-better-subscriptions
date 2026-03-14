@@ -8,7 +8,7 @@ const DEFAULT_SETTINGS = {
     "settings.hide.watched.keep.state": true,
     "settings.hide.watched.refresh.rate": 3000,
     "settings.mark.watched.youtube.watched": false,
-    "settings.log.level": 1,  // 1=ERROR, 2=WARN, 3=INFO, 4=DEBUG
+    "settings.log.level": 1, // 1=ERROR, 2=WARN, 3=INFO, 4=DEBUG
     "settings.hide.watched.support.channel": true,
     "settings.hide.watched.support.home": true,
     "settings.hide.watched.auto.store": true,
@@ -18,6 +18,7 @@ const DEFAULT_SETTINGS = {
     "settings.hide.members.only": false,
     "settings.hide.most.relevant": false,
     "settings.hide.mark.watched.button": false,
+    "settings.mark.watched.button.compact": true,
     "settings.changelog.auto.open": true,
 };
 

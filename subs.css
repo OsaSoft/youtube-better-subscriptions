@@ -25,21 +25,11 @@
 
 .subs-btn-mark-watched, .subs-btn-mark-unwatched {
   height: 24px;
-  position: absolute;
-  bottom: 3px;
-  left: 3px;
   border: none;
   border-radius: 2px;
-  background-color: hsl(0, 0%, 6.7%);
   opacity: .6;
   -webkit-transition-duration: 0.4s; /* Safari */
   transition-duration: 0.4s;
-}
-
-/* For list view, doesn't need to be position absolute */
-#contents.ytd-section-list-renderer .subs-btn-mark-watched,
-#contents.ytd-section-list-renderer .subs-btn-mark-unwatched {
-  position: static;
 }
 
 .subs-btn-mark-watched {
@@ -89,6 +79,63 @@ ytd-grid-video-renderer.style-scope.ytd-grid-renderer:hover .subs-btn-mark-watch
 
 #osasoft-better-subscriptions_subs-grid {
   vertical-align: -3px;
+}
+
+/* Default button container: row below metadata */
+.subs-btn-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 4px 0;
+}
+
+/* Button overrides inside container */
+.subs-btn-container .subs-btn-mark-watched,
+.subs-btn-container .subs-btn-mark-unwatched {
+  position: static;
+  background-color: transparent;
+  height: 24px;
+}
+
+/* Compact layout: positioned below the triple dots menu */
+.yt-lockup-metadata-view-model__menu-button {
+  position: relative;
+}
+
+.subs-btn-container--compact {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  padding: 0;
+}
+
+/* Center the eye icon under the dots in compact mode */
+.subs-btn-container--compact:has(.subs-btn-mark-watched) {
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+}
+
+.subs-btn-container .subs-btn-mark-watched {
+  width: 24px;
+}
+
+.subs-btn-container .subs-btn-mark-watched:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+}
+
+.subs-btn-container .subs-btn-mark-watched:active {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.subs-btn-container .subs-btn-mark-unwatched:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.subs-btn-container .subs-btn-mark-unwatched:active {
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 #end.ytd-masthead {

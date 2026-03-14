@@ -314,7 +314,8 @@ function removeUI() {
 
     addedElems = [];
 
-    // delete built buttons
+    // delete built buttons and strip containers
+    document.querySelectorAll(".subs-btn-container").forEach(e => e.remove());
     document.querySelectorAll("#" + METADATA_LINE).forEach(e => e.remove());
 
     // make hidden videos visible

@@ -7,7 +7,7 @@ class SubscriptionVideo extends Video {
 
         // Try new January 2026 lockupViewModel layout
         if (!this.contentDiv) {
-            this.contentDiv = this.containingDiv.querySelector("lockup-view-model");
+            this.contentDiv = this.containingDiv.querySelector("lockup-view-model, yt-lockup-view-model");
         }
     }
 
@@ -25,18 +25,14 @@ class SubscriptionVideo extends Video {
             return;
         }
 
-        let firstChild = this.contentDiv.firstChild;
+        let firstChild = this.contentDiv.firstElementChild;
         let isListView = firstChild && firstChild.nodeType === Node.COMMENT_NODE;
 
-        // For new lockupViewModel layout, find the metadata container
+        // Find the container for building the button
         let buttonContainer;
-        if (this.contentDiv.tagName === 'LOCKUP-VIEW-MODEL') {
-            // New layout: put button in the metadata area
-            buttonContainer = this.contentDiv.querySelector("lockup-metadata-view-model") ||
-                            this.contentDiv.querySelector(".metadata") ||
-                            this.contentDiv;
+        if (this.contentDiv.matches('lockup-view-model, yt-lockup-view-model')) {
+            buttonContainer = this.contentDiv;
         } else {
-            // Old layout
             buttonContainer = isListView ? this.contentDiv.querySelector(".text-wrapper.style-scope.ytd-video-renderer") : firstChild;
         }
 
@@ -47,6 +43,34 @@ class SubscriptionVideo extends Video {
         // stored = false - build "Mark as watched"
         // stored = true  - build "Mark as unwatched"
         let markButton = buildMarkWatchedButton(buttonContainer, this.containingDiv, this.videoId, !this.isStored);
-        buttonContainer.appendChild(markButton);
+
+        // Insert button in a container
+        let container = document.createElement("div");
+        container.classList.add("subs-btn-container");
+        container.appendChild(markButton);
+
+        // Detect new lockup layout by presence of vertical container
+        let verticalDiv = this.contentDiv.querySelector(".yt-lockup-view-model--vertical");
+        if (verticalDiv) {
+            let menuButtonDiv = settings["settings.mark.watched.button.compact"]
+                ? verticalDiv.querySelector(".yt-lockup-metadata-view-model__menu-button")
+                : null;
+            if (menuButtonDiv) {
+                // Compact layout: place inside the menu button area (next to triple dots)
+                container.classList.add("subs-btn-container--compact");
+                menuButtonDiv.appendChild(container);
+            } else {
+                // Default layout: insert after metadata div
+                let metadataDiv = verticalDiv.querySelector(":scope > .yt-lockup-view-model__metadata");
+                if (metadataDiv) {
+                    metadataDiv.after(container);
+                } else {
+                    verticalDiv.appendChild(container);
+                }
+            }
+        } else {
+            // Old layout: insert before title area
+            buttonContainer.insertBefore(container, buttonContainer.querySelector("#video-title")?.parentElement || buttonContainer.firstChild);
+        }
     }
 }
