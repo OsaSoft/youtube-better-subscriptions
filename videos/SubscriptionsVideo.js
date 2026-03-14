@@ -7,7 +7,7 @@ class SubscriptionVideo extends Video {
 
         // Try new January 2026 lockupViewModel layout
         if (!this.contentDiv) {
-            this.contentDiv = this.containingDiv.querySelector("lockup-view-model");
+            this.contentDiv = this.containingDiv.querySelector("lockup-view-model, yt-lockup-view-model");
         }
     }
 
@@ -25,12 +25,12 @@ class SubscriptionVideo extends Video {
             return;
         }
 
-        let firstChild = this.contentDiv.firstChild;
+        let firstChild = this.contentDiv.firstElementChild;
         let isListView = firstChild && firstChild.nodeType === Node.COMMENT_NODE;
 
         // Find the container for building the button
         let buttonContainer;
-        if (this.contentDiv.tagName === 'LOCKUP-VIEW-MODEL') {
+        if (this.contentDiv.matches('lockup-view-model, yt-lockup-view-model')) {
             buttonContainer = this.contentDiv;
         } else {
             buttonContainer = isListView ? this.contentDiv.querySelector(".text-wrapper.style-scope.ytd-video-renderer") : firstChild;
@@ -52,15 +52,13 @@ class SubscriptionVideo extends Video {
         // Detect new lockup layout by presence of vertical container
         let verticalDiv = this.contentDiv.querySelector(".yt-lockup-view-model--vertical");
         if (verticalDiv) {
-            if (settings["settings.mark.watched.button.compact"]) {
+            let menuButtonDiv = settings["settings.mark.watched.button.compact"]
+                ? verticalDiv.querySelector(".yt-lockup-metadata-view-model__menu-button")
+                : null;
+            if (menuButtonDiv) {
                 // Compact layout: place inside the menu button area (next to triple dots)
                 container.classList.add("subs-btn-container--compact");
-                let menuButtonDiv = verticalDiv.querySelector(".yt-lockup-metadata-view-model__menu-button");
-                if (menuButtonDiv) {
-                    menuButtonDiv.appendChild(container);
-                } else {
-                    verticalDiv.appendChild(container);
-                }
+                menuButtonDiv.appendChild(container);
             } else {
                 // Default layout: insert after metadata div
                 let metadataDiv = verticalDiv.querySelector(":scope > .yt-lockup-view-model__metadata");

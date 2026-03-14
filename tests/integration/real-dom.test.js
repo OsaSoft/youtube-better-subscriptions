@@ -457,6 +457,76 @@ describe('Real YouTube DOM - Most Relevant Section Hiding', () => {
     });
 });
 
+describe('Real YouTube DOM - addButton() placement', () => {
+    let items;
+
+    beforeEach(() => {
+        document.body.innerHTML = fixtureHTML;
+        loadUtil();
+        loadQueries();
+        global.watchedVideos = {};
+        global.buildMarkWatchedButton = jest.fn(() => document.createElement('div'));
+        global.processSections = jest.fn();
+        global.watchVideo = jest.fn();
+        global.unwatchVideo = jest.fn();
+        global.syncWatchedVideos = jest.fn();
+        global.changeMarkWatchedToMarkUnwatched = jest.fn();
+        global.hideWatched = false;
+        global.hidePremieres = false;
+        global.hideShorts = false;
+        global.hideLives = false;
+        global.hideMembersOnly = false;
+        loadSubscriptionsVideo();
+        items = document.querySelectorAll(vidQuery());
+    });
+
+    test('compact mode: button placed inside menu button div with --compact class', () => {
+        settings["settings.mark.watched.button.compact"] = true;
+        settings["settings.hide.mark.watched.button"] = false;
+        const vid = global.createSubscriptionVideo(items[4]); // Video 3 (grid)
+        vid.addButton();
+
+        const menuBtn = items[4].querySelector('.yt-lockup-metadata-view-model__menu-button');
+        const container = menuBtn.querySelector('.subs-btn-container');
+        expect(container).not.toBeNull();
+        expect(container.classList.contains('subs-btn-container--compact')).toBe(true);
+    });
+
+    test('non-compact mode: button placed as sibling after metadata div', () => {
+        settings["settings.mark.watched.button.compact"] = false;
+        settings["settings.hide.mark.watched.button"] = false;
+        const vid = global.createSubscriptionVideo(items[4]); // Video 3 (grid)
+        vid.addButton();
+
+        const verticalDiv = items[4].querySelector('.yt-lockup-view-model--vertical');
+        const metadataDiv = verticalDiv.querySelector(':scope > .yt-lockup-view-model__metadata');
+        const container = metadataDiv.nextElementSibling;
+        expect(container).not.toBeNull();
+        expect(container.classList.contains('subs-btn-container')).toBe(true);
+        expect(container.classList.contains('subs-btn-container--compact')).toBe(false);
+    });
+
+    test('compact fallback: when menu button div missing, falls back to non-compact placement', () => {
+        settings["settings.mark.watched.button.compact"] = true;
+        settings["settings.hide.mark.watched.button"] = false;
+
+        // Remove the menu button div from the item
+        const menuBtn = items[4].querySelector('.yt-lockup-metadata-view-model__menu-button');
+        menuBtn.remove();
+
+        const vid = global.createSubscriptionVideo(items[4]);
+        vid.addButton();
+
+        // Should fall back to after-metadata placement without --compact class
+        const verticalDiv = items[4].querySelector('.yt-lockup-view-model--vertical');
+        const metadataDiv = verticalDiv.querySelector(':scope > .yt-lockup-view-model__metadata');
+        const container = metadataDiv.nextElementSibling;
+        expect(container).not.toBeNull();
+        expect(container.classList.contains('subs-btn-container')).toBe(true);
+        expect(container.classList.contains('subs-btn-container--compact')).toBe(false);
+    });
+});
+
 describe('Real YouTube DOM - UI & SubscriptionVideo fallback', () => {
     beforeEach(() => {
         document.body.innerHTML = fixtureHTML;
