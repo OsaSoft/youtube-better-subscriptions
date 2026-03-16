@@ -120,6 +120,9 @@ class Video {
             logDebug("Video URL is null - ad.");
             this.isShort = true;
         }
+
+        this.isMix = videoHref != null && videoHref.includes("start_radio=1");
+        logDebug("Checking video " + this.videoId + " for mix: " + this.isMix);
     }
 
     hasButton() {
@@ -132,7 +135,7 @@ class Video {
 
     shouldHide() {
         return Boolean(
-                (hideWatched && this.isStored) ||
+                (hideWatched && this.isStored && !this.isMix) ||
                 (hidePremieres && this.isPremiere) ||
                 (hideShorts && this.isShort) ||
                 (hideLives && this.isLivestream) ||

@@ -243,6 +243,75 @@ describe('Video.js', () => {
         });
     });
 
+    describe('isMix detection via Video constructor', () => {
+        const { loadSubscriptionsVideo } = require('../helpers/load-source');
+
+        function createVideoDiv(href) {
+            document.body.innerHTML = `
+                <div id="container">
+                    <a id="video-title" href="${href}">Title</a>
+                    <div class="yt-badge-shape__text">3:45</div>
+                </div>
+            `;
+            return document.getElementById('container');
+        }
+
+        function createVideo(href, watchedVideosMap, hideWatchedVal) {
+            global.watchedVideos = watchedVideosMap || {};
+            global.hideWatched = hideWatchedVal || false;
+            const context = loadSubscriptionsVideo();
+            const div = createVideoDiv(href);
+            // Use vm.runInContext to create the Video inside the same context
+            const vm = require('vm');
+            // Attach the div to the context so it's accessible
+            context.__testDiv = div;
+            return vm.runInContext(
+                '(function() { var v = new Video(__testDiv); return { isMix: v.isMix, isStored: v.isStored, shouldHide: v.shouldHide() }; })()',
+                context
+            );
+        }
+
+        test('isMix is true when URL contains start_radio=1', () => {
+            const result = createVideo(
+                '/watch?v=abc12345678&list=RDabc12345678&start_radio=1',
+                { 'wabc12345678': true }
+            );
+            expect(result.isMix).toBe(true);
+        });
+
+        test('isMix is false for regular watch URL', () => {
+            const result = createVideo('/watch?v=abc12345678', {});
+            expect(result.isMix).toBe(false);
+        });
+
+        test('isMix is false for playlist URL without start_radio', () => {
+            const result = createVideo('/watch?v=abc12345678&list=PLtest123', {});
+            expect(result.isMix).toBe(false);
+        });
+
+        test('watched mix is not hidden when hideWatched is true', () => {
+            const result = createVideo(
+                '/watch?v=abc12345678&list=RDabc12345678&start_radio=1',
+                { 'wabc12345678': true },
+                true
+            );
+            expect(result.isStored).toBe(true);
+            expect(result.isMix).toBe(true);
+            expect(result.shouldHide).toBe(false);
+        });
+
+        test('watched non-mix video is still hidden when hideWatched is true', () => {
+            const result = createVideo(
+                '/watch?v=abc12345678',
+                { 'wabc12345678': true },
+                true
+            );
+            expect(result.isStored).toBe(true);
+            expect(result.isMix).toBe(false);
+            expect(result.shouldHide).toBe(true);
+        });
+    });
+
     // Video class tests are skipped because JS classes in vm.runInContext
     // cannot be instantiated from outside the context. These would need
     // a different testing approach (e.g., bundling or different module system).
