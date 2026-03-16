@@ -152,12 +152,12 @@ class Video {
     markWatched() {
         changeMarkWatchedToMarkUnwatched(this.containingDiv);
 
-        if (hideWatched) {
+        this.isStored = true;
+
+        if (this.shouldHide()) {
             this.hide();
             processSections();
         }
-
-        this.isStored = true;
 
         watchVideo(this.videoId);
         syncWatchedVideos();

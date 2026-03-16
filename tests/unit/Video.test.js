@@ -300,6 +300,21 @@ describe('Video.js', () => {
             expect(result.shouldHide).toBe(false);
         });
 
+        test('manually marking a mix as watched does not trigger hide', () => {
+            global.watchedVideos = {};
+            global.hideWatched = true;
+            const context = loadSubscriptionsVideo();
+            const div = createVideoDiv('/watch?v=abc12345678&list=RDabc12345678&start_radio=1');
+            context.__testDiv = div;
+            const vm = require('vm');
+            const result = vm.runInContext(
+                '(function() { var v = new Video(__testDiv); v.markWatched(); return { hidden: v.containingDiv.style.display === "none", isMix: v.isMix }; })()',
+                context
+            );
+            expect(result.isMix).toBe(true);
+            expect(result.hidden).toBe(false);
+        });
+
         test('watched non-mix video is still hidden when hideWatched is true', () => {
             const result = createVideo(
                 '/watch?v=abc12345678',
