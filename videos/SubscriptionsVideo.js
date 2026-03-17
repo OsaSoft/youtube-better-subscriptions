@@ -56,9 +56,18 @@ class SubscriptionVideo extends Video {
                 ? verticalDiv.querySelector(".yt-lockup-metadata-view-model__menu-button")
                 : null;
             if (menuButtonDiv) {
-                // Compact layout: place inside the menu button area (next to triple dots)
+                // Compact layout: place inside a wrapper to avoid position:relative on flex item (Firefox bug)
                 container.classList.add("subs-btn-container--compact");
-                menuButtonDiv.appendChild(container);
+                let wrapper = menuButtonDiv.querySelector(".subs-btn-compact-wrapper");
+                if (!wrapper) {
+                    wrapper = document.createElement("div");
+                    wrapper.classList.add("subs-btn-compact-wrapper");
+                    while (menuButtonDiv.firstChild) {
+                        wrapper.appendChild(menuButtonDiv.firstChild);
+                    }
+                    menuButtonDiv.appendChild(wrapper);
+                }
+                wrapper.appendChild(container);
             } else {
                 // Default layout: insert after metadata div
                 let metadataDiv = verticalDiv.querySelector(":scope > .yt-lockup-view-model__metadata");
