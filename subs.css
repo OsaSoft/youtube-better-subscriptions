@@ -98,7 +98,7 @@ ytd-grid-video-renderer.style-scope.ytd-grid-renderer:hover .subs-btn-mark-watch
 }
 
 /* Compact layout: positioned below the triple dots menu */
-.yt-lockup-metadata-view-model__menu-button {
+.subs-btn-compact-wrapper {
   position: relative;
 }
 
