@@ -1,0 +1,159 @@
+<!-- Channel "Videos" tab layout (ytd-rich-grid-media inside ytd-rich-item-renderer) -->
+<!-- This is the layout used on channel pages like /@channel/videos -->
+
+<!-- Video 1: Regular video (unwatched) -->
+<ytd-rich-item-renderer class="style-scope ytd-rich-grid-renderer" items-per-row="4" lockup="true" rendered-from-rich-grid="">
+    <div id="content" class="style-scope ytd-rich-item-renderer">
+        <ytd-rich-grid-media class="style-scope ytd-rich-item-renderer" lockup="true" mini-mode="">
+            <div id="dismissible" class="style-scope ytd-rich-grid-media">
+                <div id="thumbnail" class="style-scope ytd-rich-grid-media">
+                    <ytd-thumbnail class="style-scope ytd-rich-grid-media" size="large">
+                        <a id="thumbnail" class="yt-simple-endpoint inline-block style-scope ytd-thumbnail" href="/watch?v=channelVid_001">
+                            <yt-image class="style-scope ytd-thumbnail">
+                                <img src="https://i.ytimg.com/vi/channelVid_001/hqdefault.jpg">
+                            </yt-image>
+                            <div id="overlays" class="style-scope ytd-thumbnail">
+                                <ytd-thumbnail-overlay-time-status-renderer class="style-scope ytd-thumbnail">
+                                    <div class="thumbnail-overlay-badge-shape style-scope ytd-thumbnail-overlay-time-status-renderer">
+                                        <badge-shape class="yt-badge-shape yt-badge-shape--thumbnail-default yt-badge-shape--thumbnail-badge">
+                                            <div class="yt-badge-shape__text">15:42</div>
+                                        </badge-shape>
+                                    </div>
+                                </ytd-thumbnail-overlay-time-status-renderer>
+                            </div>
+                        </a>
+                    </ytd-thumbnail>
+                </div>
+                <div id="details" class="style-scope ytd-rich-grid-media">
+                    <div id="meta" class="style-scope ytd-rich-grid-media">
+                        <h3 class="style-scope ytd-rich-grid-media">
+                            <a id="video-title-link" class="yt-simple-endpoint style-scope ytd-rich-grid-media" href="/watch?v=channelVid_001" title="Channel Video One">
+                                <yt-formatted-string id="video-title" class="style-scope ytd-rich-grid-media" title="Channel Video One">Channel Video One</yt-formatted-string>
+                            </a>
+                        </h3>
+                        <ytd-video-meta-block class="style-scope ytd-rich-grid-media">
+                            <div id="metadata-line" class="style-scope ytd-video-meta-block">
+                                <span class="inline-metadata-item style-scope ytd-video-meta-block">65k views</span>
+                                <span class="inline-metadata-item style-scope ytd-video-meta-block">3 days ago</span>
+                            </div>
+                        </ytd-video-meta-block>
+                        <div id="buttons" class="style-scope ytd-rich-grid-media"></div>
+                    </div>
+                    <div id="menu" class="style-scope ytd-rich-grid-media">
+                        <ytd-menu-renderer class="style-scope ytd-rich-grid-media"></ytd-menu-renderer>
+                    </div>
+                </div>
+            </div>
+        </ytd-rich-grid-media>
+    </div>
+</ytd-rich-item-renderer>
+
+<!-- Video 2: Regular video (with progress bar - partially watched) -->
+<ytd-rich-item-renderer class="style-scope ytd-rich-grid-renderer" items-per-row="4" lockup="true" rendered-from-rich-grid="">
+    <div id="content" class="style-scope ytd-rich-item-renderer">
+        <ytd-rich-grid-media class="style-scope ytd-rich-item-renderer" lockup="true" mini-mode="">
+            <div id="dismissible" class="style-scope ytd-rich-grid-media">
+                <div id="thumbnail" class="style-scope ytd-rich-grid-media">
+                    <ytd-thumbnail class="style-scope ytd-rich-grid-media" size="large">
+                        <a id="thumbnail" class="yt-simple-endpoint inline-block style-scope ytd-thumbnail" href="/watch?v=channelVid_002">
+                            <yt-image class="style-scope ytd-thumbnail">
+                                <img src="https://i.ytimg.com/vi/channelVid_002/hqdefault.jpg">
+                            </yt-image>
+                            <div id="overlays" class="style-scope ytd-thumbnail">
+                                <ytd-thumbnail-overlay-time-status-renderer class="style-scope ytd-thumbnail">
+                                    <div class="thumbnail-overlay-badge-shape style-scope ytd-thumbnail-overlay-time-status-renderer">
+                                        <badge-shape class="yt-badge-shape yt-badge-shape--thumbnail-default yt-badge-shape--thumbnail-badge">
+                                            <div class="yt-badge-shape__text">22:10</div>
+                                        </badge-shape>
+                                    </div>
+                                </ytd-thumbnail-overlay-time-status-renderer>
+                            </div>
+                            <div class="ytThumbnailOverlayProgressBarHostWatchedProgressBarSegment" style="width: 45%;"></div>
+                        </a>
+                    </ytd-thumbnail>
+                </div>
+                <div id="details" class="style-scope ytd-rich-grid-media">
+                    <div id="meta" class="style-scope ytd-rich-grid-media">
+                        <h3 class="style-scope ytd-rich-grid-media">
+                            <a id="video-title-link" class="yt-simple-endpoint style-scope ytd-rich-grid-media" href="/watch?v=channelVid_002" title="Channel Video Two">
+                                <yt-formatted-string id="video-title" class="style-scope ytd-rich-grid-media" title="Channel Video Two">Channel Video Two</yt-formatted-string>
+                            </a>
+                        </h3>
+                        <ytd-video-meta-block class="style-scope ytd-rich-grid-media">
+                            <div id="metadata-line" class="style-scope ytd-video-meta-block">
+                                <span class="inline-metadata-item style-scope ytd-video-meta-block">120k views</span>
+                                <span class="inline-metadata-item style-scope ytd-video-meta-block">1 week ago</span>
+                            </div>
+                        </ytd-video-meta-block>
+                        <div id="buttons" class="style-scope ytd-rich-grid-media"></div>
+                    </div>
+                </div>
+            </div>
+        </ytd-rich-grid-media>
+    </div>
+</ytd-rich-item-renderer>
+
+<!-- Video 3: Short -->
+<ytd-rich-item-renderer class="style-scope ytd-rich-grid-renderer" items-per-row="4" lockup="true" rendered-from-rich-grid="">
+    <div id="content" class="style-scope ytd-rich-item-renderer">
+        <ytd-rich-grid-media class="style-scope ytd-rich-item-renderer" lockup="true" mini-mode="">
+            <div id="dismissible" class="style-scope ytd-rich-grid-media">
+                <div id="thumbnail" class="style-scope ytd-rich-grid-media">
+                    <ytd-thumbnail class="style-scope ytd-rich-grid-media" size="large">
+                        <a id="thumbnail" class="yt-simple-endpoint inline-block style-scope ytd-thumbnail" href="/shorts/channelShort_001">
+                            <yt-image class="style-scope ytd-thumbnail">
+                                <img src="https://i.ytimg.com/vi/channelShort_001/hqdefault.jpg">
+                            </yt-image>
+                        </a>
+                    </ytd-thumbnail>
+                </div>
+                <div id="details" class="style-scope ytd-rich-grid-media">
+                    <div id="meta" class="style-scope ytd-rich-grid-media">
+                        <h3 class="style-scope ytd-rich-grid-media">
+                            <a id="video-title-link" class="yt-simple-endpoint style-scope ytd-rich-grid-media" href="/shorts/channelShort_001" title="Channel Short">
+                                <yt-formatted-string id="video-title" class="style-scope ytd-rich-grid-media" title="Channel Short">Channel Short</yt-formatted-string>
+                            </a>
+                        </h3>
+                    </div>
+                </div>
+            </div>
+        </ytd-rich-grid-media>
+    </div>
+</ytd-rich-item-renderer>
+
+<!-- Video 4: Livestream -->
+<ytd-rich-item-renderer class="style-scope ytd-rich-grid-renderer" items-per-row="4" lockup="true" rendered-from-rich-grid="">
+    <div id="content" class="style-scope ytd-rich-item-renderer">
+        <ytd-rich-grid-media class="style-scope ytd-rich-item-renderer" lockup="true" mini-mode="">
+            <div id="dismissible" class="style-scope ytd-rich-grid-media">
+                <div id="thumbnail" class="style-scope ytd-rich-grid-media">
+                    <ytd-thumbnail class="style-scope ytd-rich-grid-media" size="large">
+                        <a id="thumbnail" class="yt-simple-endpoint inline-block style-scope ytd-thumbnail" href="/watch?v=channelLive_001">
+                            <yt-image class="style-scope ytd-thumbnail">
+                                <img src="https://i.ytimg.com/vi/channelLive_001/hqdefault.jpg">
+                            </yt-image>
+                            <div id="overlays" class="style-scope ytd-thumbnail">
+                                <ytd-thumbnail-overlay-time-status-renderer class="style-scope ytd-thumbnail">
+                                    <div class="thumbnail-overlay-badge-shape style-scope ytd-thumbnail-overlay-time-status-renderer">
+                                        <badge-shape class="yt-badge-shape yt-badge-shape--thumbnail-live yt-badge-shape--thumbnail-badge">
+                                            <div class="yt-badge-shape__text">LIVE</div>
+                                        </badge-shape>
+                                    </div>
+                                </ytd-thumbnail-overlay-time-status-renderer>
+                            </div>
+                        </a>
+                    </ytd-thumbnail>
+                </div>
+                <div id="details" class="style-scope ytd-rich-grid-media">
+                    <div id="meta" class="style-scope ytd-rich-grid-media">
+                        <h3 class="style-scope ytd-rich-grid-media">
+                            <a id="video-title-link" class="yt-simple-endpoint style-scope ytd-rich-grid-media" href="/watch?v=channelLive_001" title="Channel Livestream">
+                                <yt-formatted-string id="video-title" class="style-scope ytd-rich-grid-media" title="Channel Livestream">Channel Livestream</yt-formatted-string>
+                            </a>
+                        </h3>
+                    </div>
+                </div>
+            </div>
+        </ytd-rich-grid-media>
+    </div>
+</ytd-rich-item-renderer>
