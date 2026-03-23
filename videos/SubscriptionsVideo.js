@@ -79,7 +79,18 @@ class SubscriptionVideo extends Video {
             }
         } else {
             // Old layout: insert before title area
-            buttonContainer.insertBefore(container, buttonContainer.querySelector("#video-title")?.parentElement || buttonContainer.firstChild);
+            let refNode = buttonContainer.querySelector("#video-title")?.parentElement;
+            if (refNode?.parentElement !== buttonContainer) {
+                // Channel page layout: #video-title is deeply nested, insert into #meta area
+                let metaDiv = buttonContainer.querySelector("#meta");
+                if (metaDiv) {
+                    metaDiv.appendChild(container);
+                } else {
+                    buttonContainer.appendChild(container);
+                }
+            } else {
+                buttonContainer.insertBefore(container, refNode || buttonContainer.firstChild);
+            }
         }
     }
 }
