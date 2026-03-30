@@ -129,20 +129,14 @@ ytd-grid-video-renderer.style-scope.ytd-grid-renderer:hover .subs-btn-mark-watch
   width: 24px;
 }
 
-.subs-btn-container .subs-btn-mark-watched:hover {
-  background-color: var(--yt-spec-text-primary, #0f0f0f);
-  border-radius: 50%;
-}
-
-.subs-btn-container .subs-btn-mark-watched:active {
-  background-color: var(--yt-spec-text-primary, #0f0f0f);
-}
-
+/* With mask-image, background-color paints the icon — these change icon color on hover
+   from muted (--yt-spec-icon-inactive) to full contrast (--yt-spec-text-primary) */
+.subs-btn-container .subs-btn-mark-watched:hover,
 .subs-btn-container .subs-btn-mark-unwatched:hover {
   background-color: var(--yt-spec-text-primary, #0f0f0f);
-  border-radius: 4px;
 }
 
+.subs-btn-container .subs-btn-mark-watched:active,
 .subs-btn-container .subs-btn-mark-unwatched:active {
   background-color: var(--yt-spec-text-primary, #0f0f0f);
 }
