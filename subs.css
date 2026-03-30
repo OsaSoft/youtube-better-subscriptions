@@ -13,21 +13,27 @@
 .subs-btn-hide-watched-checked .toggle-button {
   background-color: var(--paper-toggle-button-checked-button-color, var(--primary-color));
 
-  background-image: url('images/markunwatched.svg'), /*works in Firefox*/ url('chrome-extension://__MSG_@@extension_id__/images/markunwatched.svg'); /*works in Chrome*/
-  background-size: cover;
+  -webkit-mask-image: url('images/markunwatched.svg'), /*works in Firefox*/ url('chrome-extension://__MSG_@@extension_id__/images/markunwatched.svg'); /*works in Chrome*/
+  mask-image: url('images/markunwatched.svg'), /*works in Firefox*/ url('chrome-extension://__MSG_@@extension_id__/images/markunwatched.svg'); /*works in Chrome*/
+  -webkit-mask-size: cover;
+  mask-size: cover;
   transform: translate(16px, 0);
 }
 
 .subs-btn-hide-watched-unchecked .toggle-button {
-  background-image: url('images/markwatched.svg'), /*works in Firefox*/ url('chrome-extension://__MSG_@@extension_id__/images/markwatched.svg'); /*works in Chrome*/
-  background-size: cover;
+  background-color: var(--yt-spec-icon-inactive, #606060);
+  -webkit-mask-image: url('images/markwatched.svg'), /*works in Firefox*/ url('chrome-extension://__MSG_@@extension_id__/images/markwatched.svg'); /*works in Chrome*/
+  mask-image: url('images/markwatched.svg'), /*works in Firefox*/ url('chrome-extension://__MSG_@@extension_id__/images/markwatched.svg'); /*works in Chrome*/
+  -webkit-mask-size: cover;
+  mask-size: cover;
 }
 
 .subs-btn-mark-watched, .subs-btn-mark-unwatched {
   height: 24px;
   border: none;
   border-radius: 2px;
-  opacity: .6;
+  opacity: .85;
+  background-color: var(--yt-spec-icon-inactive, #606060);
   -webkit-transition-duration: 0.4s; /* Safari */
   transition-duration: 0.4s;
 }
@@ -35,18 +41,22 @@
 .subs-btn-mark-watched {
   /*display: none;*/
   width: 24px;
-  background-image: url('images/markwatched.svg'), /*works in Firefox*/ url('chrome-extension://__MSG_@@extension_id__/images/markwatched.svg'); /*works in Chrome*/
-  background-size: cover;
+  -webkit-mask-image: url('images/markwatched.svg'), /*works in Firefox*/ url('chrome-extension://__MSG_@@extension_id__/images/markwatched.svg'); /*works in Chrome*/
+  mask-image: url('images/markwatched.svg'), /*works in Firefox*/ url('chrome-extension://__MSG_@@extension_id__/images/markwatched.svg'); /*works in Chrome*/
+  -webkit-mask-size: cover;
+  mask-size: cover;
 }
 
 .subs-btn-mark-unwatched {
   width: 95px;
-  background-image: url('images/markunwatched.svg'), /*works in Firefox*/ url('chrome-extension://__MSG_@@extension_id__/images/markunwatched.svg'); /*works in Chrome*/
-  background-size: cover;
+  -webkit-mask-image: url('images/markunwatched.svg'), /*works in Firefox*/ url('chrome-extension://__MSG_@@extension_id__/images/markunwatched.svg'); /*works in Chrome*/
+  mask-image: url('images/markunwatched.svg'), /*works in Firefox*/ url('chrome-extension://__MSG_@@extension_id__/images/markunwatched.svg'); /*works in Chrome*/
+  -webkit-mask-size: cover;
+  mask-size: cover;
 }
 
 .subs-btn-mark-watched:hover, .subs-btn-mark-unwatched:hover, .subs-btn-hide-watched-checked:hover, .subs-btn-hide-watched-unchecked:hover {
-  opacity: .8;
+  opacity: .95;
   cursor: pointer;
 }
 
@@ -93,7 +103,6 @@ ytd-grid-video-renderer.style-scope.ytd-grid-renderer:hover .subs-btn-mark-watch
 .subs-btn-container .subs-btn-mark-watched,
 .subs-btn-container .subs-btn-mark-unwatched {
   position: static;
-  background-color: transparent;
   height: 24px;
 }
 
@@ -121,21 +130,21 @@ ytd-grid-video-renderer.style-scope.ytd-grid-renderer:hover .subs-btn-mark-watch
 }
 
 .subs-btn-container .subs-btn-mark-watched:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--yt-spec-text-primary, #0f0f0f);
   border-radius: 50%;
 }
 
 .subs-btn-container .subs-btn-mark-watched:active {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: var(--yt-spec-text-primary, #0f0f0f);
 }
 
 .subs-btn-container .subs-btn-mark-unwatched:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--yt-spec-text-primary, #0f0f0f);
   border-radius: 4px;
 }
 
 .subs-btn-container .subs-btn-mark-unwatched:active {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: var(--yt-spec-text-primary, #0f0f0f);
 }
 
 #end.ytd-masthead {
