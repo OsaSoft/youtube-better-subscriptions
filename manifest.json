@@ -55,7 +55,7 @@
   "web_accessible_resources": [
     {
       "resources": ["images/*", "pageContext.js"],
-      "matches": ["<all_urls>"]
+      "matches": ["*://*.youtube.com/*"]
     }
   ],
   "background": {

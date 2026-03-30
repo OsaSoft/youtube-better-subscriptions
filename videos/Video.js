@@ -79,16 +79,20 @@ function isMembersOnly(item) {
 }
 
 function getPosterChannelId(video) {
-    if (video._posterChannelId !== undefined) return video._posterChannelId;
-    video._posterChannelId = null;
+    // Return cached non-null ID
+    if (video._posterChannelId !== undefined && video._posterChannelId !== null) {
+        return video._posterChannelId;
+    }
 
     // pageContext.js (running in page world) tags collab renderers with data-poster-channel-id
     const renderer = video.containingDiv.closest('ytd-rich-item-renderer');
     if (renderer && renderer.dataset.posterChannelId) {
         video._posterChannelId = renderer.dataset.posterChannelId;
+        return video._posterChannelId;
     }
 
-    return video._posterChannelId;
+    // Don't memoize absence - pageContext.js tags asynchronously, allow re-check
+    return null;
 }
 
 function changeMarkWatchedToMarkUnwatched(item) {

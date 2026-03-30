@@ -453,7 +453,7 @@ describe('Video.js', () => {
             expect(result).toBe('UCXuqSBlHAE6Xw-yeJA0Tunw');
         });
 
-        test('caches result after first call', () => {
+        test('caches non-null result after first call', () => {
             document.body.innerHTML = `
                 <ytd-rich-item-renderer data-poster-channel-id="UC12345">
                     <div id="container"></div>
@@ -462,9 +462,22 @@ describe('Video.js', () => {
             const video = { containingDiv: document.getElementById('container'), _posterChannelId: undefined };
             getPosterChannelId(video);
             expect(video._posterChannelId).toBe('UC12345');
-            // Second call should return cached value
+            // Second call should return cached value even if attribute removed
             document.querySelector('ytd-rich-item-renderer').removeAttribute('data-poster-channel-id');
             expect(getPosterChannelId(video)).toBe('UC12345');
+        });
+
+        test('does not cache null - allows re-check when attribute appears later', () => {
+            document.body.innerHTML = `
+                <ytd-rich-item-renderer>
+                    <div id="container"></div>
+                </ytd-rich-item-renderer>
+            `;
+            const video = { containingDiv: document.getElementById('container'), _posterChannelId: undefined };
+            expect(getPosterChannelId(video)).toBeNull();
+            // Attribute added later (by pageContext.js)
+            document.querySelector('ytd-rich-item-renderer').dataset.posterChannelId = 'UCabc';
+            expect(getPosterChannelId(video)).toBe('UCabc');
         });
     });
 

@@ -127,7 +127,7 @@ async function initSubs() {
         hideMostRelevant = settings["settings.hide.most.relevant"];
     }
 
-    if (hideCollabsUnsubscribed) {
+    if (hideCollabsUnsubscribed && getCurrentPage() === "/feed/subscriptions") {
         buildSubscriptionCache();
     }
 

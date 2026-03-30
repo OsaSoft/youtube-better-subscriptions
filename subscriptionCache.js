@@ -14,8 +14,7 @@ function _injectPageContextScript() {
 }
 
 async function buildSubscriptionCache() {
-    if (_subscribedChannelIds !== null) return;
-    _subscribedChannelIds = new Set();
+    if (_subscribedChannelIds !== null && _subscribedChannelIds.size > 0) return;
 
     _injectPageContextScript();
 
@@ -30,15 +29,20 @@ async function buildSubscriptionCache() {
     if (cacheData) {
         try {
             const ids = JSON.parse(cacheData);
-            for (const id of ids) {
-                _subscribedChannelIds.add(id);
+            if (ids.length > 0) {
+                _subscribedChannelIds = new Set(ids);
+                log("Subscription cache built: " + _subscribedChannelIds.size + " channels");
+            } else {
+                _subscribedChannelIds = null;
+                logWarn("Subscription cache returned empty, will retry");
             }
-            log("Subscription cache built: " + _subscribedChannelIds.size + " channels");
         } catch (e) {
+            _subscribedChannelIds = null;
             logWarn("Failed to parse subscription cache: " + e.message);
         }
     } else {
-        logWarn("Subscription cache data not available");
+        _subscribedChannelIds = null;
+        logWarn("Subscription cache data not available, will retry");
     }
 }
 
