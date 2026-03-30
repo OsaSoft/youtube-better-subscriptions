@@ -160,7 +160,7 @@ class Video {
                 (hideShorts && this.isShort) ||
                 (hideLives && this.isLivestream) ||
                 (hideMembersOnly && this.isMembersOnly) ||
-                (hideCollabsUnsubscribed && this.isCollaboration && getCurrentPage() === "/feed/subscriptions" && !isSubscribedToChannel(getPosterChannelId(this)))
+                (hideCollabsUnsubscribed && this.isCollaboration && isSubscriptionsPage() && !isSubscribedToChannel(getPosterChannelId(this)))
         );
     }
 

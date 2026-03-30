@@ -346,3 +346,7 @@ function getCurrentPage() {
 
     return "";
 }
+
+function isSubscriptionsPage() {
+    return getCurrentPage() === "/feed/subscriptions";
+}

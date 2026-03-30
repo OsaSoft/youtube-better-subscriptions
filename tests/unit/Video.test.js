@@ -350,7 +350,7 @@ describe('Video.js', () => {
             global.hideWatched = opts.hideWatched || false;
             global.hideCollabsUnsubscribed = opts.hideCollabsUnsubscribed || false;
             global.isSubscribedToChannel = opts.isSubscribedToChannel || (() => true);
-            global.getCurrentPage = opts.getCurrentPage || (() => '/feed/subscriptions');
+            global.isSubscriptionsPage = opts.isSubscriptionsPage !== undefined ? opts.isSubscriptionsPage : (() => true);
             const context = loadSubscriptionsVideo();
             const div = createCollabVideoDiv(hasAvatarStack);
             context.__testDiv = div;
@@ -383,7 +383,7 @@ describe('Video.js', () => {
             const result = makeVideo(true, {
                 hideCollabsUnsubscribed: true,
                 isSubscribedToChannel: () => false,
-                getCurrentPage: () => '/feed/subscriptions'
+                isSubscriptionsPage: () => true
             });
             expect(result.shouldHide).toBe(true);
         });
@@ -392,7 +392,7 @@ describe('Video.js', () => {
             const result = makeVideo(true, {
                 hideCollabsUnsubscribed: true,
                 isSubscribedToChannel: () => true,
-                getCurrentPage: () => '/feed/subscriptions'
+                isSubscriptionsPage: () => true
             });
             expect(result.shouldHide).toBe(false);
         });
@@ -401,7 +401,7 @@ describe('Video.js', () => {
             const result = makeVideo(true, {
                 hideCollabsUnsubscribed: true,
                 isSubscribedToChannel: () => false,
-                getCurrentPage: () => '/'
+                isSubscriptionsPage: () => false
             });
             expect(result.shouldHide).toBe(false);
         });
@@ -410,7 +410,7 @@ describe('Video.js', () => {
             const result = makeVideo(true, {
                 hideCollabsUnsubscribed: true,
                 isSubscribedToChannel: () => false,
-                getCurrentPage: () => '/@SomeChannel'
+                isSubscriptionsPage: () => false
             });
             expect(result.shouldHide).toBe(false);
         });
@@ -419,7 +419,7 @@ describe('Video.js', () => {
             const result = makeVideo(false, {
                 hideCollabsUnsubscribed: true,
                 isSubscribedToChannel: () => false,
-                getCurrentPage: () => '/feed/subscriptions'
+                isSubscriptionsPage: () => true
             });
             expect(result.shouldHide).toBe(false);
         });

@@ -106,6 +106,7 @@ function loadCommon() {
     global.syncWatchedVideos = context.syncWatchedVideos;
     global.clearOldestVideos = context.clearOldestVideos;
     global.getCurrentPage = context.getCurrentPage;
+    global.isSubscriptionsPage = context.isSubscriptionsPage;
     global.lastSyncUpdate = context.lastSyncUpdate;
     global.lastSyncError = context.lastSyncError;
     global.encodeTimestamp = context.encodeTimestamp;
@@ -161,6 +162,7 @@ function loadVideo() {
         hideCollabsUnsubscribed: global.hideCollabsUnsubscribed,
         isSubscribedToChannel: global.isSubscribedToChannel || (() => true),
         getCurrentPage: global.getCurrentPage || (() => ''),
+        isSubscriptionsPage: global.isSubscriptionsPage || (() => false),
         watchVideo: global.watchVideo,
         unwatchVideo: global.unwatchVideo,
         syncWatchedVideos: global.syncWatchedVideos,
@@ -232,6 +234,7 @@ function loadSubscriptionsVideo() {
         hideCollabsUnsubscribed: global.hideCollabsUnsubscribed,
         isSubscribedToChannel: global.isSubscribedToChannel || (() => true),
         getCurrentPage: global.getCurrentPage || (() => ''),
+        isSubscriptionsPage: global.isSubscriptionsPage || (() => false),
         watchVideo: global.watchVideo,
         unwatchVideo: global.unwatchVideo,
         syncWatchedVideos: global.syncWatchedVideos,
@@ -369,6 +372,7 @@ function loadSubsUI() {
         collapseSectionChanged: global.collapseSectionChanged,
         loadMoreVideos: global.loadMoreVideos,
         getCurrentPage: global.getCurrentPage,
+        isSubscriptionsPage: global.isSubscriptionsPage,
         isRendered: global.isRendered,
         hideMostRelevant: global.hideMostRelevant
     });
