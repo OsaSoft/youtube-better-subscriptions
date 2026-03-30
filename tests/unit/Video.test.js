@@ -327,6 +327,160 @@ describe('Video.js', () => {
         });
     });
 
+    describe('collaboration detection via Video constructor', () => {
+        const { loadSubscriptionsVideo } = require('../helpers/load-source');
+        const vm = require('vm');
+
+        function createCollabVideoDiv(hasAvatarStack, href = '/watch?v=abc12345678') {
+            const avatarStackHtml = hasAvatarStack
+                ? '<yt-avatar-stack-view-model></yt-avatar-stack-view-model>'
+                : '<div class="single-avatar"></div>';
+            document.body.innerHTML = `
+                <div id="container">
+                    <a id="video-title" href="${href}">Title</a>
+                    <div class="yt-badge-shape__text">3:45</div>
+                    ${avatarStackHtml}
+                </div>
+            `;
+            return document.getElementById('container');
+        }
+
+        function makeVideo(hasAvatarStack, opts = {}) {
+            global.watchedVideos = opts.watchedVideos || {};
+            global.hideWatched = opts.hideWatched || false;
+            global.hideCollabsUnsubscribed = opts.hideCollabsUnsubscribed || false;
+            global.isSubscribedToChannel = opts.isSubscribedToChannel || (() => true);
+            global.isSubscriptionsPage = opts.isSubscriptionsPage !== undefined ? opts.isSubscriptionsPage : (() => true);
+            const context = loadSubscriptionsVideo();
+            const div = createCollabVideoDiv(hasAvatarStack);
+            context.__testDiv = div;
+            return vm.runInContext(
+                '(function() { var v = new Video(__testDiv); return { isCollaboration: v.isCollaboration, shouldHide: v.shouldHide() }; })()',
+                context
+            );
+        }
+
+        test('isCollaboration is true when yt-avatar-stack-view-model present', () => {
+            const result = makeVideo(true);
+            expect(result.isCollaboration).toBe(true);
+        });
+
+        test('isCollaboration is false when no avatar stack', () => {
+            const result = makeVideo(false);
+            expect(result.isCollaboration).toBe(false);
+        });
+
+        test('collab video not hidden when setting is off', () => {
+            const result = makeVideo(true, {
+                hideCollabsUnsubscribed: false,
+                isSubscribedToChannel: () => false
+            });
+            expect(result.isCollaboration).toBe(true);
+            expect(result.shouldHide).toBe(false);
+        });
+
+        test('collab video hidden when setting on, not subscribed to poster, on subs page', () => {
+            const result = makeVideo(true, {
+                hideCollabsUnsubscribed: true,
+                isSubscribedToChannel: () => false,
+                isSubscriptionsPage: () => true
+            });
+            expect(result.shouldHide).toBe(true);
+        });
+
+        test('collab video not hidden when subscribed to poster', () => {
+            const result = makeVideo(true, {
+                hideCollabsUnsubscribed: true,
+                isSubscribedToChannel: () => true,
+                isSubscriptionsPage: () => true
+            });
+            expect(result.shouldHide).toBe(false);
+        });
+
+        test('collab video not hidden on non-subscription pages', () => {
+            const result = makeVideo(true, {
+                hideCollabsUnsubscribed: true,
+                isSubscribedToChannel: () => false,
+                isSubscriptionsPage: () => false
+            });
+            expect(result.shouldHide).toBe(false);
+        });
+
+        test('collab video not hidden on channel page', () => {
+            const result = makeVideo(true, {
+                hideCollabsUnsubscribed: true,
+                isSubscribedToChannel: () => false,
+                isSubscriptionsPage: () => false
+            });
+            expect(result.shouldHide).toBe(false);
+        });
+
+        test('non-collab video not hidden even with setting on', () => {
+            const result = makeVideo(false, {
+                hideCollabsUnsubscribed: true,
+                isSubscribedToChannel: () => false,
+                isSubscriptionsPage: () => true
+            });
+            expect(result.shouldHide).toBe(false);
+        });
+    });
+
+    describe('getPosterChannelId', () => {
+        test('returns null when no data-poster-channel-id attribute', () => {
+            document.body.innerHTML = `
+                <ytd-rich-item-renderer>
+                    <div id="container">
+                        <a id="video-title" href="/watch?v=abc12345678">Title</a>
+                        <div class="yt-badge-shape__text">3:45</div>
+                    </div>
+                </ytd-rich-item-renderer>
+            `;
+            const video = { containingDiv: document.getElementById('container'), _posterChannelId: undefined };
+            const result = getPosterChannelId(video);
+            expect(result).toBeNull();
+        });
+
+        test('reads data-poster-channel-id from parent ytd-rich-item-renderer', () => {
+            document.body.innerHTML = `
+                <ytd-rich-item-renderer data-poster-channel-id="UCXuqSBlHAE6Xw-yeJA0Tunw">
+                    <div id="container">
+                        <a id="video-title" href="/watch?v=abc12345678">Title</a>
+                    </div>
+                </ytd-rich-item-renderer>
+            `;
+            const video = { containingDiv: document.getElementById('container'), _posterChannelId: undefined };
+            const result = getPosterChannelId(video);
+            expect(result).toBe('UCXuqSBlHAE6Xw-yeJA0Tunw');
+        });
+
+        test('caches non-null result after first call', () => {
+            document.body.innerHTML = `
+                <ytd-rich-item-renderer data-poster-channel-id="UC12345">
+                    <div id="container"></div>
+                </ytd-rich-item-renderer>
+            `;
+            const video = { containingDiv: document.getElementById('container'), _posterChannelId: undefined };
+            getPosterChannelId(video);
+            expect(video._posterChannelId).toBe('UC12345');
+            // Second call should return cached value even if attribute removed
+            document.querySelector('ytd-rich-item-renderer').removeAttribute('data-poster-channel-id');
+            expect(getPosterChannelId(video)).toBe('UC12345');
+        });
+
+        test('does not cache null - allows re-check when attribute appears later', () => {
+            document.body.innerHTML = `
+                <ytd-rich-item-renderer>
+                    <div id="container"></div>
+                </ytd-rich-item-renderer>
+            `;
+            const video = { containingDiv: document.getElementById('container'), _posterChannelId: undefined };
+            expect(getPosterChannelId(video)).toBeNull();
+            // Attribute added later (by pageContext.js)
+            document.querySelector('ytd-rich-item-renderer').dataset.posterChannelId = 'UCabc';
+            expect(getPosterChannelId(video)).toBe('UCabc');
+        });
+    });
+
     // Video class tests are skipped because JS classes in vm.runInContext
     // cannot be instantiated from outside the context. These would need
     // a different testing approach (e.g., bundling or different module system).

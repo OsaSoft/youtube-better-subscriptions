@@ -327,7 +327,7 @@ function removeUI() {
 }
 
 function rebuildUI() {
-    if (getCurrentPage() === "/feed/subscriptions") {
+    if (isSubscriptionsPage()) {
         try {
             removeUI();
             buildUI();

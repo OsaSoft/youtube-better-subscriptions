@@ -219,6 +219,7 @@ describe('Real YouTube DOM - YouTube Watched Detection', () => {
         global.loadMoreVideos = jest.fn();
         global.isRendered = jest.fn(() => true);
         global.getCurrentPage = jest.fn(() => '/feed/subscriptions');
+        global.isSubscriptionsPage = jest.fn(() => true);
         global.SubscriptionVideo = jest.fn();
         global.sectionDismissableQuery = jest.fn();
         global.sectionContentsQuery = jest.fn();

@@ -16,6 +16,7 @@ const DEFAULT_SETTINGS = {
     "settings.hide.shorts": false,
     "settings.hide.lives": false,
     "settings.hide.members.only": false,
+    "settings.hide.collabs.unsubscribed": false,
     "settings.hide.most.relevant": false,
     "settings.hide.mark.watched.button": false,
     "settings.mark.watched.button.compact": true,
@@ -344,4 +345,8 @@ function getCurrentPage() {
     }
 
     return "";
+}
+
+function isSubscriptionsPage() {
+    return getCurrentPage() === "/feed/subscriptions";
 }

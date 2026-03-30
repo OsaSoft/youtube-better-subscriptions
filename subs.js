@@ -4,6 +4,7 @@ let hidePremieres = null;
 let hideShorts = null;
 let hideLives = null;
 let hideMembersOnly = null;
+let hideCollabsUnsubscribed = null;
 let hideMostRelevant = null;
 let intervalId = null;
 
@@ -119,8 +120,15 @@ async function initSubs() {
     if (hideMembersOnly == null) {
         hideMembersOnly = settings["settings.hide.members.only"];
     }
+    if (hideCollabsUnsubscribed == null) {
+        hideCollabsUnsubscribed = settings["settings.hide.collabs.unsubscribed"];
+    }
     if (hideMostRelevant == null) {
         hideMostRelevant = settings["settings.hide.most.relevant"];
+    }
+
+    if (hideCollabsUnsubscribed && isSubscriptionsPage()) {
+        buildSubscriptionCache();
     }
 
     buildUI();

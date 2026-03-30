@@ -78,6 +78,23 @@ function isMembersOnly(item) {
     return memberBadge != null;
 }
 
+function getPosterChannelId(video) {
+    // Return cached non-null ID
+    if (video._posterChannelId !== undefined && video._posterChannelId !== null) {
+        return video._posterChannelId;
+    }
+
+    // pageContext.js (running in page world) tags collab renderers with data-poster-channel-id
+    const renderer = video.containingDiv.closest('ytd-rich-item-renderer');
+    if (renderer && renderer.dataset.posterChannelId) {
+        video._posterChannelId = renderer.dataset.posterChannelId;
+        return video._posterChannelId;
+    }
+
+    // Don't memoize absence - pageContext.js tags asynchronously, allow re-check
+    return null;
+}
+
 function changeMarkWatchedToMarkUnwatched(item) {
     // find Mark as watched button and change it to Unmark as watched
     let metaDataLine = item.querySelector("#" + METADATA_LINE);
@@ -123,6 +140,9 @@ class Video {
 
         this.isMix = videoHref != null && videoHref.includes("start_radio=1");
         logDebug("Checking video " + this.videoId + " for mix: " + this.isMix);
+
+        this.isCollaboration = this.containingDiv.querySelector('yt-avatar-stack-view-model') !== null;
+        this._posterChannelId = undefined; // lazy-loaded
     }
 
     hasButton() {
@@ -139,7 +159,8 @@ class Video {
                 (hidePremieres && this.isPremiere) ||
                 (hideShorts && this.isShort) ||
                 (hideLives && this.isLivestream) ||
-                (hideMembersOnly && this.isMembersOnly)
+                (hideMembersOnly && this.isMembersOnly) ||
+                (hideCollabsUnsubscribed && this.isCollaboration && isSubscriptionsPage() && !isSubscribedToChannel(getPosterChannelId(this)))
         );
     }
 
