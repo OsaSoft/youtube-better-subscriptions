@@ -158,6 +158,9 @@ function loadVideo() {
         hideShorts: global.hideShorts,
         hideLives: global.hideLives,
         hideMembersOnly: global.hideMembersOnly,
+        hideCollabsUnsubscribed: global.hideCollabsUnsubscribed,
+        isSubscribedToChannel: global.isSubscribedToChannel || (() => true),
+        getCurrentPage: global.getCurrentPage || (() => ''),
         watchVideo: global.watchVideo,
         unwatchVideo: global.unwatchVideo,
         syncWatchedVideos: global.syncWatchedVideos,
@@ -172,6 +175,7 @@ function loadVideo() {
     global.getVideoDuration = context.getVideoDuration;
     global.isLivestream = context.isLivestream;
     global.isMembersOnly = context.isMembersOnly;
+    global.getPosterChannelId = context.getPosterChannelId;
     global.changeMarkWatchedToMarkUnwatched = context.changeMarkWatchedToMarkUnwatched;
     global.Video = context.Video;
 
@@ -225,6 +229,9 @@ function loadSubscriptionsVideo() {
         hideShorts: global.hideShorts,
         hideLives: global.hideLives,
         hideMembersOnly: global.hideMembersOnly,
+        hideCollabsUnsubscribed: global.hideCollabsUnsubscribed,
+        isSubscribedToChannel: global.isSubscribedToChannel || (() => true),
+        getCurrentPage: global.getCurrentPage || (() => ''),
         watchVideo: global.watchVideo,
         unwatchVideo: global.unwatchVideo,
         syncWatchedVideos: global.syncWatchedVideos,
@@ -251,6 +258,7 @@ function loadSubscriptionsVideo() {
     global.getVideoDuration = context.getVideoDuration;
     global.isLivestream = context.isLivestream;
     global.isMembersOnly = context.isMembersOnly;
+    global.getPosterChannelId = context.getPosterChannelId;
     global.changeMarkWatchedToMarkUnwatched = context.changeMarkWatchedToMarkUnwatched;
     global.Video = context.Video;
     global.SubscriptionVideo = context.SubscriptionVideo;
