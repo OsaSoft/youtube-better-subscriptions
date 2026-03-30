@@ -38,6 +38,7 @@
         "common.js",
         "settingsLoader.js",
         "queries.js",
+        "subscriptionCache.js",
         "videos/Video.js",
         "videos/SubscriptionsVideo.js",
         "subs-ui.js",
@@ -53,7 +54,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["images/*"],
+      "resources": ["images/*", "pageContext.js"],
       "matches": ["<all_urls>"]
     }
   ],
