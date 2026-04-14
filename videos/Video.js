@@ -44,7 +44,7 @@ function getVideoId(item) {
 
 function getVideoDuration(item) {
     // Try old layout selector
-    let durationDiv = item.containingDiv.querySelector(".yt-badge-shape__text");
+    let durationDiv = item.containingDiv.querySelector(".ytBadgeShapeText");
     if ((durationDiv != null) && (durationDiv.textContent.includes(":"))) {
         return durationDiv.textContent;
     }
