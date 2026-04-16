@@ -155,7 +155,7 @@ describe('Video.js', () => {
         test('gets duration from old layout badge', () => {
             document.body.innerHTML = `
                 <div id="container">
-                    <div class="yt-badge-shape__text">10:30</div>
+                    <div class="ytBadgeShapeText">10:30</div>
                 </div>
             `;
             const video = { containingDiv: document.getElementById('container') };
@@ -192,7 +192,7 @@ describe('Video.js', () => {
         test('returns null when badge text does not contain colon', () => {
             document.body.innerHTML = `
                 <div id="container">
-                    <div class="yt-badge-shape__text">LIVE</div>
+                    <div class="ytBadgeShapeText">LIVE</div>
                 </div>
             `;
             const video = { containingDiv: document.getElementById('container') };
@@ -250,7 +250,7 @@ describe('Video.js', () => {
             document.body.innerHTML = `
                 <div id="container">
                     <a id="video-title" href="${href}">Title</a>
-                    <div class="yt-badge-shape__text">3:45</div>
+                    <div class="ytBadgeShapeText">3:45</div>
                 </div>
             `;
             return document.getElementById('container');
@@ -338,7 +338,7 @@ describe('Video.js', () => {
             document.body.innerHTML = `
                 <div id="container">
                     <a id="video-title" href="${href}">Title</a>
-                    <div class="yt-badge-shape__text">3:45</div>
+                    <div class="ytBadgeShapeText">3:45</div>
                     ${avatarStackHtml}
                 </div>
             `;
@@ -431,7 +431,7 @@ describe('Video.js', () => {
                 <ytd-rich-item-renderer>
                     <div id="container">
                         <a id="video-title" href="/watch?v=abc12345678">Title</a>
-                        <div class="yt-badge-shape__text">3:45</div>
+                        <div class="ytBadgeShapeText">3:45</div>
                     </div>
                 </ytd-rich-item-renderer>
             `;

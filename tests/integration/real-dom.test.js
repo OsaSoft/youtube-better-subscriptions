@@ -140,7 +140,7 @@ describe('Real YouTube DOM - Duration & Badge Detection', () => {
         items = document.querySelectorAll(vidQuery());
     });
 
-    test('getVideoDuration() extracts duration from yt-badge-shape__text', () => {
+    test('getVideoDuration() extracts duration from ytBadgeShapeText', () => {
         // items[0] = Video 1 (39:36)
         const mockItem = { containingDiv: items[0] };
         const duration = getVideoDuration(mockItem);
@@ -314,7 +314,7 @@ describe('Real YouTube DOM - Video Type Classification', () => {
     test('members-only: isMembersOnly when has membership badge', () => {
         const props = classifyItem(items[6]); // Video 7 (members)
         expect(props.members).toBe(true);
-        // Note: getVideoDuration() uses querySelector(".yt-badge-shape__text") which
+        // Note: getVideoDuration() uses querySelector(".ytBadgeShapeText") which
         // returns the FIRST match — the "Members only" badge text, not the duration.
         // Since "Members only" doesn't contain ":", duration is null.
         // This means members-only videos with the membership badge before the duration
