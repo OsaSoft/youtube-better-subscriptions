@@ -43,8 +43,9 @@ function getVideoId(item) {
 }
 
 function getVideoDuration(item) {
+
     // Try old layout selector
-    let durationDiv = item.containingDiv.querySelector(".yt-badge-shape__text");
+    let durationDiv = item.containingDiv.querySelector(".ytBadgeShapeText");
     if ((durationDiv != null) && (durationDiv.textContent.includes(":"))) {
         return durationDiv.textContent;
     }
@@ -59,6 +60,12 @@ function getVideoDuration(item) {
                 return badgeText;
             }
         }
+    }
+
+    // Try older layout selector pre 2026-04
+    durationDiv = item.containingDiv.querySelector(".yt-badge-shape__text");
+    if ((durationDiv != null) && (durationDiv.textContent.includes(":"))) {
+        return durationDiv.textContent;
     }
 
     return null;
