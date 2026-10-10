@@ -35,6 +35,12 @@ const SYNC_FORMAT_VERSION = 2;
 const SYNC_META_KEY = "vw_meta";
 const CLEAR_SENTINEL_KEY = "vw_last_cleared";
 
+// browser.storage.sync total quota (same in Chrome and Firefox)
+const SYNC_QUOTA_BYTES = 102400;
+// syncWatchedVideos() caps watch history at 100000 bytes (below the quota to leave room for settings),
+// so sync storage above this threshold means older videos were dropped because of the quota
+const SYNC_QUOTA_NEARLY_FULL_BYTES = SYNC_QUOTA_BYTES * 0.95;
+
 function isVideoKey(key) {
     return key.length === 12 && (key[0] === 'w' || key[0] === 'n');
 }
@@ -89,6 +95,11 @@ async function localStorageGet(keys) {
     });
 }
 
+// 'wVIDEO_ID' <-> 'nVIDEO_ID'
+function getOppositeOperation(videoOperation) {
+    return (videoOperation[0] === 'w' ? 'n' : 'w') + videoOperation.slice(1);
+}
+
 async function saveVideoOperation(videoOperation, now) {
     if (watchedVideos[videoOperation]) {
         return;
@@ -96,14 +107,12 @@ async function saveVideoOperation(videoOperation, now) {
 
     now = now || Date.now();
 
-    const operation = videoOperation.slice(0, 1);
-    const videoId = videoOperation.slice(1);
-
     watchedVideos[videoOperation] = now;
     brwsr.storage.local.set({[videoOperation]: now});
 
-    delete watchedVideos[(operation === 'w' ? 'n' : 'w') + videoId];
-    brwsr.storage.local.remove((operation === 'w' ? 'n' : 'w') + videoId);
+    const oppositeOperation = getOppositeOperation(videoOperation);
+    delete watchedVideos[oppositeOperation];
+    brwsr.storage.local.remove(oppositeOperation);
 }
 
 async function watchVideo(videoId, now) {
@@ -118,11 +127,20 @@ function unwatchVideo(videoId, now) {
 // syncedTimestamp is null when sync has no real timestamp (v1 or malformed entry) - such entries
 // never override local state and are stored with fallbackTimestamp.
 function mergeSyncedVideoOperation(videoOperation, syncedTimestamp, fallbackTimestamp) {
-    const oppositeOperation = (videoOperation[0] === 'w' ? 'n' : 'w') + videoOperation.slice(1);
+    const oppositeOperation = getOppositeOperation(videoOperation);
     const oppositeTimestamp = watchedVideos[oppositeOperation];
 
-    if (typeof oppositeTimestamp === 'number' && (syncedTimestamp === null || oppositeTimestamp >= syncedTimestamp)) {
-        return;
+    if (typeof oppositeTimestamp === 'number') {
+        if (syncedTimestamp === null) {
+            return;
+        }
+        // Sync only stores whole seconds, so compare at that precision. On a tie every device keeps
+        // "watched", so devices converge instead of each keeping its own operation.
+        const localSeconds = Math.floor(oppositeTimestamp / 1000);
+        const syncedSeconds = Math.floor(syncedTimestamp / 1000);
+        if (localSeconds > syncedSeconds || (localSeconds === syncedSeconds && oppositeOperation[0] === 'w')) {
+            return;
+        }
     }
 
     saveVideoOperation(videoOperation, syncedTimestamp !== null ? syncedTimestamp : fallbackTimestamp);
@@ -313,11 +331,6 @@ async function syncWatchedVideos() {
 
     return syncedCount;
 }
-
-// browser.storage.sync total quota (same in Chrome and Firefox)
-const SYNC_QUOTA_BYTES = 102400;
-// syncWatchedVideos() stops adding batches at 100000 bytes, so a quota-limited sync sits above this
-const SYNC_QUOTA_NEARLY_FULL_BYTES = SYNC_QUOTA_BYTES * 0.95;
 
 // Explains why this device has more videos than sync storage, or returns null when it doesn't
 function getSyncCountWarning(localVideoCount, syncVideoCount, syncBytes) {

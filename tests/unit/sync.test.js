@@ -979,6 +979,36 @@ describe('Sync functionality', () => {
             expect(localStore['wCONFLICT001']).toBeUndefined();
         });
 
+        test('same-second conflict resolves to watched on the device holding unwatched', async () => {
+            // Device A watched at T+100ms, device B unwatched at T+900ms; sync only keeps whole seconds
+            browser._setSyncStore({
+                'vw_meta': { version: 2 },
+                'vw_0': [commonContext.packSyncEntry('wCONFLICT001', t1 + 100)],
+            });
+            browser._setLocalStore({ 'nCONFLICT001': t1 + 900 });
+
+            await commonContext.loadWatchedVideos();
+
+            const localStore = browser._getLocalStore();
+            expect(localStore['wCONFLICT001']).toBe(t1);
+            expect(localStore['nCONFLICT001']).toBeUndefined();
+        });
+
+        test('same-second conflict resolves to watched on the device holding watched', async () => {
+            // The other half of the scenario above: both devices end up with "watched"
+            browser._setSyncStore({
+                'vw_meta': { version: 2 },
+                'vw_0': [commonContext.packSyncEntry('nCONFLICT001', t1 + 900)],
+            });
+            browser._setLocalStore({ 'wCONFLICT001': t1 + 100 });
+
+            await commonContext.loadWatchedVideos();
+
+            const localStore = browser._getLocalStore();
+            expect(localStore['wCONFLICT001']).toBe(t1 + 100);
+            expect(localStore['nCONFLICT001']).toBeUndefined();
+        });
+
         test('v1 entry does not override local opposite operation', async () => {
             browser._setSyncStore({
                 'vw_0': ['wCONFLICT001'],  // v1: no vw_meta, no timestamps

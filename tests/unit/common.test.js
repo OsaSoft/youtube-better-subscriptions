@@ -87,6 +87,13 @@ describe('common.js', () => {
             expect(warning).toContain("500 videos not synced due to storage quota limit");
         });
 
+        test('quota warning starts at 95% of the sync quota', () => {
+            const quotaThreshold = 102400 * 0.95;
+
+            expect(commonContext.getSyncCountWarning(5000, 4500, quotaThreshold)).toContain("storage quota limit");
+            expect(commonContext.getSyncCountWarning(5000, 4500, quotaThreshold - 1)).not.toContain("quota");
+        });
+
         test('reports pending sync, not quota, when sync storage has room', () => {
             // Device whose sync storage copy is still stale (#271)
             const warning = commonContext.getSyncCountWarning(1200, 200, 4500);
