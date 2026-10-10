@@ -900,4 +900,96 @@ describe('Sync functionality', () => {
             expect(localStore['wMALFORMED01']).toBeLessThanOrEqual(after);
         });
     });
+
+    describe('Conflicting operations from sync', () => {
+        const t1 = 1700000000000;
+        const t2 = 1700000600000;  // 10 minutes later
+
+        test('stale watched from sync does not revert newer local unwatched', async () => {
+            browser._setSyncStore({
+                'vw_meta': { version: 2 },
+                'vw_0': [commonContext.packSyncEntry('wCONFLICT001', t1)],
+            });
+            browser._setLocalStore({ 'nCONFLICT001': t2 });
+
+            await commonContext.loadWatchedVideos();
+
+            const localStore = browser._getLocalStore();
+            expect(localStore['nCONFLICT001']).toBe(t2);
+            expect(localStore['wCONFLICT001']).toBeUndefined();
+        });
+
+        test('stale unwatched from sync does not revert newer local watched', async () => {
+            browser._setSyncStore({
+                'vw_meta': { version: 2 },
+                'vw_0': [commonContext.packSyncEntry('nCONFLICT001', t1)],
+            });
+            browser._setLocalStore({ 'wCONFLICT001': t2 });
+
+            await commonContext.loadWatchedVideos();
+
+            const localStore = browser._getLocalStore();
+            expect(localStore['wCONFLICT001']).toBe(t2);
+            expect(localStore['nCONFLICT001']).toBeUndefined();
+        });
+
+        test('newer operation from sync replaces older local opposite operation', async () => {
+            browser._setSyncStore({
+                'vw_meta': { version: 2 },
+                'vw_0': [commonContext.packSyncEntry('nCONFLICT001', t2)],
+            });
+            browser._setLocalStore({ 'wCONFLICT001': t1 });
+
+            await commonContext.loadWatchedVideos();
+
+            const localStore = browser._getLocalStore();
+            expect(localStore['nCONFLICT001']).toBe(t2);
+            expect(localStore['wCONFLICT001']).toBeUndefined();
+        });
+
+        test('unwatched survives a sync round-trip of its own stale watched entry', async () => {
+            // Device synced "watched", then the user unwatched before the next sync
+            browser._setSyncStore({
+                'vw_meta': { version: 2 },
+                'vw_0': [commonContext.packSyncEntry('wCONFLICT001', t1)],
+            });
+            browser._setLocalStore({});
+            await commonContext.loadWatchedVideos();
+
+            await commonContext.saveVideoOperation('nCONFLICT001', t2);
+            // e.g. storage.onChanged fires before the throttled sync writes the unwatch
+            await commonContext.loadWatchedVideos();
+
+            const localStore = browser._getLocalStore();
+            expect(localStore['nCONFLICT001']).toBe(t2);
+            expect(localStore['wCONFLICT001']).toBeUndefined();
+        });
+
+        test('v2 entry without timestamp does not override local opposite operation', async () => {
+            browser._setSyncStore({
+                'vw_meta': { version: 2 },
+                'vw_0': ['wCONFLICT001'],  // no timestamp
+            });
+            browser._setLocalStore({ 'nCONFLICT001': t1 });
+
+            await commonContext.loadWatchedVideos();
+
+            const localStore = browser._getLocalStore();
+            expect(localStore['nCONFLICT001']).toBe(t1);
+            expect(localStore['wCONFLICT001']).toBeUndefined();
+        });
+
+        test('v1 entry does not override local opposite operation', async () => {
+            browser._setSyncStore({
+                'vw_0': ['wCONFLICT001'],  // v1: no vw_meta, no timestamps
+            });
+            browser._setLocalStore({ 'nCONFLICT001': t1 });
+
+            await commonContext.loadWatchedVideos();
+
+            const localStore = browser._getLocalStore();
+            expect(localStore['nCONFLICT001']).toBe(t1);
+            expect(localStore['wCONFLICT001']).toBeUndefined();
+        });
+    });
 });

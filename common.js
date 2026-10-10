@@ -113,6 +113,21 @@ function unwatchVideo(videoId, now) {
     saveVideoOperation('n' + videoId, now);
 }
 
+// Applies an operation coming from sync storage, unless this device has a newer opposite operation
+// (e.g. a stale "watched" from another device must not revert a newer local "unwatched").
+// syncedTimestamp is null when sync has no real timestamp (v1 or malformed entry) - such entries
+// never override local state and are stored with fallbackTimestamp.
+function mergeSyncedVideoOperation(videoOperation, syncedTimestamp, fallbackTimestamp) {
+    const oppositeOperation = (videoOperation[0] === 'w' ? 'n' : 'w') + videoOperation.slice(1);
+    const oppositeTimestamp = watchedVideos[oppositeOperation];
+
+    if (typeof oppositeTimestamp === 'number' && (syncedTimestamp === null || oppositeTimestamp >= syncedTimestamp)) {
+        return;
+    }
+
+    saveVideoOperation(videoOperation, syncedTimestamp !== null ? syncedTimestamp : fallbackTimestamp);
+}
+
 async function loadWatchedVideos() {
     const items = await syncStorageGet(null) || {};
     const batches = [];
@@ -163,18 +178,14 @@ async function loadWatchedVideos() {
         for (const entry of operations) {
             const { operation, timestamp } = unpackSyncEntry(entry);
             if (!operation) continue;
-            if (timestamp !== null) {
-                saveVideoOperation(operation, timestamp);
-            } else {
-                // Malformed v2 entry without timestamp — use current time
-                saveVideoOperation(operation, Date.now());
-            }
+            // Malformed v2 entry without timestamp falls back to current time
+            mergeSyncedVideoOperation(operation, timestamp, Date.now());
         }
     } else {
         // v1: assign synthetic timestamps preserving order (first in batches = newest)
         const now = Date.now();
         for (const [index, operation] of operations.entries()) {
-            saveVideoOperation(operation, now - index);
+            mergeSyncedVideoOperation(operation, null, now - index);
         }
     }
 
@@ -301,6 +312,29 @@ async function syncWatchedVideos() {
     }
 
     return syncedCount;
+}
+
+// browser.storage.sync total quota (same in Chrome and Firefox)
+const SYNC_QUOTA_BYTES = 102400;
+// syncWatchedVideos() stops adding batches at 100000 bytes, so a quota-limited sync sits above this
+const SYNC_QUOTA_NEARLY_FULL_BYTES = SYNC_QUOTA_BYTES * 0.95;
+
+// Explains why this device has more videos than sync storage, or returns null when it doesn't
+function getSyncCountWarning(localVideoCount, syncVideoCount, syncBytes) {
+    if (localVideoCount <= syncVideoCount) {
+        return null;
+    }
+
+    const notSynced = localVideoCount - syncVideoCount;
+    if (syncBytes >= SYNC_QUOTA_NEARLY_FULL_BYTES) {
+        return "Warning: " + notSynced + " videos not synced due to storage quota limit. " +
+            "These older videos will only exist on this device. Use 'Clear oldest videos' to free up space.";
+    }
+
+    return notSynced + " videos on this device are not in sync storage yet. " +
+        "Your browser may not have finished syncing with your other devices - wait a few minutes " +
+        "or trigger a sync manually (Firefox: account menu > Sync Now). " +
+        "Avoid 'Force Pull' until the counts match, as it would replace this device's history with sync storage.";
 }
 
 async function clearOldestVideos(count) {
