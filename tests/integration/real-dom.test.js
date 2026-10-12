@@ -647,3 +647,49 @@ describe('Real YouTube DOM - UI & SubscriptionVideo fallback', () => {
         expect(shortsContents.children.length).toBe(2); // 2 shorts
     });
 });
+
+describe('Real YouTube DOM - Members-only card (2026-10 layout)', () => {
+    const membersCardHTML = fs.readFileSync(
+        path.join(__dirname, '../fixtures/members-only-card-2026-10.html'),
+        'utf8'
+    );
+    let item;
+
+    beforeEach(() => {
+        document.body.innerHTML = membersCardHTML;
+        loadUtil();
+        loadQueries();
+        global.watchedVideos = {};
+        global.buildMarkWatchedButton = jest.fn(() => document.createElement('div'));
+        global.processSections = jest.fn();
+        global.watchVideo = jest.fn();
+        global.unwatchVideo = jest.fn();
+        global.syncWatchedVideos = jest.fn();
+        global.changeMarkWatchedToMarkUnwatched = jest.fn();
+        loadSubscriptionsVideo();
+        item = document.querySelector(vidQuery());
+    });
+
+    test('vidQuery() finds the members-only card', () => {
+        expect(item).not.toBeNull();
+    });
+
+    test('detected as members-only via the ytBadgeShapeCommerce metadata badge', () => {
+        const video = global.createSubscriptionVideo(item);
+        expect(video.isMembersOnly).toBe(true);
+    });
+
+    test('duration still read from the thumbnail badge, so not a premiere', () => {
+        const video = global.createSubscriptionVideo(item);
+        expect(video.videoDuration).toBe('0:57');
+        expect(video.isPremiere).toBeFalsy();
+        expect(video.isLivestream).toBe(false);
+        expect(video.isShort).toBe(false);
+    });
+
+    test('not detected as members-only once the badge is removed', () => {
+        item.querySelector('.ytBadgeShapeCommerce').remove();
+        const video = global.createSubscriptionVideo(item);
+        expect(video.isMembersOnly).toBe(false);
+    });
+});

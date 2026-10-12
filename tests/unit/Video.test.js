@@ -251,9 +251,11 @@ describe('Video.js', () => {
         test('returns true when camelCase membership badge class present', () => {
             document.body.innerHTML = `
                 <div id="container">
-                    <badge-shape class="ytBadgeShapeHost ytBadgeShapeMembership ytBadgeShapeThumbnailBadge">
-                        <div class="ytBadgeShapeText">Members only</div>
-                    </badge-shape>
+                    <yt-badge-view-model class="ytBadgeViewModelHost">
+                        <badge-shape class="ytBadgeShapeHost ytBadgeShapeCommerce ytBadgeShapeModern ytBadgeShapeTypography">
+                            <div class="ytBadgeShapeText">Members only</div>
+                        </badge-shape>
+                    </yt-badge-view-model>
                 </div>
             `;
             const video = { containingDiv: document.getElementById('container') };
