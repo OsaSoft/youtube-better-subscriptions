@@ -344,7 +344,7 @@ async function runSyncDiagnostics() {
             .length;
 
         // Update UI
-        const usagePercent = (syncBytes / 102400) * 100;
+        const usagePercent = (syncBytes / SYNC_QUOTA_BYTES) * 100;
         const usageEl = document.getElementById("sync-storage-usage");
         usageEl.textContent = (syncBytes / 1024).toFixed(1) + " KB / 100 KB";
 
@@ -362,10 +362,9 @@ async function runSyncDiagnostics() {
 
         // Show warning if videos not syncing
         const resultEl = document.getElementById("sync-result");
-        if (localVideoCount > syncVideoCount) {
-            const notSynced = localVideoCount - syncVideoCount;
-            resultEl.textContent = "Warning: " + notSynced + " videos not synced due to storage quota limit. " +
-                "These older videos will only exist on this device. Use 'Clear oldest videos' to free up space.";
+        const warning = getSyncCountWarning(localVideoCount, syncVideoCount, syncBytes);
+        if (warning) {
+            resultEl.textContent = warning;
             resultEl.className = "sync-result sync-result--warning";
         } else {
             resultEl.textContent = "";
