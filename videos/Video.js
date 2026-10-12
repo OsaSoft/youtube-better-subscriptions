@@ -85,9 +85,9 @@ function isLivestream(item) {
 
 function isMembersOnly(item) {
     // Check for membership badge using CSS class (language-independent)
-    // ytBadgeShapeMembership in the camelCase badge classes since 2026-08 (assumed from the live badge rename),
+    // ytBadgeShapeCommerce (metadata row badge) in the camelCase badge classes since 2026-08,
     // yt-badge-shape--membership before
-    let memberBadge = item.containingDiv.querySelector(".ytBadgeShapeMembership, .yt-badge-shape--membership");
+    let memberBadge = item.containingDiv.querySelector(".ytBadgeShapeCommerce, .yt-badge-shape--membership");
     return memberBadge != null;
 }
 
