@@ -6,7 +6,10 @@ function vidQuery() {
         `ytd-rich-item-renderer.style-scope.ytd-rich-shelf-renderer:not([is-post]):not(.${HIDDEN_CLASS})`,
         `ytd-item-section-renderer.style-scope.ytd-section-list-renderer:not(.${HIDDEN_CLASS})`,
         // New January 2026 layout with lockupViewModel
-        `ytd-rich-item-renderer:has(lockup-view-model):not(.${HIDDEN_CLASS})`
+        `ytd-rich-item-renderer:has(lockup-view-model):not(.${HIDDEN_CLASS})`,
+        // New July 2026 layout
+        `ytd-rich-item-renderer:has(yt-lockup-view-model):not(.${HIDDEN_CLASS})`,
+        `ytd-rich-item-renderer:has(ytm-shorts-lockup-view-model):not(.${HIDDEN_CLASS})`
     ].join(',');
 }
 
