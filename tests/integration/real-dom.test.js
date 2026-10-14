@@ -314,12 +314,25 @@ describe('Real YouTube DOM - Video Type Classification', () => {
     test('members-only: isMembersOnly when has membership badge', () => {
         const props = classifyItem(items[6]); // Video 7 (members)
         expect(props.members).toBe(true);
-        // Note: getVideoDuration() uses querySelector(".ytBadgeShapeText") which
-        // returns the FIRST match — the "Members only" badge text, not the duration.
-        // Since "Members only" doesn't contain ":", duration is null.
-        // This means members-only videos with the membership badge before the duration
-        // badge will also be classified as premieres (no duration + not live).
+        // The "Members only" badge comes before the duration badge - duration must still be found,
+        // otherwise members-only videos are classified as premieres (no duration + not live)
+        expect(props.duration).toBe('25:00');
+        expect(props.isPremiere).toBeFalsy();
+    });
+
+    test('short: not a premiere even though it has no duration badge', () => {
+        const props = classifyItem(items[2]); // Short 1
         expect(props.duration).toBeNull();
+        expect(props.isPremiere).toBeFalsy();
+    });
+
+    test('livestream: detected with the camelCase live badge class', () => {
+        const liveBadge = items[5].querySelector('.yt-badge-shape--thumbnail-live');
+        liveBadge.className = 'ytBadgeShapeHost ytBadgeShapeThumbnailLive ytBadgeShapeThumbnailBadge';
+
+        const props = classifyItem(items[5]); // Video 6 (livestream)
+        expect(props.live).toBe(true);
+        expect(props.isPremiere).toBeFalsy();
     });
 });
 
@@ -368,6 +381,13 @@ describe('Real YouTube DOM - Hide Logic', () => {
         global.hidePremieres = true;
         const vid = makeVideo(items[7]); // Video 8 (premiere)
         expect(vid.shouldHide()).toBe(true);
+    });
+
+    test('shouldHide: short, livestream and members-only not hidden when only hidePremieres=true', () => {
+        global.hidePremieres = true;
+        expect(makeVideo(items[2]).shouldHide()).toBe(false); // Short 1
+        expect(makeVideo(items[5]).shouldHide()).toBe(false); // Video 6 (livestream)
+        expect(makeVideo(items[6]).shouldHide()).toBe(false); // Video 7 (members)
     });
 
     test('shouldHide: livestream hidden when hideLives=true', () => {
@@ -447,6 +467,34 @@ describe('Real YouTube DOM - Most Relevant Section Hiding', () => {
         const gridElement = document.querySelector('ytd-two-column-browse-results-renderer ytd-rich-grid-renderer #contents');
         const sections = gridElement.querySelectorAll(':scope > ytd-rich-section-renderer');
         expect(sections[1].style.display).not.toBe('none');
+    });
+
+    test('Shorts section hidden as empty shelf is shown again by showWatched', () => {
+        global.vidQuery = () => 'ytd-nonexistent-element';
+        loadSubsUI();
+
+        const gridElement = document.querySelector('ytd-two-column-browse-results-renderer ytd-rich-grid-renderer #contents');
+        const shortsSection = gridElement.querySelectorAll(':scope > ytd-rich-section-renderer')[1];
+        // all shorts were hidden (e.g. by hideShorts or hideWatched)
+        shortsSection.querySelectorAll('#contents > ytd-rich-item-renderer').forEach(item => item.style.display = 'none');
+
+        global.removeWatchedAndAddButton();
+        expect(shortsSection.style.display).toBe('none');
+
+        global.showWatched();
+        expect(shortsSection.style.display).not.toBe('none');
+    });
+
+    test('"Most relevant" section stays hidden by showWatched when hideMostRelevant=true', () => {
+        global.hideMostRelevant = true;
+        global.vidQuery = () => 'ytd-nonexistent-element';
+        loadSubsUI();
+        global.removeWatchedAndAddButton();
+        global.showWatched();
+
+        const gridElement = document.querySelector('ytd-two-column-browse-results-renderer ytd-rich-grid-renderer #contents');
+        const sections = gridElement.querySelectorAll(':scope > ytd-rich-section-renderer');
+        expect(sections[0].style.display).toBe('none');
     });
 
     test('section count remains 2', () => {
@@ -597,5 +645,51 @@ describe('Real YouTube DOM - UI & SubscriptionVideo fallback', () => {
         );
         expect(shortsContents).not.toBeNull();
         expect(shortsContents.children.length).toBe(2); // 2 shorts
+    });
+});
+
+describe('Real YouTube DOM - Members-only card (2026-10 layout)', () => {
+    const membersCardHTML = fs.readFileSync(
+        path.join(__dirname, '../fixtures/members-only-card-2026-10.html'),
+        'utf8'
+    );
+    let item;
+
+    beforeEach(() => {
+        document.body.innerHTML = membersCardHTML;
+        loadUtil();
+        loadQueries();
+        global.watchedVideos = {};
+        global.buildMarkWatchedButton = jest.fn(() => document.createElement('div'));
+        global.processSections = jest.fn();
+        global.watchVideo = jest.fn();
+        global.unwatchVideo = jest.fn();
+        global.syncWatchedVideos = jest.fn();
+        global.changeMarkWatchedToMarkUnwatched = jest.fn();
+        loadSubscriptionsVideo();
+        item = document.querySelector(vidQuery());
+    });
+
+    test('vidQuery() finds the members-only card', () => {
+        expect(item).not.toBeNull();
+    });
+
+    test('detected as members-only via the ytBadgeShapeCommerce metadata badge', () => {
+        const video = global.createSubscriptionVideo(item);
+        expect(video.isMembersOnly).toBe(true);
+    });
+
+    test('duration still read from the thumbnail badge, so not a premiere', () => {
+        const video = global.createSubscriptionVideo(item);
+        expect(video.videoDuration).toBe('0:57');
+        expect(video.isPremiere).toBeFalsy();
+        expect(video.isLivestream).toBe(false);
+        expect(video.isShort).toBe(false);
+    });
+
+    test('not detected as members-only once the badge is removed', () => {
+        item.querySelector('.ytBadgeShapeCommerce').remove();
+        const video = global.createSubscriptionVideo(item);
+        expect(video.isMembersOnly).toBe(false);
     });
 });

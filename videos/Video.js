@@ -42,12 +42,22 @@ function getVideoId(item) {
     return url ? getVideoIdFromUrl(url) : null;
 }
 
+function getBadgeDuration(item, badgeTextSelector) {
+    // A card can have several badges (e.g. "Members only" before the duration), so check all of them
+    for (const badgeText of item.containingDiv.querySelectorAll(badgeTextSelector)) {
+        if (badgeText.textContent.includes(":")) {
+            return badgeText.textContent;
+        }
+    }
+    return null;
+}
+
 function getVideoDuration(item) {
 
     // Try old layout selector
-    let durationDiv = item.containingDiv.querySelector(".ytBadgeShapeText");
-    if ((durationDiv != null) && (durationDiv.textContent.includes(":"))) {
-        return durationDiv.textContent;
+    let duration = getBadgeDuration(item, ".ytBadgeShapeText");
+    if (duration != null) {
+        return duration;
     }
 
     // Try new lockupViewModel layout - duration badge is in thumbnail-badge-view-model
@@ -63,25 +73,21 @@ function getVideoDuration(item) {
     }
 
     // Try older layout selector pre 2026-04
-    durationDiv = item.containingDiv.querySelector(".yt-badge-shape__text");
-    if ((durationDiv != null) && (durationDiv.textContent.includes(":"))) {
-        return durationDiv.textContent;
-    }
-
-    return null;
+    return getBadgeDuration(item, ".yt-badge-shape__text");
 }
 
 function isLivestream(item) {
     // Check for LIVE badge using CSS class (language-independent)
-    // The class yt-badge-shape--thumbnail-live is used for live badges
-    let liveBadge = item.containingDiv.querySelector(".yt-badge-shape--thumbnail-live");
+    // ytBadgeShapeThumbnailLive since 2026-08, yt-badge-shape--thumbnail-live before
+    let liveBadge = item.containingDiv.querySelector(".ytBadgeShapeThumbnailLive, .yt-badge-shape--thumbnail-live");
     return liveBadge != null;
 }
 
 function isMembersOnly(item) {
     // Check for membership badge using CSS class (language-independent)
-    // The class yt-badge-shape--membership is used for members-only content
-    let memberBadge = item.containingDiv.querySelector(".yt-badge-shape--membership");
+    // ytBadgeShapeCommerce (metadata row badge) in the camelCase badge classes since 2026-08,
+    // yt-badge-shape--membership before
+    let memberBadge = item.containingDiv.querySelector(".ytBadgeShapeCommerce, .yt-badge-shape--membership");
     return memberBadge != null;
 }
 
@@ -130,12 +136,6 @@ class Video {
         this.isMembersOnly = isMembersOnly(this);
         logDebug("Checking video " + this.videoId + " for members-only: " + this.isMembersOnly);
 
-        // Only mark as premiere if no duration AND not a livestream
-        logDebug("Checking video " + this.videoId + " for premiere: duration = " + this.videoDuration);
-        if (this.videoDuration == null && !this.isLivestream) {
-            this.isPremiere = true;
-        }
-
         logDebug("Checking video " + this.videoId + " for short");
         let videoHref = getVideoUrl(containingDiv);
         if (videoHref != null) {
@@ -143,6 +143,12 @@ class Video {
         } else {
             logDebug("Video URL is null - ad.");
             this.isShort = true;
+        }
+
+        // Only mark as premiere if no duration AND not a livestream AND not a short (shorts have no duration badge)
+        logDebug("Checking video " + this.videoId + " for premiere: duration = " + this.videoDuration);
+        if (this.videoDuration == null && !this.isLivestream && !this.isShort) {
+            this.isPremiere = true;
         }
 
         this.isMix = videoHref != null && videoHref.includes("start_radio=1");

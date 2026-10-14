@@ -215,6 +215,19 @@ describe('Video.js', () => {
             expect(isLivestream(video)).toBe(true);
         });
 
+        test('returns true when camelCase live badge class present (2026-08 layout)', () => {
+            document.body.innerHTML = `
+                <div id="container">
+                    <badge-shape class="ytBadgeShapeHost ytBadgeShapeThumbnailLive ytBadgeShapeThumbnailBadge">
+                        <div class="ytBadgeShapeText">LIVE</div>
+                    </badge-shape>
+                </div>
+            `;
+            const video = { containingDiv: document.getElementById('container') };
+
+            expect(isLivestream(video)).toBe(true);
+        });
+
         test('returns false when no live badge', () => {
             document.body.innerHTML = `<div id="container"></div>`;
             const video = { containingDiv: document.getElementById('container') };
@@ -228,6 +241,21 @@ describe('Video.js', () => {
             document.body.innerHTML = `
                 <div id="container">
                     <div class="yt-badge-shape--membership">Members only</div>
+                </div>
+            `;
+            const video = { containingDiv: document.getElementById('container') };
+
+            expect(isMembersOnly(video)).toBe(true);
+        });
+
+        test('returns true when camelCase membership badge class present', () => {
+            document.body.innerHTML = `
+                <div id="container">
+                    <yt-badge-view-model class="ytBadgeViewModelHost">
+                        <badge-shape class="ytBadgeShapeHost ytBadgeShapeCommerce ytBadgeShapeModern ytBadgeShapeTypography">
+                            <div class="ytBadgeShapeText">Members only</div>
+                        </badge-shape>
+                    </yt-badge-view-model>
                 </div>
             `;
             const video = { containingDiv: document.getElementById('container') };

@@ -9,8 +9,17 @@ const COLLAPSE_SECTION_CHECKBOX = PREFIX + "collapse-section";
 
 const HIDDEN_CLASS = PREFIX + "hidden";
 const COLLAPSE_CLASS = PREFIX + "collapse-section";
+const EMPTY_SHELF_HIDDEN_CLASS = PREFIX + "empty-shelf-hidden";
 
 let addedElems = [];
+
+// show shelves (e.g. Shorts) that were hidden because all of their videos were hidden
+function showEmptyShelves() {
+    document.querySelectorAll("." + EMPTY_SHELF_HIDDEN_CLASS).forEach(section => {
+        section.style.display = '';
+        section.classList.remove(EMPTY_SHELF_HIDDEN_CLASS);
+    });
+}
 
 function showWatched() {
     log("Showing watched videos");
@@ -20,6 +29,7 @@ function showWatched() {
         item.classList.remove(HIDDEN_CLASS);
     }
     hidden = [];
+    showEmptyShelves();
 
     processSections();
 }
@@ -290,11 +300,13 @@ function removeWatchedAndAddButton() {
         [...gridElement.querySelectorAll(':scope > ytd-rich-section-renderer')].forEach(richSectionElement => {
             const contents = richSectionElement.querySelector(':scope > #content > ytd-rich-shelf-renderer > #dismissible #contents');
 
-            if (!contents) {
+            // skip missing shelves and ones already hidden (e.g. "Most relevant" by its own setting)
+            if (!contents || richSectionElement.style.display === 'none') {
                 return;
             }
             if (![...contents.children].some(child => isRendered(child))) {
                 richSectionElement.style.display = 'none';
+                richSectionElement.classList.add(EMPTY_SHELF_HIDDEN_CLASS);
             }
         });
     }
@@ -324,6 +336,7 @@ function removeUI() {
         item.classList.remove(HIDDEN_CLASS);
     }
     hidden = [];
+    showEmptyShelves();
 }
 
 function rebuildUI() {
