@@ -15,6 +15,23 @@ class SubscriptionVideo extends Video {
         return this.contentDiv && this.contentDiv.querySelector("#" + this.buttonId) != null
     }
 
+    // The element faded while the video is marked watched (the whole card on lockup layouts). On the
+    // old layouts it's also where addButton() puts the button. Every path that builds a mark/unmark
+    // button passes this one, so marking by click and loading as watched fade the same element.
+    getFadeTarget() {
+        if (!this.contentDiv) {
+            return null;
+        }
+
+        if (this.contentDiv.matches('lockup-view-model, yt-lockup-view-model')) {
+            return this.contentDiv;
+        }
+
+        let firstChild = this.contentDiv.firstElementChild;
+        let isListView = firstChild && firstChild.nodeType === Node.COMMENT_NODE;
+        return isListView ? this.contentDiv.querySelector(".text-wrapper.style-scope.ytd-video-renderer") : firstChild;
+    }
+
     addButton() {
         // Check if button should be hidden
         if (settings["settings.hide.mark.watched.button"]) {
@@ -29,16 +46,8 @@ class SubscriptionVideo extends Video {
         // device): replace it rather than adding a second one.
         this.contentDiv.querySelectorAll(".subs-btn-container").forEach(e => e.remove());
 
-        let firstChild = this.contentDiv.firstElementChild;
-        let isListView = firstChild && firstChild.nodeType === Node.COMMENT_NODE;
-
         // Find the container for building the button
-        let buttonContainer;
-        if (this.contentDiv.matches('lockup-view-model, yt-lockup-view-model')) {
-            buttonContainer = this.contentDiv;
-        } else {
-            buttonContainer = isListView ? this.contentDiv.querySelector(".text-wrapper.style-scope.ytd-video-renderer") : firstChild;
-        }
+        let buttonContainer = this.getFadeTarget();
 
         if (!buttonContainer) {
             return;
