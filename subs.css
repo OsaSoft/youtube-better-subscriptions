@@ -33,9 +33,15 @@
   border: none;
   border-radius: 2px;
   opacity: .85;
-  background-color: var(--yt-spec-icon-inactive, #606060);
+  /* YouTube no longer defines --yt-spec-icon-inactive / --yt-spec-text-primary on the page,
+     so the colours are keyed on its html[dark] attribute instead */
+  background-color: #606060;
   -webkit-transition-duration: 0.4s; /* Safari */
   transition-duration: 0.4s;
+}
+
+html[dark] .subs-btn-mark-watched, html[dark] .subs-btn-mark-unwatched {
+  background-color: #aaaaaa;
 }
 
 .subs-btn-mark-watched {
@@ -106,6 +112,18 @@ ytd-grid-video-renderer.style-scope.ytd-grid-renderer:hover .subs-btn-mark-watch
   height: 24px;
 }
 
+/* Default layout on lockup cards: the container follows the lockup host. Stretch the lockup to
+   the row's height (the grid row is a flex line, so cards in a row share a height) and push the
+   container to the bottom, so the buttons line up across a row whatever the title length. */
+yt-lockup-view-model:has(> .subs-btn-container--bottom) {
+  align-self: stretch;
+  flex-direction: column;
+}
+
+.subs-btn-container--bottom {
+  margin-top: auto;
+}
+
 /* Compact layout: positioned below the triple dots menu */
 .subs-btn-compact-wrapper {
   position: relative;
@@ -130,15 +148,29 @@ ytd-grid-video-renderer.style-scope.ytd-grid-renderer:hover .subs-btn-mark-watch
 }
 
 /* With mask-image, background-color paints the icon — these change icon color on hover
-   from muted (--yt-spec-icon-inactive) to full contrast (--yt-spec-text-primary) */
+   from muted grey to full contrast (the theme's primary text colour) */
 .subs-btn-container .subs-btn-mark-watched:hover,
-.subs-btn-container .subs-btn-mark-unwatched:hover {
-  background-color: var(--yt-spec-text-primary, #0f0f0f);
-}
-
+.subs-btn-container .subs-btn-mark-unwatched:hover,
 .subs-btn-container .subs-btn-mark-watched:active,
 .subs-btn-container .subs-btn-mark-unwatched:active {
-  background-color: var(--yt-spec-text-primary, #0f0f0f);
+  background-color: #0f0f0f;
+}
+
+html[dark] .subs-btn-container .subs-btn-mark-watched:hover,
+html[dark] .subs-btn-container .subs-btn-mark-unwatched:hover,
+html[dark] .subs-btn-container .subs-btn-mark-watched:active,
+html[dark] .subs-btn-container .subs-btn-mark-unwatched:active {
+  background-color: #f1f1f1;
+}
+
+/* Marking a video watched puts .semitransparent on the button's own container: keep the button
+   readable. In a card faded as watched, drop the button's own opacity so it isn't faded twice. */
+.subs-btn-container.semitransparent {
+  opacity: 1 !important;
+}
+
+.semitransparent .subs-btn-mark-unwatched {
+  opacity: 1;
 }
 
 #end.ytd-masthead {

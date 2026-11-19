@@ -541,17 +541,17 @@ describe('Real YouTube DOM - addButton() placement', () => {
         expect(container.classList.contains('subs-btn-container--compact')).toBe(true);
     });
 
-    test('non-compact mode: button placed as sibling after metadata div', () => {
+    test('non-compact mode: button placed after the lockup host, below the metadata', () => {
         settings["settings.mark.watched.button.compact"] = false;
         settings["settings.hide.mark.watched.button"] = false;
         const vid = global.createSubscriptionVideo(items[4]); // Video 3 (grid)
         vid.addButton();
 
         const verticalDiv = items[4].querySelector('.yt-lockup-view-model--vertical');
-        const metadataDiv = verticalDiv.querySelector(':scope > .yt-lockup-view-model__metadata');
-        const container = metadataDiv.nextElementSibling;
+        const container = verticalDiv.nextElementSibling;
         expect(container).not.toBeNull();
         expect(container.classList.contains('subs-btn-container')).toBe(true);
+        expect(container.classList.contains('subs-btn-container--bottom')).toBe(true);
         expect(container.classList.contains('subs-btn-container--compact')).toBe(false);
     });
 
@@ -566,13 +566,149 @@ describe('Real YouTube DOM - addButton() placement', () => {
         const vid = global.createSubscriptionVideo(items[4]);
         vid.addButton();
 
-        // Should fall back to after-metadata placement without --compact class
+        // Should fall back to the non-compact placement without --compact class
         const verticalDiv = items[4].querySelector('.yt-lockup-view-model--vertical');
-        const metadataDiv = verticalDiv.querySelector(':scope > .yt-lockup-view-model__metadata');
-        const container = metadataDiv.nextElementSibling;
+        const container = verticalDiv.nextElementSibling;
         expect(container).not.toBeNull();
         expect(container.classList.contains('subs-btn-container')).toBe(true);
         expect(container.classList.contains('subs-btn-container--compact')).toBe(false);
+    });
+});
+
+const camelFixtureHTML = fs.readFileSync(
+    path.join(__dirname, '../fixtures/subscription-feed-2026-11-camel.html'),
+    'utf8'
+);
+
+describe('Real YouTube DOM - addButton() placement (camelCase lockup classes, November 2026)', () => {
+    let items;
+
+    function setUpGlobals() {
+        document.body.innerHTML = camelFixtureHTML;
+        loadUtil();
+        loadQueries();
+        global.watchedVideos = {};
+        global.processSections = jest.fn();
+        global.watchVideo = jest.fn();
+        global.unwatchVideo = jest.fn();
+        global.syncWatchedVideos = jest.fn();
+        global.hideWatched = false;
+        global.hidePremieres = false;
+        global.hideShorts = false;
+        global.hideLives = false;
+        global.hideMembersOnly = false;
+        settings["settings.hide.mark.watched.button"] = false;
+    }
+
+    beforeEach(() => {
+        setUpGlobals();
+        global.buildMarkWatchedButton = jest.fn(() => document.createElement('div'));
+        global.changeMarkWatchedToMarkUnwatched = jest.fn();
+        loadSubscriptionsVideo();
+        items = document.querySelectorAll(vidQuery());
+    });
+
+    test('fixture has the camelCase lockup and none of the dashed classes', () => {
+        expect(items.length).toBe(3);
+        for (const item of items) {
+            expect(item.querySelector('.ytLockupViewModelVertical')).not.toBeNull();
+            expect(item.querySelector('.ytLockupMetadataViewModelMenuButton')).not.toBeNull();
+            expect(item.querySelector('[class*="yt-lockup-view-model--"], [class*="__menu-button"]')).toBeNull();
+        }
+    });
+
+    test('compact mode: every card gets its button under its own menu button', () => {
+        settings["settings.mark.watched.button.compact"] = true;
+        for (const item of items) {
+            global.createSubscriptionVideo(item).addButton();
+
+            const menuBtn = item.querySelector('.ytLockupMetadataViewModelMenuButton');
+            const wrapper = menuBtn.querySelector(':scope > .subs-btn-compact-wrapper');
+            expect(wrapper).not.toBeNull();
+            // YouTube's ⋮ button moved into the wrapper, the container follows it
+            expect(wrapper.firstElementChild.tagName).toBe('BUTTON-VIEW-MODEL');
+            const container = wrapper.querySelector(':scope > .subs-btn-container');
+            expect(container).not.toBeNull();
+            expect(container.classList.contains('subs-btn-container--compact')).toBe(true);
+            expect(item.querySelectorAll('.subs-btn-container').length).toBe(1);
+        }
+    });
+
+    test('compact mode: adding the button again reuses the wrapper and replaces the container', () => {
+        settings["settings.mark.watched.button.compact"] = true;
+        global.createSubscriptionVideo(items[0]).addButton();
+        global.createSubscriptionVideo(items[0]).addButton();
+
+        expect(items[0].querySelectorAll('.subs-btn-compact-wrapper').length).toBe(1);
+        expect(items[0].querySelectorAll('.subs-btn-container').length).toBe(1);
+    });
+
+    test('non-compact mode: button placed after the lockup host, not at the end of the card', () => {
+        settings["settings.mark.watched.button.compact"] = false;
+        for (const item of items) {
+            global.createSubscriptionVideo(item).addButton();
+
+            const host = item.querySelector('.ytLockupViewModelVertical');
+            const container = host.nextElementSibling;
+            expect(container).not.toBeNull();
+            expect(container.classList.contains('subs-btn-container')).toBe(true);
+            expect(container.classList.contains('subs-btn-container--bottom')).toBe(true);
+            expect(container.classList.contains('subs-btn-container--compact')).toBe(false);
+            expect(container.parentElement.tagName).toBe('YT-LOCKUP-VIEW-MODEL');
+        }
+    });
+
+    test('compact fallback: without a menu button the non-compact placement is used', () => {
+        settings["settings.mark.watched.button.compact"] = true;
+        items[0].querySelector('.ytLockupMetadataViewModelMenuButton').remove();
+        global.createSubscriptionVideo(items[0]).addButton();
+
+        const container = items[0].querySelector('.ytLockupViewModelVertical').nextElementSibling;
+        expect(container.classList.contains('subs-btn-container--bottom')).toBe(true);
+        expect(container.classList.contains('subs-btn-container--compact')).toBe(false);
+    });
+
+    test('compact mode, real button: clicking the eye swaps it for WATCHED in the same container', () => {
+        settings["settings.mark.watched.button.compact"] = true;
+        setUpGlobals();
+        // SubscriptionsVideo and subs-ui each capture the other at load time: route the
+        // SubscriptionsVideo context's buildMarkWatchedButton to the real one loaded after it.
+        let realBuild;
+        global.buildMarkWatchedButton = (...args) => realBuild(...args);
+        loadSubscriptionsVideo();
+        // The class declaration isn't a property of the VM context: hand subs-ui a constructor
+        // that builds the instance through the context's factory.
+        const createVideo = global.createSubscriptionVideo;
+        global.SubscriptionVideo = function (item) { return createVideo(item); };
+        try {
+            loadSubsUI();
+            realBuild = global.buildMarkWatchedButton;
+            items = document.querySelectorAll(vidQuery());
+
+            global.createSubscriptionVideo(items[0]).addButton();
+            const menuBtn = items[0].querySelector('.ytLockupMetadataViewModelMenuButton');
+            const container = menuBtn.querySelector('.subs-btn-container--compact');
+            const eye = container.querySelector('.subs-btn-mark-watched');
+            expect(eye).not.toBeNull();
+
+            const lockupClick = jest.fn();
+            items[0].querySelector('.ytLockupViewModelVertical').addEventListener('click', lockupClick);
+            eye.click();
+
+            expect(global.watchVideo).toHaveBeenCalledWith('testCam_001');
+            expect(lockupClick).not.toHaveBeenCalled();
+            expect(container.querySelector('.subs-btn-mark-watched')).toBeNull();
+            expect(container.querySelector('.subs-btn-mark-unwatched')).not.toBeNull();
+            expect(menuBtn.querySelectorAll('.subs-btn-container').length).toBe(1);
+
+            container.querySelector('.subs-btn-mark-unwatched').click();
+            expect(global.unwatchVideo).toHaveBeenCalledWith('testCam_001');
+            expect(container.querySelector('.subs-btn-mark-watched')).not.toBeNull();
+            expect(container.querySelector('.subs-btn-mark-unwatched')).toBeNull();
+        } finally {
+            // Don't leave the shim for later loadSubsUI() calls in this file, even if an assertion fails
+            global.SubscriptionVideo = undefined;
+        }
     });
 });
 

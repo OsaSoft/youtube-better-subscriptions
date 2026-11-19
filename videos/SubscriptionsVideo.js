@@ -53,11 +53,13 @@ class SubscriptionVideo extends Video {
         container.classList.add("subs-btn-container");
         container.appendChild(markButton);
 
-        // Detect new lockup layout by presence of vertical container
-        let verticalDiv = this.contentDiv.querySelector(".yt-lockup-view-model--vertical");
+        // Detect new lockup layout by presence of vertical container. YouTube renamed the lockup
+        // classes from dashed BEM (yt-lockup-view-model--vertical) to camelCase
+        // (ytLockupViewModelVertical); some users may still get the dashed ones.
+        let verticalDiv = this.contentDiv.querySelector(".ytLockupViewModelVertical, .yt-lockup-view-model--vertical");
         if (verticalDiv) {
             let menuButtonDiv = settings["settings.mark.watched.button.compact"]
-                ? verticalDiv.querySelector(".yt-lockup-metadata-view-model__menu-button")
+                ? verticalDiv.querySelector(".ytLockupMetadataViewModelMenuButton, .yt-lockup-metadata-view-model__menu-button")
                 : null;
             if (menuButtonDiv) {
                 // Compact layout: place inside a wrapper to avoid position:relative on flex item (Firefox bug)
@@ -73,13 +75,11 @@ class SubscriptionVideo extends Video {
                 }
                 wrapper.appendChild(container);
             } else {
-                // Default layout: insert after metadata div
-                let metadataDiv = verticalDiv.querySelector(":scope > .yt-lockup-view-model__metadata");
-                if (metadataDiv) {
-                    metadataDiv.after(container);
-                } else {
-                    verticalDiv.appendChild(container);
-                }
+                // Default layout: below the card's metadata, after the lockup host rather than inside
+                // it, where YouTube's touch-feedback overlay would sit on top of the button. subs.css
+                // stretches the lockup and pushes the container to the bottom so a row lines up.
+                container.classList.add("subs-btn-container--bottom");
+                verticalDiv.after(container);
             }
         } else {
             // Old layout: insert before title area
