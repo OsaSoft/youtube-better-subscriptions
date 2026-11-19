@@ -12,7 +12,39 @@ class SubscriptionVideo extends Video {
     }
 
     hasButton() {
-        return this.contentDiv && this.contentDiv.querySelector("#" + this.buttonId) != null
+        let button = this.contentDiv ? this.contentDiv.querySelector("#" + this.buttonId) : null;
+        if (!button) {
+            return false;
+        }
+        // Compact layout: a button that fell back to the bottom row because YouTube hadn't built the
+        // ⋮ yet counts as missing once the ⋮ exists, so the next scan moves it there.
+        return !(button.closest(".subs-btn-container--bottom") && this.usesCompactButton() && this.getMenuButtonDiv());
+    }
+
+    // Whether the button goes under the lockup's ⋮ (compact setting on, vertical lockup card)
+    usesCompactButton() {
+        return Boolean(settings["settings.mark.watched.button.compact"]
+                && !settings["settings.hide.mark.watched.button"]
+                && this.getVerticalDiv());
+    }
+
+    // Whether the compact button can't be placed yet because YouTube hasn't built the ⋮
+    awaitsMenuButton() {
+        return this.usesCompactButton() && !this.getMenuButtonDiv();
+    }
+
+    // Same lookups as addButton()
+    getVerticalDiv() {
+        return this.contentDiv
+                ? this.contentDiv.querySelector(".ytLockupViewModelVertical, .yt-lockup-view-model--vertical")
+                : null;
+    }
+
+    getMenuButtonDiv() {
+        let verticalDiv = this.getVerticalDiv();
+        return verticalDiv
+                ? verticalDiv.querySelector(".ytLockupMetadataViewModelMenuButton, .yt-lockup-metadata-view-model__menu-button")
+                : null;
     }
 
     // The element faded while the video is marked watched (the whole card on lockup layouts). On the

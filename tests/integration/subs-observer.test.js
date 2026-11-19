@@ -164,6 +164,33 @@ describe('initSubs feed observer', () => {
         expect(card.querySelector('.subs-btn-container--bottom')).not.toBeNull();
     });
 
+    test('an empty lockup is not given a button until YouTube builds its contents', async () => {
+        setup();
+        await initSubs();
+
+        const tmp = document.createElement('div');
+        tmp.innerHTML = camelHTML;
+        const card = tmp.querySelector('ytd-rich-item-renderer');
+        const lockup = card.querySelector('yt-lockup-view-model');
+        const host = lockup.firstElementChild;
+        host.remove();
+
+        addFeed('<ytd-rich-grid-renderer class="style-scope ytd-two-column-browse-results-renderer"><div id="contents" class="style-scope ytd-rich-grid-renderer"></div></ytd-rich-grid-renderer>');
+        document.querySelector('#contents').appendChild(card);
+        await flushObserver();
+
+        // judged now, the button would land inside the empty lockup and stay there
+        expect(card.querySelector('.subs-btn-container')).toBeNull();
+
+        lockup.appendChild(host);
+        await flushObserver();
+
+        expect(card.querySelectorAll('.subs-btn-container').length).toBe(1);
+        const container = card.querySelector('.subs-btn-container');
+        expect(container.classList.contains('subs-btn-container--bottom')).toBe(true);
+        expect(container.previousElementSibling).toBe(host);
+    });
+
     test('hide watched on: a watched card is hidden as it is rendered', async () => {
         setup({ hideWatched: true, watchedVideos: { wtestCam_001: true } });
         await initSubs();
@@ -175,7 +202,108 @@ describe('initSubs feed observer', () => {
         expect(watched.querySelector('#' + MARK_UNWATCHED_BTN)).not.toBeNull();
         expect(unwatched.style.display).not.toBe('none');
         expect(unwatched.querySelector('#' + MARK_WATCHED_BTN)).not.toBeNull();
-        expect(global.processSections).toHaveBeenCalled();
+
+        // sections/loading more are coalesced into the next frame
+        expect(global.processSections).not.toHaveBeenCalled();
+        jest.advanceTimersByTime(16);
+        expect(global.processSections).toHaveBeenCalledTimes(1);
+    });
+
+    test('several bursts hiding cards in one frame update sections once', async () => {
+        setup({ hideWatched: true, watchedVideos: { wtestCam_001: true, wtestCam_003: true } });
+        await initSubs();
+
+        const tmp = document.createElement('div');
+        tmp.innerHTML = camelHTML;
+        const cards = [...tmp.querySelectorAll('ytd-rich-item-renderer')];
+        addFeed('<ytd-rich-grid-renderer class="style-scope ytd-two-column-browse-results-renderer"><div id="contents" class="style-scope ytd-rich-grid-renderer"></div></ytd-rich-grid-renderer>');
+        const grid = document.querySelector('#contents');
+        grid.appendChild(cards[0]);
+        await flushObserver();
+        grid.appendChild(cards[1]);
+        await flushObserver();
+
+        expect(cards[0].style.display).toBe('none');
+        expect(cards[1].style.display).toBe('none');
+        jest.advanceTimersByTime(16);
+        expect(global.processSections).toHaveBeenCalledTimes(1);
+    });
+
+    test('compact on: a ⋮ built after the rest of the card still gets the button under it', async () => {
+        setup({ compact: true });
+        await initSubs();
+
+        const tmp = document.createElement('div');
+        tmp.innerHTML = camelHTML;
+        const card = tmp.querySelector('ytd-rich-item-renderer');
+        const menu = card.querySelector('.ytLockupMetadataViewModelMenuButton');
+        const metadataHost = menu.parentElement;
+        menu.remove();
+
+        addFeed('<ytd-rich-grid-renderer class="style-scope ytd-two-column-browse-results-renderer"><div id="contents" class="style-scope ytd-rich-grid-renderer"></div></ytd-rich-grid-renderer>');
+        document.querySelector('#contents').appendChild(card);
+        await flushObserver();
+
+        // link and metadata are there, the ⋮ isn't: no bottom-row fallback
+        expect(card.querySelector('.subs-btn-container')).toBeNull();
+
+        metadataHost.appendChild(menu);
+        await flushObserver();
+
+        expect(card.querySelectorAll('.subs-btn-container').length).toBe(1);
+        expect(card.querySelector('.subs-btn-container--bottom')).toBeNull();
+        expect(card.querySelector('.subs-btn-container').closest('.ytLockupMetadataViewModelMenuButton')).not.toBeNull();
+    });
+
+    test('compact on: a bottom-row button the interval placed before the ⋮ existed moves under it', async () => {
+        setup({ compact: true });
+        await initSubs();
+
+        const tmp = document.createElement('div');
+        tmp.innerHTML = camelHTML;
+        const card = tmp.querySelector('ytd-rich-item-renderer');
+        const menu = card.querySelector('.ytLockupMetadataViewModelMenuButton');
+        const metadataHost = menu.parentElement;
+        menu.remove();
+
+        addFeed('<ytd-rich-grid-renderer class="style-scope ytd-two-column-browse-results-renderer"><div id="contents" class="style-scope ytd-rich-grid-renderer"></div></ytd-rich-grid-renderer>');
+        document.querySelector('#contents').appendChild(card);
+        await flushObserver();
+
+        // the periodic scan doesn't wait for the ⋮ and falls back to the bottom row
+        removeWatchedAndAddButton();
+        await flushObserver();
+        expect(card.querySelector('.subs-btn-container--bottom')).not.toBeNull();
+
+        // ⋮ arrives: the observer moves the button (the interval would too, via hasButton())
+        metadataHost.appendChild(menu);
+        await flushObserver();
+
+        expect(card.querySelectorAll('.subs-btn-container').length).toBe(1);
+        expect(card.querySelector('.subs-btn-container--bottom')).toBeNull();
+        expect(card.querySelector('.subs-btn-container--compact')).not.toBeNull();
+    });
+
+    test('a progress-bar-watched card without a duration badge is not hidden as a premiere', async () => {
+        setup({
+            hidePremieres: true,
+            isYouTubeWatched: item => item.querySelector('thumbnail-overlay-progress-bar-view-model') != null
+        });
+        await initSubs();
+
+        const tmp = document.createElement('div');
+        tmp.innerHTML = camelHTML;
+        const card = tmp.querySelector('ytd-rich-item-renderer');
+        card.querySelector('yt-thumbnail-badge-view-model').remove();
+        card.querySelector('yt-thumbnail-view-model').appendChild(document.createElement('thumbnail-overlay-progress-bar-view-model'));
+        addFeed('<ytd-rich-grid-renderer class="style-scope ytd-two-column-browse-results-renderer"><div id="contents" class="style-scope ytd-rich-grid-renderer"></div></ytd-rich-grid-renderer>');
+        document.querySelector('#contents').appendChild(card);
+        await flushObserver();
+
+        expect(global.watchVideo).toHaveBeenCalledWith('testCam_001');
+        expect(card.style.display).not.toBe('none');
+        expect(card.querySelectorAll('.subs-btn-container').length).toBe(1);
+        expect(card.querySelector('#' + MARK_UNWATCHED_BTN)).not.toBeNull();
     });
 
     test('hide watched on: a card YouTube shows as watched is marked and hidden as it is rendered', async () => {

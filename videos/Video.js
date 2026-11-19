@@ -175,9 +175,14 @@ class Video {
         return null;
     }
 
+    // The "Hide watched" rule alone, which needs nothing from the card beyond its link
+    hidesAsWatched() {
+        return Boolean(hideWatched && this.isStored && !this.isMix);
+    }
+
     shouldHide() {
         return Boolean(
-                (hideWatched && this.isStored && !this.isMix) ||
+                this.hidesAsWatched() ||
                 (hidePremieres && this.isPremiere) ||
                 (hideShorts && this.isShort) ||
                 (hideLives && this.isLivestream) ||
@@ -193,14 +198,20 @@ class Video {
     }
 
     markWatched() {
-        changeMarkWatchedToMarkUnwatched(this);
-
-        this.isStored = true;
+        this.recordWatched();
 
         if (this.shouldHide()) {
             this.hide();
             processSections();
         }
+    }
+
+    // Stores the video as watched and swaps its button, without hiding the card
+    recordWatched() {
+        changeMarkWatchedToMarkUnwatched(this);
+
+        this.isStored = true;
+        this.buttonId = MARK_UNWATCHED_BTN;
 
         watchVideo(this.videoId);
         syncWatchedVideos();

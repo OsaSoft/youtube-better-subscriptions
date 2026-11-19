@@ -8,6 +8,7 @@ let hideCollabsUnsubscribed = null;
 let hideMostRelevant = null;
 let intervalId = null;
 let feedObserver = null;
+let feedSectionsFrame = null;
 
 // Cards the feed observer reacts to. List-view sections (ytd-item-section-renderer) are left to the
 // periodic scan: a mutation anywhere in a section would otherwise rescan it.
@@ -122,9 +123,17 @@ function onFeedMutations(records) {
             }
         }
 
-        if (hiddenCount > 0) {
-            processSections();
-            loadMoreVideos();
+        // once per frame, however many mutation bursts hid cards in it
+        if (hiddenCount > 0 && feedSectionsFrame == null) {
+            feedSectionsFrame = window.requestAnimationFrame(function () {
+                feedSectionsFrame = null;
+                try {
+                    processSections();
+                    loadMoreVideos();
+                } catch (e) {
+                    logError(e);
+                }
+            });
         }
     } catch (e) {
         logError(e);
@@ -219,5 +228,9 @@ function stopSubs() {
     if (feedObserver) {
         feedObserver.disconnect();
         feedObserver = null;
+    }
+    if (feedSectionsFrame != null) {
+        window.cancelAnimationFrame(feedSectionsFrame);
+        feedSectionsFrame = null;
     }
 }
