@@ -25,6 +25,10 @@ class SubscriptionVideo extends Video {
             return;
         }
 
+        // A button for the other state means the watched state changed elsewhere (another tab or
+        // device): replace it rather than adding a second one.
+        this.contentDiv.querySelectorAll(".subs-btn-container").forEach(e => e.remove());
+
         let firstChild = this.contentDiv.firstElementChild;
         let isListView = firstChild && firstChild.nodeType === Node.COMMENT_NODE;
 
