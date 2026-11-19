@@ -163,12 +163,8 @@ html[dark] .subs-btn-container .subs-btn-mark-unwatched:active {
   background-color: #f1f1f1;
 }
 
-/* Marking a video watched puts .semitransparent on the button's own container: keep the button
-   readable. In a card faded as watched, drop the button's own opacity so it isn't faded twice. */
-.subs-btn-container.semitransparent {
-  opacity: 1 !important;
-}
-
+/* The WATCHED button sits inside the card that .semitransparent fades: drop the button's own .85
+   opacity there so it is faded only once, with the card. */
 .semitransparent .subs-btn-mark-unwatched {
   opacity: 1;
 }

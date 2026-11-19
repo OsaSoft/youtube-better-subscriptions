@@ -712,6 +712,117 @@ describe('Real YouTube DOM - addButton() placement (camelCase lockup classes, No
     });
 });
 
+describe('Real YouTube DOM - watched card fade (camelCase lockup, real button)', () => {
+    let items;
+
+    // Fade state of each card's lockup, and every element in the feed that carries the class
+    const lockupFaded = (item) => item.querySelector('yt-lockup-view-model').classList.contains('semitransparent');
+    const fadedElements = () => [...document.querySelectorAll('.semitransparent')];
+
+    beforeEach(() => {
+        document.body.innerHTML = camelFixtureHTML;
+        loadUtil();
+        loadQueries();
+        global.watchedVideos = {};
+        global.processSections = jest.fn();
+        global.watchVideo = jest.fn();
+        global.unwatchVideo = jest.fn();
+        global.syncWatchedVideos = jest.fn();
+        global.hideWatched = false;
+        global.hidePremieres = false;
+        global.hideShorts = false;
+        global.hideLives = false;
+        global.hideMembersOnly = false;
+        settings["settings.hide.mark.watched.button"] = false;
+    });
+
+    afterEach(() => {
+        // Don't leave the shim for later loadSubsUI() calls in this file
+        global.SubscriptionVideo = undefined;
+    });
+
+    // Wire the real subs-ui into the SubscriptionsVideo context, as in the camelCase "real button"
+    // test above: Video.js builds the WATCHED button through the real buildMarkWatchedButton.
+    function loadRealUI() {
+        let realBuild;
+        global.buildMarkWatchedButton = (...args) => realBuild(...args);
+        global.changeMarkWatchedToMarkUnwatched = undefined;
+        loadSubscriptionsVideo();
+        const createVideo = global.createSubscriptionVideo;
+        global.SubscriptionVideo = function (item) { return createVideo(item); };
+        loadSubsUI();
+        realBuild = global.buildMarkWatchedButton;
+        items = document.querySelectorAll(vidQuery());
+    }
+
+    describe.each([true, false])('compact = %s', (compact) => {
+        beforeEach(() => {
+            settings["settings.mark.watched.button.compact"] = compact;
+        });
+
+        test('clicking the eye fades the whole card, and only that card', () => {
+            loadRealUI();
+            for (const item of items) {
+                global.createSubscriptionVideo(item).addButton();
+            }
+
+            items[0].querySelector('.subs-btn-mark-watched').click();
+
+            expect(lockupFaded(items[0])).toBe(true);
+            expect(lockupFaded(items[1])).toBe(false);
+            expect(lockupFaded(items[2])).toBe(false);
+            // The lockup is the only faded element: not the button's own container
+            expect(fadedElements()).toEqual([items[0].querySelector('yt-lockup-view-model')]);
+            expect(items[0].querySelector('.subs-btn-mark-unwatched')).not.toBeNull();
+        });
+
+        test('the card after the click is faded the same way as when it loads as watched', () => {
+            loadRealUI();
+            global.createSubscriptionVideo(items[0]).addButton();
+            items[0].querySelector('.subs-btn-mark-watched').click();
+            const afterClick = fadedElements().map(e => e.tagName);
+
+            // "Reload": fresh DOM, the video already stored as watched
+            document.body.innerHTML = camelFixtureHTML;
+            global.watchedVideos['wtestCam_001'] = true;
+            loadRealUI();
+            global.createSubscriptionVideo(items[0]).addButton();
+
+            expect(fadedElements().map(e => e.tagName)).toEqual(afterClick);
+            expect(lockupFaded(items[0])).toBe(true);
+        });
+
+        test('clicking WATCHED after marking by click removes the fade completely', () => {
+            loadRealUI();
+            global.createSubscriptionVideo(items[0]).addButton();
+            items[0].querySelector('.subs-btn-mark-watched').click();
+
+            items[0].querySelector('.subs-btn-mark-unwatched').click();
+
+            expect(global.unwatchVideo).toHaveBeenCalledWith('testCam_001');
+            expect(fadedElements()).toEqual([]);
+            expect(items[0].querySelector('.subs-btn-mark-watched')).not.toBeNull();
+        });
+
+        test('a card that loaded as watched: WATCHED removes the fade, the eye fades it again', () => {
+            global.watchedVideos['wtestCam_001'] = true;
+            loadRealUI();
+            global.createSubscriptionVideo(items[0]).addButton();
+            expect(fadedElements()).toEqual([items[0].querySelector('yt-lockup-view-model')]);
+
+            items[0].querySelector('.subs-btn-mark-unwatched').click();
+            expect(fadedElements()).toEqual([]);
+
+            items[0].querySelector('.subs-btn-mark-watched').click();
+            expect(fadedElements()).toEqual([items[0].querySelector('yt-lockup-view-model')]);
+
+            items[0].querySelector('.subs-btn-mark-unwatched').click();
+            expect(fadedElements()).toEqual([]);
+            expect(items[0].querySelectorAll('.subs-btn-container').length).toBe(1);
+        });
+    });
+});
+
 describe('Real YouTube DOM - UI & SubscriptionVideo fallback', () => {
     beforeEach(() => {
         document.body.innerHTML = fixtureHTML;

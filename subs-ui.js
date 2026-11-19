@@ -332,6 +332,8 @@ function removeUI() {
     // delete built buttons and strip containers
     document.querySelectorAll(".subs-btn-container").forEach(e => e.remove());
     document.querySelectorAll("#" + METADATA_LINE).forEach(e => e.remove());
+    // and the watched fade, which lives on the card rather than in the removed button
+    document.querySelectorAll(".semitransparent").forEach(e => e.classList.remove("semitransparent"));
 
     // make hidden videos visible
     for (let item of hidden) {

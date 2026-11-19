@@ -108,15 +108,19 @@ function getPosterChannelId(video) {
     return null;
 }
 
-function changeMarkWatchedToMarkUnwatched(item) {
+function changeMarkWatchedToMarkUnwatched(video) {
     // find Mark as watched button and change it to Unmark as watched
+    let item = video.containingDiv;
     let metaDataLine = item.querySelector("#" + METADATA_LINE);
     if (metaDataLine != null) {
-        let dismissibleDiv = metaDataLine.parentNode;
-        dismissibleDiv.removeChild(metaDataLine);
+        let buttonParent = metaDataLine.parentNode;
+        buttonParent.removeChild(metaDataLine);
 
-        let markUnwatchedBtn = buildMarkWatchedButton(dismissibleDiv, item, getVideoId(item), false);
-        dismissibleDiv.appendChild(markUnwatchedBtn);
+        // Fade the element addButton() fades for a video that loads as watched, not the button's
+        // own container, so the card looks the same straight after the click as after a reload.
+        let fadeTarget = video.getFadeTarget() || item;
+        let markUnwatchedBtn = buildMarkWatchedButton(fadeTarget, item, video.videoId, false);
+        buttonParent.appendChild(markUnwatchedBtn);
     }
 }
 
@@ -166,6 +170,11 @@ class Video {
         throw Error("Subclasses must implement addButton method");
     }
 
+    getFadeTarget() {
+        // Subclasses return the element faded when the video is watched; callers fall back to the item
+        return null;
+    }
+
     shouldHide() {
         return Boolean(
                 (hideWatched && this.isStored && !this.isMix) ||
@@ -184,7 +193,7 @@ class Video {
     }
 
     markWatched() {
-        changeMarkWatchedToMarkUnwatched(this.containingDiv);
+        changeMarkWatchedToMarkUnwatched(this);
 
         this.isStored = true;
 
