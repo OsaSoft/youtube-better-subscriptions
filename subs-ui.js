@@ -174,11 +174,14 @@ function buildMarkWatchedButton(dismissibleDiv, item, videoId, isMarkWatchedBtn 
 
     let vid = new SubscriptionVideo(item);
     if (isMarkWatchedBtn) {
-        button.onclick = () => {
+        button.onclick = (event) => {
+            // The compact button sits inside YouTube's clickable lockup: don't let the click reach it.
+            event.stopPropagation();
             vid.markWatched();
         };
     } else {
-        button.onclick = () => {
+        button.onclick = (event) => {
+            event.stopPropagation();
             vid.markUnwatched();
             let metaDataElem = item.querySelector("#" + METADATA_LINE);
             let container = metaDataElem.parentNode;
