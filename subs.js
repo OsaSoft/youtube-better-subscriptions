@@ -133,13 +133,13 @@ async function initSubs() {
 
     buildUI();
 
+    // always scan: buttons and the other filters must reach late-loaded videos
+    // even with hide watched off (shouldHide() already respects hideWatched)
     intervalId = window.setInterval(function () {
-        if (hideWatched) {
-            try {
-                removeWatchedAndAddButton();
-            } catch (e) {
-                logError(e);
-            }
+        try {
+            removeWatchedAndAddButton();
+        } catch (e) {
+            logError(e);
         }
     }, settings["settings.hide.watched.refresh.rate"]);
 
