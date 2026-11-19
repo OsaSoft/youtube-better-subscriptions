@@ -171,7 +171,8 @@ class Video {
     }
 
     getFadeTarget() {
-        throw Error("Subclasses must implement getFadeTarget method");
+        // Subclasses return the element faded when the video is watched; callers fall back to the item
+        return null;
     }
 
     shouldHide() {
