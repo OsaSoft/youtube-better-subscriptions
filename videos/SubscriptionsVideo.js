@@ -27,9 +27,7 @@ class SubscriptionVideo extends Video {
             return this.contentDiv;
         }
 
-        let firstChild = this.contentDiv.firstElementChild;
-        let isListView = firstChild && firstChild.nodeType === Node.COMMENT_NODE;
-        return isListView ? this.contentDiv.querySelector(".text-wrapper.style-scope.ytd-video-renderer") : firstChild;
+        return this.contentDiv.firstElementChild;
     }
 
     addButton() {
