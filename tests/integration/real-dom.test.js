@@ -680,33 +680,35 @@ describe('Real YouTube DOM - addButton() placement (camelCase lockup classes, No
         // that builds the instance through the context's factory.
         const createVideo = global.createSubscriptionVideo;
         global.SubscriptionVideo = function (item) { return createVideo(item); };
-        loadSubsUI();
-        realBuild = global.buildMarkWatchedButton;
-        items = document.querySelectorAll(vidQuery());
+        try {
+            loadSubsUI();
+            realBuild = global.buildMarkWatchedButton;
+            items = document.querySelectorAll(vidQuery());
 
-        global.createSubscriptionVideo(items[0]).addButton();
-        const menuBtn = items[0].querySelector('.ytLockupMetadataViewModelMenuButton');
-        const container = menuBtn.querySelector('.subs-btn-container--compact');
-        const eye = container.querySelector('.subs-btn-mark-watched');
-        expect(eye).not.toBeNull();
+            global.createSubscriptionVideo(items[0]).addButton();
+            const menuBtn = items[0].querySelector('.ytLockupMetadataViewModelMenuButton');
+            const container = menuBtn.querySelector('.subs-btn-container--compact');
+            const eye = container.querySelector('.subs-btn-mark-watched');
+            expect(eye).not.toBeNull();
 
-        const lockupClick = jest.fn();
-        items[0].querySelector('.ytLockupViewModelVertical').addEventListener('click', lockupClick);
-        eye.click();
+            const lockupClick = jest.fn();
+            items[0].querySelector('.ytLockupViewModelVertical').addEventListener('click', lockupClick);
+            eye.click();
 
-        expect(global.watchVideo).toHaveBeenCalledWith('testCam_001');
-        expect(lockupClick).not.toHaveBeenCalled();
-        expect(container.querySelector('.subs-btn-mark-watched')).toBeNull();
-        expect(container.querySelector('.subs-btn-mark-unwatched')).not.toBeNull();
-        expect(menuBtn.querySelectorAll('.subs-btn-container').length).toBe(1);
+            expect(global.watchVideo).toHaveBeenCalledWith('testCam_001');
+            expect(lockupClick).not.toHaveBeenCalled();
+            expect(container.querySelector('.subs-btn-mark-watched')).toBeNull();
+            expect(container.querySelector('.subs-btn-mark-unwatched')).not.toBeNull();
+            expect(menuBtn.querySelectorAll('.subs-btn-container').length).toBe(1);
 
-        container.querySelector('.subs-btn-mark-unwatched').click();
-        expect(global.unwatchVideo).toHaveBeenCalledWith('testCam_001');
-        expect(container.querySelector('.subs-btn-mark-watched')).not.toBeNull();
-        expect(container.querySelector('.subs-btn-mark-unwatched')).toBeNull();
-
-        // Don't leave the shim for later loadSubsUI() calls in this file
-        global.SubscriptionVideo = undefined;
+            container.querySelector('.subs-btn-mark-unwatched').click();
+            expect(global.unwatchVideo).toHaveBeenCalledWith('testCam_001');
+            expect(container.querySelector('.subs-btn-mark-watched')).not.toBeNull();
+            expect(container.querySelector('.subs-btn-mark-unwatched')).toBeNull();
+        } finally {
+            // Don't leave the shim for later loadSubsUI() calls in this file, even if an assertion fails
+            global.SubscriptionVideo = undefined;
+        }
     });
 });
 
