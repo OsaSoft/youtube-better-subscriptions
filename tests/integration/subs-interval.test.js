@@ -91,6 +91,27 @@ describe('initSubs periodic scan', () => {
         expect(watchedItem.querySelector('#' + MARK_UNWATCHED_BTN)).not.toBeNull();
     });
 
+    test('replaces the button when the watched state changes elsewhere while hide watched is off', async () => {
+        jest.useFakeTimers();
+        const watched = {};
+        setup({ hideWatched: false, watchedVideos: watched });
+
+        await initSubs();
+        document.body.innerHTML = fixtureHTML;
+        const item = document.querySelectorAll(vidQuery())[0];
+
+        jest.advanceTimersByTime(3000);
+        expect(item.querySelector('#' + MARK_WATCHED_BTN)).not.toBeNull();
+
+        // e.g. watched in another tab: storage listener updates watchedVideos, card untouched
+        watched['wtestVid_001'] = true;
+        jest.advanceTimersByTime(3000);
+
+        expect(item.querySelectorAll('.subs-btn-container').length).toBe(1);
+        expect(item.querySelector('#' + MARK_WATCHED_BTN)).toBeNull();
+        expect(item.querySelector('#' + MARK_UNWATCHED_BTN)).not.toBeNull();
+    });
+
     test('hides watched videos rendered after init while hide watched is on', async () => {
         jest.useFakeTimers();
         setup({ hideWatched: true, watchedVideos: { 'wtestVid_001': true } });
