@@ -4,6 +4,9 @@
  * YouTube renders the subscriptions feed after initSubs() has run, so the
  * one-off scan at the end of initSubs() usually finds nothing. The periodic
  * scan must add buttons to late-loaded videos regardless of hide watched.
+ *
+ * The feed observer (subs-observer.test.js) normally gets there first, so it is
+ * stubbed out here: these tests cover the interval as the safety net.
  */
 
 const fs = require('fs');
@@ -15,9 +18,16 @@ const fixtureHTML = fs.readFileSync(
     'utf8'
 );
 
+const RealMutationObserver = global.MutationObserver;
+
 describe('initSubs periodic scan', () => {
     function setup({ hideWatched, watchedVideos = {} }) {
         document.body.innerHTML = '';
+        global.MutationObserver = class {
+            observe() {}
+            disconnect() {}
+            takeRecords() { return []; }
+        };
         settings["settings.hide.watched.default"] = hideWatched;
         settings["settings.hide.watched.refresh.rate"] = 3000;
 
@@ -55,6 +65,7 @@ describe('initSubs periodic scan', () => {
 
     afterEach(() => {
         global.stopSubs && global.stopSubs();
+        global.MutationObserver = RealMutationObserver;
         jest.useRealTimers();
     });
 

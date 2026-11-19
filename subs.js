@@ -7,6 +7,11 @@ let hideMembersOnly = null;
 let hideCollabsUnsubscribed = null;
 let hideMostRelevant = null;
 let intervalId = null;
+let feedObserver = null;
+
+// Cards the feed observer reacts to. List-view sections (ytd-item-section-renderer) are left to the
+// periodic scan: a mutation anywhere in a section would otherwise rescan it.
+const FEED_CARD_QUERY = "ytd-rich-item-renderer, ytd-grid-video-renderer";
 
 function isYouTubeWatched(item) {
     let ytWatchedPercentThreshold = settings["settings.mark.watched.youtube.watched"];
@@ -81,6 +86,56 @@ function loadMoreVideos() {
     sidebar.scrollTop = top;
 }
 
+// MutationObserver callback: runs as a microtask right after YouTube's DOM change, before the
+// browser paints, so a card is first painted with its button already in place (no row jump, no
+// pop-in). Only the cards touched by the mutations are processed, not the whole feed.
+function onFeedMutations(records) {
+    try {
+        let cards = new Set();
+        for (let record of records) {
+            // our own buttons being built or swapped
+            if (record.target.closest && record.target.closest(".subs-btn-container")) {
+                continue;
+            }
+            for (let node of record.addedNodes) {
+                if (node.nodeType !== 1 || node.classList.contains("subs-btn-container")) {
+                    continue;
+                }
+                // a new card, or content arriving in a card YouTube added earlier
+                let card = node.closest(FEED_CARD_QUERY);
+                if (card) {
+                    cards.add(card);
+                } else if (node.firstElementChild) {
+                    node.querySelectorAll(FEED_CARD_QUERY).forEach(c => cards.add(c));
+                }
+            }
+        }
+        if (cards.size === 0) {
+            return;
+        }
+
+        let query = vidQuery();
+        let hiddenCount = 0;
+        for (let card of cards) {
+            if (card.isConnected && card.matches(query) && processRenderedVideo(card)) {
+                hiddenCount++;
+            }
+        }
+
+        if (hiddenCount > 0) {
+            processSections();
+            loadMoreVideos();
+        }
+    } catch (e) {
+        logError(e);
+    } finally {
+        // drop the records our own insertions just produced
+        if (feedObserver) {
+            feedObserver.takeRecords();
+        }
+    }
+}
+
 function getVideoTitle(item) {
     // Try old layout
     let titleElem = item.querySelector("#video-title");
@@ -143,6 +198,14 @@ async function initSubs() {
         }
     }, settings["settings.hide.watched.refresh.rate"]);
 
+    // YouTube renders the feed after this point and keeps adding cards on scroll; handle each card
+    // as it appears instead of waiting for the next interval tick, which stays as a safety net
+    if (feedObserver) {
+        feedObserver.disconnect();
+    }
+    feedObserver = new MutationObserver(onFeedMutations);
+    feedObserver.observe(document.body, {childList: true, subtree: true});
+
     removeWatchedAndAddButton();
 
     log("Initializing subs page... DONE");
@@ -153,4 +216,8 @@ function stopSubs() {
 
     removeUI();
     window.clearInterval(intervalId);
+    if (feedObserver) {
+        feedObserver.disconnect();
+        feedObserver = null;
+    }
 }
