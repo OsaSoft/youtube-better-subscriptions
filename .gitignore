@@ -10,3 +10,7 @@ CLAUDE.local.md
 # Node.js
 node_modules/
 coverage/
+
+# Visual harness recordings
+pr-media/
+.claude/worktrees/
