@@ -9,6 +9,9 @@ let hideMostRelevant = null;
 let intervalId = null;
 let feedObserver = null;
 let feedSectionsFrame = null;
+// bumped by stopSubs(): an initSubs() still awaiting storage when a navigation unloads the page
+// sees it changed and stops, so it can't build controls or start a scan on the next page
+let subsRun = 0;
 
 // Cards the feed observer reacts to. List-view sections (ytd-item-section-renderer) are left to the
 // periodic scan: a mutation anywhere in a section would otherwise rescan it.
@@ -170,8 +173,13 @@ function getVideoTitle(item) {
 
 async function initSubs() {
     log("Initializing subs page...");
+    const run = subsRun;
 
     await loadWatchedVideos();
+    if (run !== subsRun) {
+        log("Initializing subs page... superseded by a navigation");
+        return;
+    }
 
     if (hideWatched == null || !settings["settings.hide.watched.keep.state"]) {
         hideWatched = settings["settings.hide.watched.default"];
@@ -201,6 +209,10 @@ async function initSubs() {
 
     // before buildUI() applies it and before the first hide pass, which may ask YouTube for more videos
     await loadStopLoadingOlder();
+    if (run !== subsRun) {
+        log("Initializing subs page... superseded by a navigation");
+        return;
+    }
 
     buildUI();
 
@@ -229,6 +241,7 @@ async function initSubs() {
 
 function stopSubs() {
     log("Stopping subs page behaviour");
+    subsRun++;
 
     removeUI();
     window.clearInterval(intervalId);

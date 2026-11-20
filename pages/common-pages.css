@@ -4,7 +4,10 @@
 :root {
     /* Colors */
     --color-primary: #ff0000;
-    --color-primary-hover: #cc0000;
+    /* red behind white text (Save button, LATEST badge): white on #ff0000 is only 4.0:1, on #cc0000 5.9:1.
+       Same in both themes. --color-primary stays for icons, toggles, borders and focus rings (3:1 is enough). */
+    --color-primary-strong: #cc0000;
+    --color-primary-strong-hover: #a00000;
     --color-bg: #f9f9f9;
     --color-card: #ffffff;
     --color-text: #0f0f0f;
@@ -274,12 +277,12 @@ body {
 }
 
 .btn-primary {
-    background: var(--color-primary);
+    background: var(--color-primary-strong);
     color: white;
 }
 
 .btn-primary:hover {
-    background: var(--color-primary-hover);
+    background: var(--color-primary-strong-hover);
 }
 
 .btn-primary:focus {

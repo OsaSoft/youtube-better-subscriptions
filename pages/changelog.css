@@ -24,7 +24,7 @@
 }
 
 .badge--latest {
-    background: var(--color-primary);
+    background: var(--color-primary-strong);
     color: white;
 }
 

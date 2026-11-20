@@ -3,38 +3,31 @@
  * Global mocks and helpers for YouTube Better Subscriptions tests
  */
 
+const fs = require('fs');
+const path = require('path');
+const vm = require('vm');
 const { createStorageMock } = require('./mocks/browser-api');
 
-// Default settings matching common.js
-const DEFAULT_SETTINGS = {
-    "settings.hide.watched.label": true,
-    "settings.hide.watched.all.label": true,
-    "settings.hide.watched.ui.stick.right": true,
-    "settings.hide.watched.default": true,
-    "settings.hide.watched.keep.state": true,
-    "settings.hide.watched.refresh.rate": 3000,
-    "settings.mark.watched.youtube.watched": false,
-    "settings.log.level": 1,
-    "settings.hide.watched.support.channel": true,
-    "settings.hide.watched.support.home": true,
-    "settings.hide.watched.auto.store": true,
-    "settings.hide.premieres": false,
-    "settings.hide.shorts": false,
-    "settings.hide.lives": false,
-    "settings.hide.members.only": false,
-    "settings.hide.most.relevant": false,
-    "settings.hide.mark.watched.button": false,
-    "settings.mark.watched.button.compact": true,
-    "settings.changelog.auto.open": true,
-    "settings.stop.loading.button.style": "icon-text",
-};
+// Settings defaults and storage constants come from common.js itself, so they can't drift from it.
+// Top-level consts of a vm script aren't properties of its context: read them with runInContext.
+function loadCommonConstants() {
+    const context = { browser: createStorageMock(), console };
+    vm.createContext(context);
+    vm.runInContext(fs.readFileSync(path.join(__dirname, '../common.js'), 'utf8'), context);
+    return vm.runInContext(
+        '({PREFIX, DEFAULT_SETTINGS, VIDEO_WATCH_KEY, SETTINGS_KEY, SETTINGS_LOCAL_KEY, WATCHED_SYNC_THROTTLE})',
+        context
+    );
+}
 
-// Constants matching the codebase
-const PREFIX = "osasoft-better-subscriptions_";
-const VIDEO_WATCH_KEY = "vw_";
-const SETTINGS_KEY = "settings";
-const SETTINGS_LOCAL_KEY = "settings_cache";
-const WATCHED_SYNC_THROTTLE = 1000;
+const {
+    PREFIX,
+    DEFAULT_SETTINGS,
+    VIDEO_WATCH_KEY,
+    SETTINGS_KEY,
+    SETTINGS_LOCAL_KEY,
+    WATCHED_SYNC_THROTTLE
+} = loadCommonConstants();
 
 // UI Constants
 const HIDE_WATCHED_TOGGLE = PREFIX + "hide-watched-toggle";
@@ -67,6 +60,9 @@ beforeEach(() => {
     global.settingsLoadedCallbacks = [];
     global.hidden = [];
     global.addedElems = [];
+    // loaders reuse a loaded class; drop it so each test loads it against its own settings object
+    global.Video = undefined;
+    global.SubscriptionVideo = undefined;
 
     // Reset hide flags
     global.hideWatched = false;

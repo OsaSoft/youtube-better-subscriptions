@@ -42,34 +42,60 @@ describe('common.js', () => {
         });
     });
 
-    // Note: saveVideoOperation, watchVideo, unwatchVideo, loadWatchedVideos,
-    // syncWatchedVideos, and getCurrentPage tests require more complex setup
-    // due to vm.runInContext context isolation. The functions work correctly
-    // in the browser environment but are harder to test in isolation.
-    // These are skipped to keep the test suite running.
+    // loadWatchedVideos, syncWatchedVideos and more saveVideoOperation cases: see sync.test.js
 
-    describe.skip('saveVideoOperation', () => {
-        // Would need to refactor to work with vm context isolation
+    describe('saveVideoOperation', () => {
+        test('keeps the first timestamp of an operation it already has', async () => {
+            await commonContext.saveVideoOperation('wTESTVIDEO01', 1000);
+            await commonContext.saveVideoOperation('wTESTVIDEO01', 2000);
+
+            expect(browser._getLocalStore()['wTESTVIDEO01']).toBe(1000);
+        });
     });
 
-    describe.skip('watchVideo', () => {
-        // Would need to refactor to work with vm context isolation
+    describe('watchVideo', () => {
+        test('stores the video as watched', async () => {
+            await commonContext.watchVideo('TESTVIDEO01', 1000);
+
+            expect(browser._getLocalStore()).toEqual({ 'wTESTVIDEO01': 1000 });
+        });
     });
 
-    describe.skip('unwatchVideo', () => {
-        // Would need to refactor to work with vm context isolation
+    describe('unwatchVideo', () => {
+        test('replaces a watched video with an unwatched one', async () => {
+            await commonContext.watchVideo('TESTVIDEO01', 1000);
+            commonContext.unwatchVideo('TESTVIDEO01', 2000);
+
+            expect(browser._getLocalStore()).toEqual({ 'nTESTVIDEO01': 2000 });
+        });
+
+        test('watching again afterwards replaces the unwatched one', async () => {
+            commonContext.unwatchVideo('TESTVIDEO01', 1000);
+            await commonContext.watchVideo('TESTVIDEO01', 2000);
+
+            expect(browser._getLocalStore()).toEqual({ 'wTESTVIDEO01': 2000 });
+        });
     });
 
-    describe.skip('loadWatchedVideos', () => {
-        // Would need to refactor to work with vm context isolation
-    });
+    describe('getCurrentPage', () => {
+        afterEach(() => window.history.replaceState(null, '', '/'));
 
-    describe.skip('syncWatchedVideos', () => {
-        // Would need to refactor to work with vm context isolation
-    });
+        test('returns the path without a trailing slash', () => {
+            window.history.replaceState(null, '', '/feed/subscriptions/');
+            expect(commonContext.getCurrentPage()).toBe('/feed/subscriptions');
+            expect(commonContext.isSubscriptionsPage()).toBe(true);
+        });
 
-    describe.skip('getCurrentPage', () => {
-        // window.location cannot be easily mocked in JSDOM
+        test('ignores the query string', () => {
+            window.history.replaceState(null, '', '/watch?v=abc12345678');
+            expect(commonContext.getCurrentPage()).toBe('/watch');
+            expect(commonContext.isSubscriptionsPage()).toBe(false);
+        });
+
+        test('is empty on the home page', () => {
+            window.history.replaceState(null, '', '/');
+            expect(commonContext.getCurrentPage()).toBe('');
+        });
     });
 
     describe('getSyncCountWarning', () => {

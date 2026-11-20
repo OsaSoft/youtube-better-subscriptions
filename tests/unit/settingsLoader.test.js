@@ -3,6 +3,7 @@
  * Settings loading, migration, and callback system
  */
 
+const vm = require('vm');
 const { loadUtil, loadSettingsLoader } = require('../helpers/load-source');
 
 describe('settingsLoader.js', () => {
@@ -134,9 +135,89 @@ describe('settingsLoader.js', () => {
         });
     });
 
-    // loadSettings tests are skipped due to complexity of async callback testing
-    // across vm.runInContext boundaries
-    describe.skip('loadSettings', () => {
-        // Tests would need different architecture
+    describe('loadSettings', () => {
+        let ctx;
+        let loaded;
+
+        // settings and settingsLoadedCallbacks are top-level lets: reach them inside the context
+        function load() {
+            ctx = loadSettingsLoader(false);
+            loaded = jest.fn();
+            ctx.__loaded = loaded;
+            vm.runInContext('settingsLoadedCallbacks.push(__loaded)', ctx);
+            return ctx.loadSettings();
+        }
+
+        const loadedSettings = () => vm.runInContext('settings', ctx);
+        const banner = () => document.querySelector('.' + PREFIX + 'settings-updated-banner');
+
+        test('starts from the local cache, filled up with defaults', async () => {
+            browser._setLocalStore({ [SETTINGS_LOCAL_KEY]: { "settings.hide.shorts": true } });
+            browser._setSyncStore({ [SETTINGS_KEY]: { "settings.hide.shorts": true } });
+
+            await load();
+
+            expect(loadedSettings()).toEqual({ ...DEFAULT_SETTINGS, "settings.hide.shorts": true });
+            expect(loaded).toHaveBeenCalledTimes(1);
+            expect(vm.runInContext('settingsLoaded', ctx)).toBe(true);
+            // same in sync: no banner, no rebuild
+            expect(banner()).toBeNull();
+            expect(global.rebuildUI).not.toHaveBeenCalled();
+        });
+
+        test('applies newer sync settings over the cache, caches them and rebuilds the UI', async () => {
+            browser._setLocalStore({ [SETTINGS_LOCAL_KEY]: { "settings.hide.shorts": true } });
+            browser._setSyncStore({ [SETTINGS_KEY]: { "settings.hide.shorts": false, "settings.hide.lives": true } });
+
+            await load();
+
+            expect(loadedSettings()["settings.hide.shorts"]).toBe(false);
+            expect(loadedSettings()["settings.hide.lives"]).toBe(true);
+            expect(browser._getLocalStore()[SETTINGS_LOCAL_KEY]).toEqual({ "settings.hide.shorts": false, "settings.hide.lives": true });
+            expect(global.rebuildUI).toHaveBeenCalledTimes(1);
+            expect(banner()).not.toBeNull();
+            // callbacks ran once, from the cache
+            expect(loaded).toHaveBeenCalledTimes(1);
+        });
+
+        test('migrates old log settings in the cache', async () => {
+            browser._setLocalStore({ [SETTINGS_LOCAL_KEY]: { "settings.log.enabled": true, "settings.log.debug": false } });
+
+            await load();
+
+            expect(loadedSettings()["settings.log.level"]).toBe(3);
+            expect(browser._getLocalStore()[SETTINGS_LOCAL_KEY]).toEqual({ "settings.log.level": 3 });
+        });
+
+        test('without a cache, uses sync settings and caches them', async () => {
+            browser._setSyncStore({ [SETTINGS_KEY]: { "settings.hide.premieres": true } });
+
+            await load();
+
+            expect(loadedSettings()).toEqual({ ...DEFAULT_SETTINGS, "settings.hide.premieres": true });
+            expect(browser._getLocalStore()[SETTINGS_LOCAL_KEY]).toEqual({ "settings.hide.premieres": true });
+            expect(loaded).toHaveBeenCalledTimes(1);
+        });
+
+        test('without a cache or sync settings (first install), uses the defaults', async () => {
+            await load();
+
+            expect(loadedSettings()).toEqual(DEFAULT_SETTINGS);
+            expect(browser._getLocalStore()[SETTINGS_LOCAL_KEY]).toBeUndefined();
+            expect(loaded).toHaveBeenCalledTimes(1);
+        });
+
+        test('falls back to the defaults when sync does not answer within 2 s', async () => {
+            jest.useFakeTimers();
+            browser.storage.sync.get.mockImplementationOnce(() => {});
+
+            await load();
+            expect(loaded).not.toHaveBeenCalled();
+
+            jest.advanceTimersByTime(2000);
+
+            expect(loadedSettings()).toEqual(DEFAULT_SETTINGS);
+            expect(loaded).toHaveBeenCalledTimes(1);
+        });
     });
 });

@@ -12,10 +12,15 @@ function initExtension() {
 
     let pageChangeTimeout = null;
     let lastHandledPage = null;
+    // a navigation that starts gets this long to finish before the page counts as never left
+    const ABORTED_NAVIGATION_MS = 5000;
+    let abortedNavigationTimeout = null;
+    let pageBeforeNavigation = null;
 
     // Debounced page change handler - delays processing to allow URL to update
     // during SPA navigation before we check which page we're on (fixes #180)
     function schedulePageChange() {
+        clearTimeout(abortedNavigationTimeout);
         clearTimeout(pageChangeTimeout);
         pageChangeTimeout = setTimeout(handlePageChange, 100);
     }
@@ -60,13 +65,34 @@ function initExtension() {
     }
 
     function initPageHandler() {
-        // Take the floating stop-loading button down as soon as YouTube starts navigating, so it
-        // doesn't float over the next page until navigation finishes. Only the button: a full
-        // stopSubs() here would reveal the hidden videos of the feed being left.
+        // Take the header controls and the floating stop-loading button down as soon as YouTube
+        // starts navigating, so they don't stay over the next page until navigation finishes. Only
+        // those: a full stopSubs() here would reveal the hidden videos of the feed being left.
         // Forget the handled page so a navigation back to the same page rebuilds it.
+        // If the navigation never finishes and we're still on the same page, put the controls back.
         document.addEventListener('yt-navigate-start', () => {
-            removeStopLoadingButton();
+            let startPage = getCurrentPage();
+            // a second start before the first finished keeps the page handled before the first
+            if (lastHandledPage !== null) {
+                pageBeforeNavigation = lastHandledPage;
+            }
+            removeControlsOnNavigateStart();
             lastHandledPage = null;
+
+            clearTimeout(abortedNavigationTimeout);
+            abortedNavigationTimeout = setTimeout(() => {
+                if (getCurrentPage() !== startPage || lastHandledPage !== null) {
+                    return;
+                }
+                log("Navigation didn't finish, restoring " + startPage);
+                if (pageBeforeNavigation === startPage) {
+                    lastHandledPage = startPage;
+                    restoreControlsAfterAbortedNavigation();
+                } else {
+                    // the page the controls were built for isn't this one: handle it from scratch
+                    handlePageChange();
+                }
+            }, ABORTED_NAVIGATION_MS);
         });
 
         // Method 1: Try the old progress bar element (for old layout)
