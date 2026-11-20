@@ -417,14 +417,14 @@
 }
 
 .settings-footer__link {
-    color: var(--color-primary);
+    color: var(--color-link);
     text-decoration: none;
     font-weight: 500;
     transition: color var(--transition-fast);
 }
 
 .settings-footer__link:hover {
-    color: var(--color-primary-hover);
+    color: var(--color-link-hover);
     text-decoration: underline;
 }
 
@@ -580,6 +580,17 @@
 
 .modal__body p:last-child {
     margin-bottom: 0;
+}
+
+/* Dark text on the amber badge: white on #f0ad4e is ~1.9:1 */
+.badge-experimental {
+    font-size: 0.7em;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: #f0ad4e;
+    color: #1a1a1a;
+    vertical-align: middle;
+    font-weight: 600;
 }
 
 .modal__radio-group {
