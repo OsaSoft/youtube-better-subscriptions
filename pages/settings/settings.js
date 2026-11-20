@@ -57,7 +57,8 @@ function saveSettings() {
         if (elem.matches('input[type="checkbox"]')) {
             values[elem.id] = elem.checked;
         } else if (elem.matches('select')) {
-            values[elem.id] = parseInt(elem.value, 10);
+            // numeric selects (log level) store numbers, the others their option value
+            values[elem.id] = typeof DEFAULT_SETTINGS[elem.id] === "number" ? parseInt(elem.value, 10) : elem.value;
         } else {
             values[elem.id] = elem.value;
         }
