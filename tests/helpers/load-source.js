@@ -381,6 +381,7 @@ function loadSubsUI() {
     global.buildMarkWatchedButton = context.buildMarkWatchedButton;
     global.processSections = context.processSections;
     global.removeWatchedAndAddButton = context.removeWatchedAndAddButton;
+    global.processRenderedVideo = context.processRenderedVideo;
     global.buildUI = context.buildUI;
     global.removeUI = context.removeUI;
     global.rebuildUI = context.rebuildUI;
@@ -418,6 +419,8 @@ function loadSubs() {
         buildUI: global.buildUI,
         removeUI: global.removeUI,
         removeWatchedAndAddButton: global.removeWatchedAndAddButton,
+        processRenderedVideo: global.processRenderedVideo,
+        MutationObserver: global.MutationObserver,
         processSections: global.processSections,
         loadMoreVideos: global.loadMoreVideos,
         isRendered: global.isRendered,

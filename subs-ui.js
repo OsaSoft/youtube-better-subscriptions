@@ -322,6 +322,48 @@ function removeWatchedAndAddButton() {
     }
 }
 
+// Whether YouTube has finished building a card far enough to judge it: it has its link and, on
+// lockup layouts, the metadata block with the title link in it.
+function isVideoRendered(item) {
+    let lockup = item.querySelector("yt-lockup-view-model, lockup-view-model");
+    if (!lockup) {
+        return item.querySelector("a[href]") != null;
+    }
+    let metadata = lockup.querySelector("yt-lockup-metadata-view-model, lockup-metadata-view-model");
+    return metadata != null && metadata.querySelector("a[href]") != null;
+}
+
+// Handles a card the feed observer (see initSubs) saw YouTube render, before the browser paints it.
+// Unlike removeWatchedAndAddButton() it only hides on positive evidence that the video is watched
+// (stored as watched, or YouTube's progress bar): the other filters read badges that may not have
+// rendered yet, and a card hidden by mistake is never rescanned, so those are left to the periodic
+// scan. Returns whether the card was hidden.
+function processRenderedVideo(item) {
+    if (!isVideoRendered(item)) {
+        // a later mutation inside the card brings it back here
+        return false;
+    }
+
+    let vid = new SubscriptionVideo(item);
+
+    // not markWatched(): that applies every filter, and e.g. a missing duration badge would hide the
+    // card as a premiere
+    if (!vid.isStored && isYouTubeWatched(item)) {
+        vid.recordWatched();
+    }
+    let isHidden = vid.hidesAsWatched();
+    if (isHidden) {
+        vid.hide();
+    }
+
+    // Hidden cards get theirs too, ready for when "Hide watched" is switched off. A compact button
+    // waits for the ⋮: the mutation that adds it brings the card back here.
+    if (!vid.awaitsMenuButton() && !vid.hasButton()) {
+        vid.addButton();
+    }
+    return isHidden;
+}
+
 function removeUI() {
     addedElems.forEach((elem) => {
         elem.remove();  // Safe - doesn't throw if already removed from DOM
