@@ -26,6 +26,7 @@ const DEFAULT_SETTINGS = {
     "settings.hide.mark.watched.button": false,
     "settings.mark.watched.button.compact": true,
     "settings.changelog.auto.open": true,
+    "settings.stop.loading.button.style": "icon-text",
 };
 
 // Constants matching the codebase
@@ -83,6 +84,9 @@ beforeEach(() => {
     global.WATCHED_SYNC_THROTTLE = WATCHED_SYNC_THROTTLE;
     global.DEFAULT_SETTINGS = DEFAULT_SETTINGS;
     global.LOG_LEVEL = LOG_LEVEL;
+    // tests that need the subscriptions feed override this
+    global.isSubscriptionsPage = () => false;
+    document.documentElement.removeAttribute(PREFIX + "stop-loading");
 
     // UI Constants
     global.HIDE_WATCHED_TOGGLE = HIDE_WATCHED_TOGGLE;
