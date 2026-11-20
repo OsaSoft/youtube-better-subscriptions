@@ -60,6 +60,15 @@ function initExtension() {
     }
 
     function initPageHandler() {
+        // Take the floating stop-loading button down as soon as YouTube starts navigating, so it
+        // doesn't float over the next page until navigation finishes. Only the button: a full
+        // stopSubs() here would reveal the hidden videos of the feed being left.
+        // Forget the handled page so a navigation back to the same page rebuilds it.
+        document.addEventListener('yt-navigate-start', () => {
+            removeStopLoadingButton();
+            lastHandledPage = null;
+        });
+
         // Method 1: Try the old progress bar element (for old layout)
         let pageLoader = document.querySelector("yt-page-navigation-progress");
 

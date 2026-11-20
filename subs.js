@@ -74,6 +74,10 @@ function markAllAsWatched() {
 }
 
 function loadMoreVideos() {
+    // the user stopped YouTube from loading older videos (see addStopLoadingButton)
+    if (document.documentElement.hasAttribute(STOP_LOADING_ATTR)) {
+        return;
+    }
     log("Loading more videos");
 
     // workaround to load more videos, slightly scroll in the sidebar :)
@@ -194,6 +198,9 @@ async function initSubs() {
     if (hideCollabsUnsubscribed && isSubscriptionsPage()) {
         buildSubscriptionCache();
     }
+
+    // before buildUI() applies it and before the first hide pass, which may ask YouTube for more videos
+    await loadStopLoadingOlder();
 
     buildUI();
 

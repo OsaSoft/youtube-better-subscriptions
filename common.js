@@ -21,6 +21,7 @@ const DEFAULT_SETTINGS = {
     "settings.hide.mark.watched.button": false,
     "settings.mark.watched.button.compact": true,
     "settings.changelog.auto.open": true,
+    "settings.stop.loading.button.style": "icon-text", // text | icon-text | icon | off
 };
 
 const SETTINGS_KEY = "settings";

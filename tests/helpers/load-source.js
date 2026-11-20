@@ -374,10 +374,17 @@ function loadSubsUI() {
         getCurrentPage: global.getCurrentPage,
         isSubscriptionsPage: global.isSubscriptionsPage,
         isRendered: global.isRendered,
-        hideMostRelevant: global.hideMostRelevant
+        hideMostRelevant: global.hideMostRelevant,
+        DEFAULT_SETTINGS: global.DEFAULT_SETTINGS,
+        MutationObserver: global.MutationObserver
     });
 
     global.COLLAPSE_CLASS = context.COLLAPSE_CLASS;
+    // top-level consts aren't properties of the vm context
+    global.STOP_LOADING_ATTR = vm.runInContext('STOP_LOADING_ATTR', context);
+    global.loadStopLoadingOlder = context.loadStopLoadingOlder;
+    global.addStopLoadingButton = context.addStopLoadingButton;
+    global.isLoadingOlderStopped = context.isLoadingOlderStopped;
     global.buildMarkWatchedButton = context.buildMarkWatchedButton;
     global.processSections = context.processSections;
     global.removeWatchedAndAddButton = context.removeWatchedAndAddButton;
@@ -427,7 +434,10 @@ function loadSubs() {
         getCurrentPage: global.getCurrentPage,
         HIDDEN_CLASS: global.HIDDEN_CLASS,
         sectionDismissableQuery: global.sectionDismissableQuery,
-        sectionContentsQuery: global.sectionContentsQuery
+        sectionContentsQuery: global.sectionContentsQuery,
+        isSubscriptionsPage: global.isSubscriptionsPage,
+        loadStopLoadingOlder: global.loadStopLoadingOlder || (async () => {}),
+        STOP_LOADING_ATTR: global.STOP_LOADING_ATTR
     });
 
     global.isYouTubeWatched = context.isYouTubeWatched;
