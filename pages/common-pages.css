@@ -15,6 +15,9 @@
     --color-danger-hover: #b71c1c;
     --color-danger-text: #d32f2f;
     --color-quota-warn: #f57c00;
+    /* link text: pure red #ff0000 is only ~4:1 on cards */
+    --color-link: #cc0000;
+    --color-link-hover: #a00000;
     --color-field: #ffffff;
     --color-header-from: #fafafa;
     --color-hero-from: #fff5f5;
@@ -94,6 +97,8 @@
         --color-error-text: #ef9a9a;
         --color-danger-text: #ef9a9a;
         --color-quota-warn: #ffb74d;
+        --color-link: #ff5c54;
+        --color-link-hover: #ff7a73;
         --color-warning-bg: #3a2a14;
         --color-warning-text: #ffb74d;
         --color-info-bg: #12263a;
@@ -229,14 +234,14 @@ body {
 }
 
 .page-footer__link {
-    color: var(--color-primary);
+    color: var(--color-link);
     text-decoration: none;
     font-weight: 500;
     transition: color var(--transition-fast);
 }
 
 .page-footer__link:hover {
-    color: var(--color-primary-hover);
+    color: var(--color-link-hover);
     text-decoration: underline;
 }
 
@@ -299,15 +304,20 @@ body {
     height: 20px;
 }
 
+/* Radios in the extension's red instead of the browser's blue */
+input[type="radio"] {
+    accent-color: var(--color-primary);
+}
+
 /* Links in content */
 a {
-    color: var(--color-primary);
+    color: var(--color-link);
     text-decoration: none;
     transition: color var(--transition-fast);
 }
 
 a:hover {
-    color: var(--color-primary-hover);
+    color: var(--color-link-hover);
     text-decoration: underline;
 }
 
