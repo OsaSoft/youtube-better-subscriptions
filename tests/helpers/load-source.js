@@ -45,6 +45,18 @@ function loadSource(filename, additionalContext = {}) {
 }
 
 /**
+ * Read a top-level const, let or class of a loaded script. Those are lexical bindings of the vm
+ * context, not properties of the context object, so context.NAME is undefined (or whatever global
+ * of that name was copied into the context). A let is read as it is now: later reassignments in the
+ * script don't reach the copy, so read it again with this when a test needs its current value.
+ * @param {object} context - A context returned by loadSource() or created with vm.createContext()
+ * @param {string} name - The binding's name
+ */
+function readBinding(context, name) {
+    return vm.runInContext(name, context);
+}
+
+/**
  * Load util.js and expose its functions globally
  */
 function loadUtil() {
@@ -52,8 +64,8 @@ function loadUtil() {
         settings: global.settings || {}
     });
 
-    global.LOG_HEADER = context.LOG_HEADER;
-    global.LOG_LEVEL = context.LOG_LEVEL;
+    global.LOG_HEADER = readBinding(context, 'LOG_HEADER');
+    global.LOG_LEVEL = readBinding(context, 'LOG_LEVEL');
     global.getLogLevel = context.getLogLevel;
     global.log = context.log;
     global.logDebug = context.logDebug;
@@ -85,18 +97,18 @@ function loadCommon() {
         chrome: global.chrome
     });
 
-    global.PREFIX = context.PREFIX;
-    global.DEFAULT_SETTINGS = context.DEFAULT_SETTINGS;
-    global.SETTINGS_KEY = context.SETTINGS_KEY;
-    global.SETTINGS_LOCAL_KEY = context.SETTINGS_LOCAL_KEY;
-    global.VIDEO_WATCH_KEY = context.VIDEO_WATCH_KEY;
-    global.WATCHED_SYNC_THROTTLE = context.WATCHED_SYNC_THROTTLE;
-    global.SYNC_FORMAT_VERSION = context.SYNC_FORMAT_VERSION;
-    global.SYNC_META_KEY = context.SYNC_META_KEY;
-    global.CLEAR_SENTINEL_KEY = context.CLEAR_SENTINEL_KEY;
+    global.PREFIX = readBinding(context, 'PREFIX');
+    global.DEFAULT_SETTINGS = readBinding(context, 'DEFAULT_SETTINGS');
+    global.SETTINGS_KEY = readBinding(context, 'SETTINGS_KEY');
+    global.SETTINGS_LOCAL_KEY = readBinding(context, 'SETTINGS_LOCAL_KEY');
+    global.VIDEO_WATCH_KEY = readBinding(context, 'VIDEO_WATCH_KEY');
+    global.WATCHED_SYNC_THROTTLE = readBinding(context, 'WATCHED_SYNC_THROTTLE');
+    global.SYNC_FORMAT_VERSION = readBinding(context, 'SYNC_FORMAT_VERSION');
+    global.SYNC_META_KEY = readBinding(context, 'SYNC_META_KEY');
+    global.CLEAR_SENTINEL_KEY = readBinding(context, 'CLEAR_SENTINEL_KEY');
     global.isVideoKey = context.isVideoKey;
-    global.brwsr = context.brwsr;
-    global.watchedVideos = context.watchedVideos;
+    global.brwsr = readBinding(context, 'brwsr');
+    global.watchedVideos = readBinding(context, 'watchedVideos');
     global.syncStorageGet = context.syncStorageGet;
     global.localStorageGet = context.localStorageGet;
     global.saveVideoOperation = context.saveVideoOperation;
@@ -107,8 +119,8 @@ function loadCommon() {
     global.clearOldestVideos = context.clearOldestVideos;
     global.getCurrentPage = context.getCurrentPage;
     global.isSubscriptionsPage = context.isSubscriptionsPage;
-    global.lastSyncUpdate = context.lastSyncUpdate;
-    global.lastSyncError = context.lastSyncError;
+    global.lastSyncUpdate = readBinding(context, 'lastSyncUpdate');
+    global.lastSyncError = readBinding(context, 'lastSyncError');
     global.encodeTimestamp = context.encodeTimestamp;
     global.decodeTimestamp = context.decodeTimestamp;
     global.packSyncEntry = context.packSyncEntry;
@@ -179,7 +191,7 @@ function loadVideo() {
     global.isMembersOnly = context.isMembersOnly;
     global.getPosterChannelId = context.getPosterChannelId;
     global.changeMarkWatchedToMarkUnwatched = context.changeMarkWatchedToMarkUnwatched;
-    global.Video = context.Video;
+    global.Video = readBinding(context, 'Video');
 
     return context;
 }
@@ -263,8 +275,8 @@ function loadSubscriptionsVideo() {
     global.isMembersOnly = context.isMembersOnly;
     global.getPosterChannelId = context.getPosterChannelId;
     global.changeMarkWatchedToMarkUnwatched = context.changeMarkWatchedToMarkUnwatched;
-    global.Video = context.Video;
-    global.SubscriptionVideo = context.SubscriptionVideo;
+    global.Video = readBinding(context, 'Video');
+    global.SubscriptionVideo = readBinding(context, 'SubscriptionVideo');
     global.createSubscriptionVideo = context.createSubscriptionVideo;
 
     return context;
@@ -318,9 +330,9 @@ function loadSettingsLoader(autoLoad = false) {
     vm.createContext(context);
     vm.runInContext(code, context, { filename: filePath });
 
-    global.settings = context.settings;
-    global.settingsLoadedCallbacks = context.settingsLoadedCallbacks;
-    global.settingsLoaded = context.settingsLoaded;
+    global.settings = readBinding(context, 'settings');
+    global.settingsLoadedCallbacks = readBinding(context, 'settingsLoadedCallbacks');
+    global.settingsLoaded = readBinding(context, 'settingsLoaded');
     global.migrateSettings = context.migrateSettings;
     global.settingsChanged = context.settingsChanged;
     global.showSettingsUpdatedNotification = context.showSettingsUpdatedNotification;
@@ -379,9 +391,8 @@ function loadSubsUI() {
         MutationObserver: global.MutationObserver
     });
 
-    global.COLLAPSE_CLASS = context.COLLAPSE_CLASS;
-    // top-level consts aren't properties of the vm context
-    global.STOP_LOADING_ATTR = vm.runInContext('STOP_LOADING_ATTR', context);
+    global.COLLAPSE_CLASS = readBinding(context, 'COLLAPSE_CLASS');
+    global.STOP_LOADING_ATTR = readBinding(context, 'STOP_LOADING_ATTR');
     global.loadStopLoadingOlder = context.loadStopLoadingOlder;
     global.addStopLoadingButton = context.addStopLoadingButton;
     global.isLoadingOlderStopped = context.isLoadingOlderStopped;
@@ -444,18 +455,19 @@ function loadSubs() {
     global.getVideoTitle = context.getVideoTitle;
     global.initSubs = context.initSubs;
     global.stopSubs = context.stopSubs;
-    global.hidden = context.hidden;
-    global.hideWatched = context.hideWatched;
-    global.hidePremieres = context.hidePremieres;
-    global.hideShorts = context.hideShorts;
-    global.hideLives = context.hideLives;
-    global.hideMembersOnly = context.hideMembersOnly;
+    global.hidden = readBinding(context, 'hidden');
+    global.hideWatched = readBinding(context, 'hideWatched');
+    global.hidePremieres = readBinding(context, 'hidePremieres');
+    global.hideShorts = readBinding(context, 'hideShorts');
+    global.hideLives = readBinding(context, 'hideLives');
+    global.hideMembersOnly = readBinding(context, 'hideMembersOnly');
 
     return context;
 }
 
 module.exports = {
     loadSource,
+    readBinding,
     loadUtil,
     loadCommon,
     loadQueries,

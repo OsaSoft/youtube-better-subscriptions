@@ -509,10 +509,108 @@ describe('Video.js', () => {
         });
     });
 
-    // Video class tests are skipped because JS classes in vm.runInContext
-    // cannot be instantiated from outside the context. These would need
-    // a different testing approach (e.g., bundling or different module system).
-    describe.skip('Video class', () => {
-        // Tests would go here if we had a proper module system
+    describe('Video class', () => {
+        // loads Video.js again so the class sees the hide flags and watched videos set here
+        function videoClass({ watched = {}, flags = {} } = {}) {
+            global.watchedVideos = watched;
+            Object.assign(global, {
+                hideWatched: false, hidePremieres: false, hideShorts: false, hideLives: false,
+                hideMembersOnly: false, hideCollabsUnsubscribed: false,
+            }, flags);
+            loadVideo();
+            return global.Video;
+        }
+
+        function card(href, duration = '3:45') {
+            document.body.innerHTML = `
+                <div id="container">
+                    <a id="video-title" href="${href}">Title</a>
+                    ${duration ? `<div class="ytBadgeShapeText">${duration}</div>` : ''}
+                </div>
+            `;
+            return document.getElementById('container');
+        }
+
+        test('reads the video id and whether it is stored as watched', () => {
+            const Video = videoClass({ watched: { 'wabc12345678': 1000 } });
+
+            const watched = new Video(card('/watch?v=abc12345678'));
+            const other = new Video(card('/watch?v=xyz12345678'));
+
+            expect(watched.videoId).toBe('abc12345678');
+            expect(watched.isStored).toBeTruthy();
+            expect(watched.buttonId).toBe(MARK_UNWATCHED_BTN);
+            expect(other.isStored).toBeFalsy();
+            expect(other.buttonId).toBe(MARK_WATCHED_BTN);
+        });
+
+        test('a shorts link is a short, not a premiere', () => {
+            const Video = videoClass();
+            const video = new Video(card('/shorts/abc12345678', null));
+
+            expect(video.isShort).toBe(true);
+            expect(video.isPremiere).toBeFalsy();
+        });
+
+        test('a regular video without a duration badge is a premiere', () => {
+            const Video = videoClass();
+            const video = new Video(card('/watch?v=abc12345678', null));
+
+            expect(video.isShort).toBe(false);
+            expect(video.isPremiere).toBe(true);
+        });
+
+        test('shouldHide follows the hide flags', () => {
+            const watched = { 'wabc12345678': 1000 };
+            expect(new (videoClass({ watched, flags: { hideWatched: true } }))(card('/watch?v=abc12345678')).shouldHide()).toBe(true);
+            expect(new (videoClass({ watched, flags: { hideWatched: false } }))(card('/watch?v=abc12345678')).shouldHide()).toBe(false);
+            expect(new (videoClass({ flags: { hideShorts: true } }))(card('/shorts/abc12345678', null)).shouldHide()).toBe(true);
+            expect(new (videoClass({ flags: { hidePremieres: true } }))(card('/watch?v=abc12345678', null)).shouldHide()).toBe(true);
+            expect(new (videoClass({ flags: { hideShorts: true, hidePremieres: true } }))(card('/watch?v=abc12345678')).shouldHide()).toBe(false);
+        });
+
+        test('hide() hides the card and remembers it', () => {
+            const Video = videoClass();
+            const div = card('/watch?v=abc12345678');
+
+            new Video(div).hide();
+
+            expect(div.style.display).toBe('none');
+            expect(div.classList.contains(HIDDEN_CLASS)).toBe(true);
+            expect(global.hidden).toContain(div);
+        });
+
+        test('markWatched stores and syncs the video, and hides it while hiding watched', () => {
+            const Video = videoClass({ flags: { hideWatched: true } });
+            const div = card('/watch?v=abc12345678');
+            const video = new Video(div);
+
+            video.markWatched();
+
+            expect(global.watchVideo).toHaveBeenCalledWith('abc12345678');
+            expect(global.syncWatchedVideos).toHaveBeenCalled();
+            expect(video.isStored).toBe(true);
+            expect(video.buttonId).toBe(MARK_UNWATCHED_BTN);
+            expect(div.style.display).toBe('none');
+            expect(global.processSections).toHaveBeenCalled();
+        });
+
+        test('markUnwatched unstores and syncs the video', () => {
+            const Video = videoClass({ watched: { 'wabc12345678': 1000 } });
+
+            new Video(card('/watch?v=abc12345678')).markUnwatched();
+
+            expect(global.unwatchVideo).toHaveBeenCalledWith('abc12345678');
+            expect(global.syncWatchedVideos).toHaveBeenCalled();
+        });
+
+        test('leaves the buttons to subclasses', () => {
+            const Video = videoClass();
+            const video = new Video(card('/watch?v=abc12345678'));
+
+            expect(() => video.hasButton()).toThrow('Subclasses must implement hasButton method');
+            expect(() => video.addButton()).toThrow('Subclasses must implement addButton method');
+            expect(video.getFadeTarget()).toBeNull();
+        });
     });
 });
