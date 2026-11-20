@@ -351,9 +351,9 @@ async function runSyncDiagnostics() {
 
         // Color-code usage based on quota usage
         if (usagePercent > 95) {
-            usageEl.style.color = "#c62828";  // Red
+            usageEl.style.color = "var(--color-error-text)";  // Red
         } else if (usagePercent > 80) {
-            usageEl.style.color = "#f57c00";  // Orange
+            usageEl.style.color = "var(--color-quota-warn)";  // Orange
         } else {
             usageEl.style.color = "";  // Reset to default
         }
