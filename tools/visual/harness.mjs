@@ -7,7 +7,7 @@
 //
 //   node tools/visual/harness.mjs record --out <dir> [--ext <path>] [--url <url>] [--seconds N]
 //                                        [--theme light|dark] [--seed <storage.json>] [--headed]
-//                                        [--actions <steps.mjs>]
+//                                        [--actions <steps.mjs>] [--init-script <file.js>]
 //       Launches Chromium with the extension from --ext (default: repo root; pass a worktree
 //       path to record another build), opens --url (default: subscriptions feed), records a
 //       video plus a screenshot at the end into --out. --actions runs a script of clicks first.
@@ -108,6 +108,11 @@ async function record(args) {
             expires: Math.floor(Date.now() / 1000) + 3600 * 24 * 365, secure: true, sameSite: 'Lax',
         }]);
 
+        if (args['init-script']) {
+            // Runs in every page before YouTube's own scripts: for measurements that must see the load.
+            await ctx.addInitScript({ path: resolve(args['init-script']) });
+        }
+
         page = ctx.pages()[0] || await ctx.newPage();
         await page.goto(url, { waitUntil: 'domcontentloaded' });
         await page.waitForSelector('ytd-masthead #end', { timeout: 15000 }).catch(() => {});
@@ -141,6 +146,6 @@ const cmd = args._[0];
 if (cmd === 'login') await login();
 else if (cmd === 'record') await record(args);
 else {
-    console.error('Usage: harness.mjs login | record --out <dir> [--ext <path>] [--url <url>] [--seconds N] [--theme light|dark] [--seed file] [--actions steps.mjs] [--headed]');
+    console.error('Usage: harness.mjs login | record --out <dir> [--ext <path>] [--url <url>] [--seconds N] [--theme light|dark] [--seed file] [--actions steps.mjs] [--init-script file.js] [--headed]');
     process.exit(1);
 }
