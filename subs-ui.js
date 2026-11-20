@@ -35,6 +35,13 @@ const RESUME_LOADING_ICON = [
 
 let addedElems = [];
 
+// true from the start of a YouTube navigation (see removeControlsOnNavigateStart) until stopSubs()
+// unloads the page: buildUI() and rebuildUI() must not put controls back on the page being left
+let navigatingAway = false;
+// whether removeControlsOnNavigateStart() took anything down, i.e. there is something to restore
+// if the navigation never finishes
+let removedOnNavigateStart = false;
+
 // whether the user stopped YouTube from loading older videos on the subscriptions feed (per device)
 let stopLoadingOlder = false;
 let stopLoadingObservers = [];
@@ -62,6 +69,9 @@ function showWatched() {
 }
 
 function buildUI() {
+    if (navigatingAway) {
+        return;
+    }
     log("Building subs UI");
 
     // first, so loading is stopped even if the header controls below find no place to go. Floating,
@@ -195,7 +205,9 @@ function stopLoadingStorageChanged(changes, areaName) {
     }
 }
 
-function removeStopLoadingButton() {
+// keepLoadingStopped: leave the attribute that stops loading, so the feed being left doesn't load
+// another batch while YouTube navigates (stopSubs() clears it)
+function removeStopLoadingButton(keepLoadingStopped = false) {
     brwsr.storage.onChanged.removeListener(stopLoadingStorageChanged);
     stopLoadingObservers.forEach(observer => observer.disconnect());
     stopLoadingObservers = [];
@@ -206,7 +218,9 @@ function removeStopLoadingButton() {
     if (button) {
         button.remove();
     }
-    document.documentElement.removeAttribute(STOP_LOADING_ATTR);
+    if (!keepLoadingStopped) {
+        document.documentElement.removeAttribute(STOP_LOADING_ATTR);
+    }
 }
 
 // The box of YouTube's miniplayer while it is on screen in the bottom right, or null. Judged by
@@ -583,7 +597,38 @@ function processRenderedVideo(item) {
     return isHidden;
 }
 
+// Takes the header controls and the floating stop-loading button down as soon as YouTube starts
+// navigating, so they don't stay over the next page until navigation finishes. Unlike removeUI() it
+// leaves the hidden videos of the feed being left hidden, and loading stopped if it was.
+function removeControlsOnNavigateStart() {
+    removedOnNavigateStart = removedOnNavigateStart || addedElems.length > 0 ||
+        document.getElementById(STOP_LOADING_BTN) != null;
+    navigatingAway = true;
+    addedElems.forEach(elem => elem.remove());
+    addedElems = [];
+    removeStopLoadingButton(true);
+}
+
+// A navigation started but never finished (e.g. the next page failed to load) and the page is still
+// the one the controls were taken from: put them back.
+function restoreControlsAfterAbortedNavigation() {
+    if (!navigatingAway) {
+        return;
+    }
+    navigatingAway = false;
+    if (removedOnNavigateStart) {
+        removedOnNavigateStart = false;
+        try {
+            buildUI();
+        } catch (e) {
+            logError(e);
+        }
+    }
+}
+
 function removeUI() {
+    navigatingAway = false;
+    removedOnNavigateStart = false;
     addedElems.forEach((elem) => {
         elem.remove();  // Safe - doesn't throw if already removed from DOM
     });
@@ -607,7 +652,7 @@ function removeUI() {
 }
 
 function rebuildUI() {
-    if (isSubscriptionsPage()) {
+    if (isSubscriptionsPage() && !navigatingAway) {
         try {
             removeUI();
             buildUI();
