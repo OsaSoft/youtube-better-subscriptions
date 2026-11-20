@@ -11,7 +11,34 @@ const HIDDEN_CLASS = PREFIX + "hidden";
 const COLLAPSE_CLASS = PREFIX + "collapse-section";
 const EMPTY_SHELF_HIDDEN_CLASS = PREFIX + "empty-shelf-hidden";
 
+const STOP_LOADING_BTN = PREFIX + "stop-loading-older";
+// set on <html> while loading is stopped; a rule in subs.css hides YouTube's continuation element under it
+const STOP_LOADING_ATTR = PREFIX + "stop-loading";
+// storage.local key. Must not be 11 or 12 characters long: loadWatchedVideos() reads all of
+// storage.local and treats such keys as (old format) video ids.
+const STOP_LOADING_KEY = "subs_stop_loading_older";
+const STOP_LOADING_STYLES = ["text", "icon-text", "icon", "off"];
+const STOP_LOADING_LABEL = "Stop loading older videos";
+const RESUME_LOADING_LABEL = "Resume loading older videos";
+const SVG_NS = "http://www.w3.org/2000/svg";
+// crossed-out clock / rewind clock, drawn in currentColor so they follow the theme
+const STOP_LOADING_ICON = [
+    ["circle", {cx: "12", cy: "12", r: "8.5"}],
+    ["path", {d: "M12 7.5V12l2.5 1.5"}],
+    ["path", {d: "M4.5 4.5l15 15"}],
+];
+const RESUME_LOADING_ICON = [
+    ["path", {d: "M3.5 12a8.5 8.5 0 1 0 2.5-6"}],
+    ["path", {d: "M3 4v4h4"}],
+    ["path", {d: "M12 7.5V12l3 2"}],
+];
+
 let addedElems = [];
+
+// whether the user stopped YouTube from loading older videos on the subscriptions feed (per device)
+let stopLoadingOlder = false;
+let stopLoadingObservers = [];
+let stopLoadingPlaceTimeout = null;
 
 // show shelves (e.g. Shorts) that were hidden because all of their videos were hidden
 function showEmptyShelves() {
@@ -37,12 +64,206 @@ function showWatched() {
 function buildUI() {
     log("Building subs UI");
 
+    // first, so loading is stopped even if the header controls below find no place to go. Floating,
+    // so kept out of addedElems (which the stick-right line below moves into the header).
+    addStopLoadingButton();
+
     addHideWatchedCheckbox();
     addHideAllMenuButton();
     addSettingsButton();
 
     if (settings["settings.hide.watched.ui.stick.right"])
         addedElems[0].after(...addedElems)
+}
+
+function getStopLoadingStyle() {
+    let style = settings["settings.stop.loading.button.style"];
+    return STOP_LOADING_STYLES.includes(style) ? style : DEFAULT_SETTINGS["settings.stop.loading.button.style"];
+}
+
+// Whether YouTube is kept from loading older videos: only on the subscriptions feed, and never with
+// the button turned off (a stored "stopped" state is then ignored, so loading can't get stuck).
+function isLoadingOlderStopped() {
+    return stopLoadingOlder && getStopLoadingStyle() !== "off" && isSubscriptionsPage();
+}
+
+async function loadStopLoadingOlder() {
+    if (!isSubscriptionsPage()) {
+        stopLoadingOlder = false;
+        return;
+    }
+    let items = await new Promise(resolve => brwsr.storage.local.get(STOP_LOADING_KEY, resolve));
+    stopLoadingOlder = (items && items[STOP_LOADING_KEY]) === true;
+}
+
+function applyStopLoadingOlder() {
+    document.documentElement.toggleAttribute(STOP_LOADING_ATTR, isLoadingOlderStopped());
+}
+
+function buildSvgIcon(shapes) {
+    let svg = document.createElementNS(SVG_NS, "svg");
+    let attrs = {
+        "viewBox": "0 0 24 24", "fill": "none", "stroke": "currentColor", "stroke-width": "2",
+        "stroke-linecap": "round", "stroke-linejoin": "round", "aria-hidden": "true",
+    };
+    for (let name in attrs) {
+        svg.setAttribute(name, attrs[name]);
+    }
+    for (let [tag, shapeAttrs] of shapes) {
+        let shape = document.createElementNS(SVG_NS, tag);
+        for (let name in shapeAttrs) {
+            shape.setAttribute(name, shapeAttrs[name]);
+        }
+        svg.appendChild(shape);
+    }
+    return svg;
+}
+
+function renderStopLoadingButton(button) {
+    let style = getStopLoadingStyle();
+    let stopped = isLoadingOlderStopped();
+    let label = stopped ? RESUME_LOADING_LABEL : STOP_LOADING_LABEL;
+
+    button.setAttribute("data-state", stopped ? "stopped" : "loading");
+    button.setAttribute("data-style", style);
+    button.setAttribute("title", label);
+    button.setAttribute("aria-label", label);
+    button.replaceChildren();
+    if (style !== "text") {
+        button.appendChild(buildSvgIcon(stopped ? RESUME_LOADING_ICON : STOP_LOADING_ICON));
+    }
+    if (style !== "icon") {
+        let text = document.createElement("span");
+        text.textContent = label;
+        button.appendChild(text);
+    }
+}
+
+function stopLoadingOlderClicked() {
+    try {
+        stopLoadingOlder = !isLoadingOlderStopped();
+        log("Loading older videos " + (stopLoadingOlder ? "stopped" : "resumed"));
+        brwsr.storage.local.set({[STOP_LOADING_KEY]: stopLoadingOlder});
+        applyStopLoadingOlder();
+        let button = document.getElementById(STOP_LOADING_BTN);
+        if (button) {
+            renderStopLoadingButton(button);
+        }
+    } catch (e) {
+        logError(e);
+    }
+}
+
+// Floating "Stop/Resume loading older videos" button on the subscriptions feed (#63): YouTube loads the
+// next batch whenever its continuation element is in view, which with watched videos hidden is all
+// the time, so it would load years of history.
+function addStopLoadingButton() {
+    removeStopLoadingButton();
+    applyStopLoadingOlder();
+
+    if (!isSubscriptionsPage() || getStopLoadingStyle() === "off" || !document.body) {
+        return;
+    }
+
+    let button = document.createElement("button");
+    button.setAttribute("id", STOP_LOADING_BTN);
+    button.setAttribute("type", "button");
+    button.classList.add("subs-btn-stop-loading");
+    button.addEventListener("click", stopLoadingOlderClicked);
+    renderStopLoadingButton(button);
+    document.body.appendChild(button);
+
+    brwsr.storage.onChanged.addListener(stopLoadingStorageChanged);
+    watchMiniplayer();
+}
+
+// keeps other open subscriptions tabs in step with a click in this one
+function stopLoadingStorageChanged(changes, areaName) {
+    if (areaName !== "local" || !(STOP_LOADING_KEY in changes)) {
+        return;
+    }
+    try {
+        stopLoadingOlder = changes[STOP_LOADING_KEY].newValue === true;
+        applyStopLoadingOlder();
+        let button = document.getElementById(STOP_LOADING_BTN);
+        if (button) {
+            renderStopLoadingButton(button);
+        }
+    } catch (e) {
+        logError(e);
+    }
+}
+
+function removeStopLoadingButton() {
+    brwsr.storage.onChanged.removeListener(stopLoadingStorageChanged);
+    stopLoadingObservers.forEach(observer => observer.disconnect());
+    stopLoadingObservers = [];
+    window.removeEventListener("resize", scheduleStopLoadingPlacement);
+    clearTimeout(stopLoadingPlaceTimeout);
+
+    let button = document.getElementById(STOP_LOADING_BTN);
+    if (button) {
+        button.remove();
+    }
+    document.documentElement.removeAttribute(STOP_LOADING_ATTR);
+}
+
+// The box of YouTube's miniplayer while it is on screen in the bottom right, or null. Judged by
+// geometry rather than by a state attribute, so a renamed attribute doesn't break it: the host
+// element, or one of its children when the host box is empty or covers most of the page.
+function getMiniplayerRect() {
+    let miniplayer = document.querySelector("ytd-miniplayer");
+    if (!miniplayer || window.getComputedStyle(miniplayer).visibility === "hidden") {
+        return null;
+    }
+    for (let elem of [miniplayer, ...miniplayer.children]) {
+        let rect = elem.getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0 &&
+                rect.width < window.innerWidth * 0.75 && rect.height < window.innerHeight * 0.75 &&
+                rect.top < window.innerHeight && rect.bottom > 0 &&
+                rect.right > window.innerWidth - 200) {
+            return rect;
+        }
+    }
+    return null;
+}
+
+// moves the button up above the miniplayer while that is open
+function placeStopLoadingButton() {
+    let button = document.getElementById(STOP_LOADING_BTN);
+    if (!button) {
+        return;
+    }
+    let rect = getMiniplayerRect();
+    button.style.bottom = rect ? (window.innerHeight - rect.top + 16) + "px" : "";
+}
+
+function scheduleStopLoadingPlacement() {
+    placeStopLoadingButton();
+    // and again once YouTube's open/close animation has settled
+    clearTimeout(stopLoadingPlaceTimeout);
+    stopLoadingPlaceTimeout = setTimeout(placeStopLoadingButton, 400);
+}
+
+function watchMiniplayer() {
+    window.addEventListener("resize", scheduleStopLoadingPlacement);
+
+    // ytd-app has miniplayer-is-active while the miniplayer is open
+    let app = document.querySelector("ytd-app");
+    if (app) {
+        let mutationObserver = new MutationObserver(scheduleStopLoadingPlacement);
+        mutationObserver.observe(app, {attributes: true, attributeFilter: ["miniplayer-is-active"]});
+        stopLoadingObservers.push(mutationObserver);
+    }
+
+    let miniplayer = document.querySelector("ytd-miniplayer");
+    if (miniplayer && typeof ResizeObserver !== "undefined") {
+        let resizeObserver = new ResizeObserver(scheduleStopLoadingPlacement);
+        resizeObserver.observe(miniplayer);
+        stopLoadingObservers.push(resizeObserver);
+    }
+
+    scheduleStopLoadingPlacement();
 }
 
 function buildMenuButtonContainer() {
@@ -370,6 +591,7 @@ function removeUI() {
     });
 
     addedElems = [];
+    removeStopLoadingButton();
 
     // delete built buttons and strip containers
     document.querySelectorAll(".subs-btn-container").forEach(e => e.remove());

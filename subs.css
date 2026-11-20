@@ -172,3 +172,90 @@ html[dark] .subs-btn-container .subs-btn-mark-unwatched:active {
 #end.ytd-masthead {
   min-width: auto !important;
 }
+
+/* Stop loading older videos (#63): with the continuation element gone YouTube has nothing to scroll
+   into view, so it stops loading batches. Only set on the subscriptions feed (see subs-ui.js), and
+   scoped to it so home/channel grids are never hit in the moment before stopSubs() clears it. */
+html[osasoft-better-subscriptions_stop-loading] ytd-browse[page-subtype="subscriptions"] ytd-rich-grid-renderer > #contents > ytd-continuation-item-renderer {
+  display: none !important;
+}
+
+/* Floating stop/resume button, styled like YouTube's own chips */
+.subs-btn-stop-loading {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  /* above the feed, below YouTube's masthead, popups and dialogs */
+  z-index: 2000;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-sizing: border-box;
+  height: 36px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 18px;
+  font-family: "Roboto", "YouTube Sans", Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 36px;
+  white-space: nowrap;
+  cursor: pointer;
+  background-color: #f2f2f2;
+  color: #0f0f0f;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: background-color 0.1s, bottom 0.2s;
+}
+
+.subs-btn-stop-loading:hover {
+  background-color: #e5e5e5;
+}
+
+.subs-btn-stop-loading[data-state="stopped"] {
+  background-color: #0f0f0f;
+  color: #fff;
+}
+
+.subs-btn-stop-loading[data-state="stopped"]:hover {
+  background-color: #272727;
+}
+
+html[dark] .subs-btn-stop-loading {
+  background-color: #272727;
+  color: #f1f1f1;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+html[dark] .subs-btn-stop-loading:hover {
+  background-color: #3f3f3f;
+}
+
+html[dark] .subs-btn-stop-loading[data-state="stopped"] {
+  background-color: #f1f1f1;
+  color: #0f0f0f;
+}
+
+html[dark] .subs-btn-stop-loading[data-state="stopped"]:hover {
+  background-color: #d9d9d9;
+}
+
+.subs-btn-stop-loading:focus-visible {
+  outline: 2px solid #065fd4;
+  outline-offset: 2px;
+}
+
+.subs-btn-stop-loading svg {
+  flex: none;
+  width: 20px;
+  height: 20px;
+}
+
+.subs-btn-stop-loading[data-style="icon-text"] {
+  padding-left: 12px;
+}
+
+.subs-btn-stop-loading[data-style="icon"] {
+  justify-content: center;
+  width: 36px;
+  padding: 0;
+}
