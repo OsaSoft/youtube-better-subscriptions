@@ -13,6 +13,28 @@
     --color-success: #2e7d32;
     --color-danger: #d32f2f;
     --color-danger-hover: #b71c1c;
+    --color-danger-text: #d32f2f;
+    --color-quota-warn: #f57c00;
+    --color-field: #ffffff;
+    --color-header-from: #fafafa;
+    --color-hero-from: #fff5f5;
+    --color-hover: rgba(0, 0, 0, 0.02);
+    --color-divider: #f0f0f0;
+    --color-toggle-off: #ccc;
+    --color-btn-secondary: #f0f0f0;
+    --color-btn-secondary-hover: #e5e5e5;
+    --color-subtle-bg: #f9f9f9;
+    --color-toast-bg: #0f0f0f;
+    --color-toast-text: #ffffff;
+    --color-backdrop: rgba(0, 0, 0, 0.5);
+    --color-success-bg: #e8f5e9;
+    --color-success-text: #2e7d32;
+    --color-error-bg: #ffebee;
+    --color-error-text: #c62828;
+    --color-warning-bg: #fff3e0;
+    --color-warning-text: #e65100;
+    --color-info-bg: #e3f2fd;
+    --color-info-text: #1565c0;
 
     /* Spacing */
     --spacing-xs: 4px;
@@ -42,6 +64,55 @@
     /* Transitions */
     --transition-fast: 150ms ease;
     --transition-normal: 200ms ease;
+
+    color-scheme: light dark;
+}
+
+/* Dark theme follows the browser/OS setting; colours match YouTube's dark theme */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-bg: #0f0f0f;
+        --color-card: #212121;
+        --color-text: #f1f1f1;
+        --color-text-secondary: #aaaaaa;
+        --color-border: #3f3f3f;
+        --color-field: #121212;
+        --color-header-from: #282828;
+        --color-hero-from: #3a1d1d;
+        --color-hover: rgba(255, 255, 255, 0.04);
+        --color-divider: #303030;
+        --color-toggle-off: #5a5a5a;
+        --color-btn-secondary: #3a3a3a;
+        --color-btn-secondary-hover: #4a4a4a;
+        --color-subtle-bg: #181818;
+        --color-toast-bg: #f1f1f1;
+        --color-toast-text: #0f0f0f;
+        --color-backdrop: rgba(0, 0, 0, 0.7);
+        --color-success-bg: #1b3320;
+        --color-success-text: #81c784;
+        --color-error-bg: #3b1c1c;
+        --color-error-text: #ef9a9a;
+        --color-danger-text: #ef9a9a;
+        --color-quota-warn: #ffb74d;
+        --color-warning-bg: #3a2a14;
+        --color-warning-text: #ffb74d;
+        --color-info-bg: #12263a;
+        --color-info-text: #90caf9;
+        --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.4);
+        --shadow-card-hover: 0 4px 8px rgba(0, 0, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.4);
+    }
+
+    /* the logo image is black */
+    .settings-header__logo,
+    .page-header__logo {
+        filter: invert(1);
+    }
+
+    /* the light theme's faint focus rings disappear on dark backgrounds */
+    .btn-primary:focus,
+    .btn-secondary:focus {
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.35);
+    }
 }
 
 /* Reset & Base */
@@ -122,7 +193,7 @@ body {
     gap: var(--spacing-sm);
     padding: var(--spacing-md) var(--spacing-lg);
     border-bottom: 1px solid var(--color-border);
-    background: linear-gradient(to bottom, #fafafa, #ffffff);
+    background: linear-gradient(to bottom, var(--color-header-from), var(--color-card));
 }
 
 .card__icon {
@@ -211,12 +282,12 @@ body {
 }
 
 .btn-secondary {
-    background: #f0f0f0;
+    background: var(--color-btn-secondary);
     color: var(--color-text);
 }
 
 .btn-secondary:hover {
-    background: #e5e5e5;
+    background: var(--color-btn-secondary-hover);
 }
 
 .btn-secondary:focus {
