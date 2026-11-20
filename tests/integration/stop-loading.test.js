@@ -239,11 +239,50 @@ describe('stop loading older videos', () => {
         expect(order.slice(0, 3)).toEqual(['load', 'buildUI', 'scan']);
     });
 
-    test('subs.css hides the continuation element only under the attribute', () => {
+    test('subs.css hides the continuation element of the grid and list layouts only under the attribute', () => {
         const css = fs.readFileSync(path.join(__dirname, '../../subs.css'), 'utf8');
         expect(css).toContain(
-            `html[${ATTR}] ytd-browse[page-subtype="subscriptions"] ytd-rich-grid-renderer > #contents > ytd-continuation-item-renderer {\n  display: none !important;`
+            `html[${ATTR}] ytd-browse[page-subtype="subscriptions"] ytd-rich-grid-renderer > #contents > ytd-continuation-item-renderer,\n` +
+            `html[${ATTR}] ytd-browse[page-subtype="subscriptions"] ytd-section-list-renderer > #contents > ytd-continuation-item-renderer {\n  display: none !important;`
         );
+    });
+
+    describe('subs.css rule in the page', () => {
+        const css = fs.readFileSync(path.join(__dirname, '../../subs.css'), 'utf8');
+        const rule = css.match(/[^{}]*ytd-continuation-item-renderer[^{}]*\{[^}]*\}/)[0];
+
+        function continuation(html) {
+            const style = document.createElement('style');
+            style.textContent = rule;
+            document.head.appendChild(style);
+            document.body.innerHTML = html;
+            const elem = document.querySelector('ytd-continuation-item-renderer');
+            const display = window.getComputedStyle(elem).display;
+            style.remove();
+            return display;
+        }
+
+        const grid = (subtype) => `<ytd-browse page-subtype="${subtype}"><ytd-rich-grid-renderer><div id="contents">` +
+            '<ytd-continuation-item-renderer></ytd-continuation-item-renderer></div></ytd-rich-grid-renderer></ytd-browse>';
+        const list = (subtype) => `<ytd-browse page-subtype="${subtype}"><ytd-section-list-renderer><div id="contents">` +
+            '<ytd-item-section-renderer></ytd-item-section-renderer>' +
+            '<ytd-continuation-item-renderer></ytd-continuation-item-renderer></div></ytd-section-list-renderer></ytd-browse>';
+
+        afterEach(() => root().removeAttribute(ATTR));
+
+        test.each([['grid', grid], ['list', list]])('hides the %s layout continuation while stopped', (name, layout) => {
+            root().setAttribute(ATTR, '');
+            expect(continuation(layout('subscriptions'))).toBe('none');
+        });
+
+        test.each([['grid', grid], ['list', list]])('leaves the %s layout continuation alone while loading', (name, layout) => {
+            expect(continuation(layout('subscriptions'))).not.toBe('none');
+        });
+
+        test.each([['grid', grid], ['list', list]])('leaves the %s layout of other pages alone', (name, layout) => {
+            root().setAttribute(ATTR, '');
+            expect(continuation(layout('home'))).not.toBe('none');
+        });
     });
 });
 

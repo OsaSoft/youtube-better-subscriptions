@@ -176,7 +176,8 @@ html[dark] .subs-btn-container .subs-btn-mark-unwatched:active {
 /* Stop loading older videos (#63): with the continuation element gone YouTube has nothing to scroll
    into view, so it stops loading batches. Only set on the subscriptions feed (see subs-ui.js), and
    scoped to it so home/channel grids are never hit in the moment before stopSubs() clears it. */
-html[osasoft-better-subscriptions_stop-loading] ytd-browse[page-subtype="subscriptions"] ytd-rich-grid-renderer > #contents > ytd-continuation-item-renderer {
+html[osasoft-better-subscriptions_stop-loading] ytd-browse[page-subtype="subscriptions"] ytd-rich-grid-renderer > #contents > ytd-continuation-item-renderer,
+html[osasoft-better-subscriptions_stop-loading] ytd-browse[page-subtype="subscriptions"] ytd-section-list-renderer > #contents > ytd-continuation-item-renderer {
   display: none !important;
 }
 
