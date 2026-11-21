@@ -1,0 +1,41 @@
+<!doctype html>
+<!-- 440x280 small promo tile: ?tagline=… -->
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&display=block">
+    <link rel="stylesheet" href="store.css">
+</head>
+<body class="tile">
+    <section class="copy">
+        <span class="chip"><img src="../../../icons/ic_video_library_black_128dp_1x.png" alt=""></span>
+        <h1>Better<br>Subscriptions</h1>
+        <span class="accent"></span>
+        <p id="tagline"></p>
+    </section>
+    <!-- motif: a mini feed (thumbnail + title line per card) where a watched video is faded
+         out under a crossed-out eye. Plain blocks, no play triangles. -->
+    <svg class="motif" viewBox="0 0 128 172" aria-hidden="true">
+        <g fill="#fff">
+            <rect x="0" y="0" width="128" height="40" rx="7"/>
+            <rect x="0" y="47" width="84" height="6" rx="3"/>
+            <g opacity="0.25">
+                <rect x="0" y="66" width="128" height="40" rx="7"/>
+                <rect x="0" y="113" width="84" height="6" rx="3"/>
+            </g>
+            <rect x="0" y="132" width="128" height="40" rx="7"/>
+        </g>
+        <g fill="none" stroke="#cc0000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M48 86c5-7 10-10 16-10s11 3 16 10c-5 7-10 10-16 10s-11-3-16-10z" stroke="#fff"/>
+            <circle cx="64" cy="86" r="3.5" stroke="#fff"/>
+            <path d="M47 71l34 30"/>
+        </g>
+    </svg>
+    <script>
+        document.getElementById('tagline').textContent = new URLSearchParams(location.search).get('tagline');
+        window.ready = document.fonts.ready;
+    </script>
+</body>
+</html>

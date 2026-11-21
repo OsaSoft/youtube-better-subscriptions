@@ -36,10 +36,10 @@ jobs:
         run: |
           zip -r -q yt-better-subscriptions-latest.zip . -x \
             '.git' '.git/*' '.github/*' '.gitignore' '.editorconfig' \
-            'chrome_promo_tiles/*' 'tests/*' 'tools/*' 'node_modules/*' 'coverage/*' 'pr-media/*' \
+            'chrome_promo_tiles/*' 'store-assets/*' 'tests/*' 'tools/*' 'node_modules/*' 'coverage/*' 'pr-media/*' \
             'package.json' 'package-lock.json' 'jest.config.js' 'CLAUDE.md'
           unzip -Z1 yt-better-subscriptions-latest.zip
-          if unzip -Z1 yt-better-subscriptions-latest.zip | grep -E '^(\.git|tests/|tools/|node_modules/|chrome_promo_tiles/)'; then
+          if unzip -Z1 yt-better-subscriptions-latest.zip | grep -E '^(\.git|tests/|tools/|node_modules/|chrome_promo_tiles/|store-assets/)'; then
             echo "::error::Development files ended up in the ZIP"
             exit 1
           fi
