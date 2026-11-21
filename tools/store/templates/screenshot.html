@@ -1,0 +1,30 @@
+<!doctype html>
+<!-- 1280x800 store screenshot: ?caption=…&img=<capture relative to this file>&bg=…&callouts=… -->
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&display=block">
+    <link rel="stylesheet" href="store.css">
+    <script src="frame.js"></script>
+</head>
+<body class="shot">
+    <h1 id="caption"></h1>
+    <span class="accent"></span>
+    <main class="frame"><img class="capture" alt=""></main>
+    <script>
+        const caption = document.getElementById('caption');
+        caption.textContent = new URLSearchParams(location.search).get('caption');
+        // shrink a caption that doesn't fit on one line; then place the capture (needs the font
+        // for the callout labels' widths)
+        window.ready = document.fonts.ready.then(() => {
+            let size = 54;
+            while (caption.scrollWidth > caption.clientWidth && size > 40) {
+                caption.style.fontSize = --size + 'px';
+            }
+            return placeCapture();
+        });
+    </script>
+</body>
+</html>

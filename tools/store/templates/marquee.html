@@ -1,0 +1,25 @@
+<!doctype html>
+<!-- 1400x560 marquee: ?tagline=…&img=<capture relative to this file>&bg=… -->
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&display=block">
+    <link rel="stylesheet" href="store.css">
+    <script src="frame.js"></script>
+</head>
+<body class="marquee">
+    <section class="copy">
+        <span class="chip"><img src="../../../icons/ic_video_library_black_128dp_1x.png" alt=""></span>
+        <h1>Better<br>Subscriptions</h1>
+        <span class="accent"></span>
+        <p id="tagline"></p>
+    </section>
+    <main class="frame"><img class="capture" alt=""></main>
+    <script>
+        document.getElementById('tagline').textContent = new URLSearchParams(location.search).get('tagline');
+        window.ready = document.fonts.ready.then(placeCapture);
+    </script>
+</body>
+</html>

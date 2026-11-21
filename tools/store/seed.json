@@ -1,0 +1,16 @@
+{
+  "local": {
+    "settings_cache": {
+      "settings.hide.most.relevant": true,
+      "settings.hide.shorts": true,
+      "settings.changelog.auto.open": false
+    }
+  },
+  "sync": {
+    "settings": {
+      "settings.hide.most.relevant": true,
+      "settings.hide.shorts": true,
+      "settings.changelog.auto.open": false
+    }
+  }
+}

@@ -1,0 +1,204 @@
+/* Shared look of the store images: a deep neutral background (not a video site's red), the
+   extension's red (--color-primary-strong in pages/common-pages.css) only as an accent, Inter,
+   white text, captures in a fixed frame with rounded corners and a soft shadow. */
+:root {
+  --bg-from: #15171c;
+  --bg-to: #262a33;
+  --accent: #cc0000;
+  --text: #ffffff;
+  --text-soft: #c9ccd3;
+  --radius: 16px;
+  --shadow: 0 30px 70px rgba(0, 0, 0, 0.55), 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  position: relative;
+  background: linear-gradient(160deg, var(--bg-from) 0%, var(--bg-to) 100%);
+  color: var(--text);
+  font-family: "Inter", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* the icon is black on transparent: always on a white chip */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  background: #ffffff;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+.chip img {
+  display: block;
+  width: 70%;
+  height: 70%;
+}
+
+/* short red bar under a heading */
+.accent {
+  display: block;
+  width: 64px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--accent);
+}
+
+/* a capture in a fixed frame; frame.js scales and centres it and places the callouts */
+.frame {
+  position: absolute;
+  overflow: hidden;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow), 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.frame.dark {
+  box-shadow: var(--shadow), 0 0 0 1px rgba(255, 255, 255, 0.22), 0 0 28px rgba(255, 255, 255, 0.07);
+}
+
+.frame .capture {
+  position: absolute;
+  display: block;
+}
+
+.callout {
+  position: absolute;
+  border: 3px solid var(--accent);
+  border-radius: 12px;
+  box-shadow: 0 0 0 5px rgba(204, 0, 0, 0.18);
+}
+
+.callout-label {
+  position: absolute;
+  padding: 7px 16px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #ffffff;
+  font-size: 21px;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* ---- 1280x800 screenshots: one frame size and position for all of them ---- */
+.shot h1 {
+  position: absolute;
+  top: 40px;
+  left: 50px;
+  right: 50px;
+  font-size: 54px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-align: center;
+  /* one line; screenshot.html shrinks the font of a long caption to fit */
+  white-space: nowrap;
+}
+
+.shot .accent {
+  position: absolute;
+  top: 122px;
+  left: 608px;
+}
+
+.shot .frame {
+  top: 160px;
+  left: 60px;
+  width: 1160px;
+  height: 600px;
+}
+
+/* ---- 440x280 small promo tile ---- */
+.tile .copy {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 32px;
+  width: 262px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+}
+
+.tile .chip {
+  width: 60px;
+  height: 60px;
+  border-radius: 15px;
+}
+
+.tile h1 {
+  font-size: 33px;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.tile p {
+  font-size: 16px;
+  text-wrap: balance;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text-soft);
+}
+
+.tile .motif {
+  position: absolute;
+  top: 50%;
+  right: 28px;
+  width: 112px;
+  height: 150px;
+  transform: translateY(-50%);
+}
+
+/* ---- 1400x560 marquee ---- */
+.marquee .copy {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 88px;
+  width: 520px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 22px;
+}
+
+.marquee .chip {
+  width: 104px;
+  height: 104px;
+  border-radius: 26px;
+}
+
+.marquee h1 {
+  font-size: 68px;
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+}
+
+.marquee p {
+  font-size: 30px;
+  font-weight: 600;
+  color: var(--text-soft);
+}
+
+/* sized for the marquee capture's shape (about 2:1) */
+.marquee .frame {
+  top: 84px;
+  right: 64px;
+  width: 724px;
+  height: 392px;
+}
