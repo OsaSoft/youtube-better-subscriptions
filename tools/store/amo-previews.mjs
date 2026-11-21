@@ -34,19 +34,28 @@ function auth() {
     return { Authorization: `JWT ${unsigned}.${sig}` };
 }
 
+// AMO throttles bursts (HTTP 429, "Expected available in N seconds"): wait as asked and retry
 async function call(method, path, { json, form } = {}) {
-    const headers = auth();
-    let body;
-    if (json) {
-        headers['Content-Type'] = 'application/json';
-        body = JSON.stringify(json);
-    } else if (form) {
-        body = form;
+    for (let attempt = 1; ; attempt++) {
+        const headers = auth();
+        let body;
+        if (json) {
+            headers['Content-Type'] = 'application/json';
+            body = JSON.stringify(json);
+        } else if (form) {
+            body = form;
+        }
+        const res = await fetch(API + path, { method, headers, body });
+        const text = await res.text();
+        if (res.status === 429 && attempt < 6) {
+            const seconds = Number(res.headers.get('retry-after')) || Number(text.match(/available in (\d+) second/)?.[1]) || 60;
+            console.log(`Throttled on ${method} ${path}, waiting ${seconds + 2} s`);
+            await new Promise(r => setTimeout(r, (seconds + 2) * 1000));
+            continue;
+        }
+        if (!res.ok) throw new Error(`${method} ${path} returned HTTP ${res.status}: ${text.slice(0, 500)}`);
+        return text ? JSON.parse(text) : null;
     }
-    const res = await fetch(API + path, { method, headers, body });
-    const text = await res.text();
-    if (!res.ok) throw new Error(`${method} ${path} returned HTTP ${res.status}: ${text.slice(0, 500)}`);
-    return text ? JSON.parse(text) : null;
 }
 
 function describe(p) {
