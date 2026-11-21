@@ -62,12 +62,40 @@ jobs:
 
       - name: Get an access token
         id: auth
-        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
-        with:
-          credentials_json: ${{ secrets.CWS_SERVICE_ACCOUNT_KEY }}
-          token_format: access_token
-          access_token_scopes: https://www.googleapis.com/auth/chromewebstore
-          create_credentials_file: false
+        env:
+          KEY: ${{ secrets.CWS_SERVICE_ACCOUNT_KEY }}
+        run: |
+          # Service account JWT exchanged at Google's token endpoint (the OAuth 2.0 JWT bearer flow).
+          # Unlike impersonation, this needs no extra Cloud API or IAM role.
+          token=$(node - <<'EOF'
+          const crypto = require('crypto');
+          const key = JSON.parse(process.env.KEY);
+          const b64 = o => Buffer.from(JSON.stringify(o)).toString('base64url');
+          const now = Math.floor(Date.now() / 1000);
+          const unsigned = b64({alg: 'RS256', typ: 'JWT'}) + '.' + b64({
+              iss: key.client_email,
+              scope: 'https://www.googleapis.com/auth/chromewebstore',
+              aud: 'https://oauth2.googleapis.com/token',
+              iat: now,
+              exp: now + 3600,
+          });
+          const jwt = unsigned + '.' + crypto.sign('RSA-SHA256', Buffer.from(unsigned), key.private_key).toString('base64url');
+          fetch('https://oauth2.googleapis.com/token', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+              body: new URLSearchParams({grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer', assertion: jwt}),
+          }).then(async r => {
+              const body = await r.json();
+              if (!r.ok || !body.access_token) {
+                  console.error(`::error::Token request failed with HTTP ${r.status}: ${body.error} ${body.error_description || ''}`);
+                  process.exit(1);
+              }
+              console.log(body.access_token);
+          });
+          EOF
+          )
+          echo "::add-mask::$token"
+          echo "access_token=$token" >> "$GITHUB_OUTPUT"
 
       - name: Read the item's status
         env:
