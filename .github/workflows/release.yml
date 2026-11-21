@@ -10,6 +10,8 @@ jobs:
   build:
     name: Upload Release Asset
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -21,11 +23,26 @@ jobs:
           schema: https://json.schemastore.org/chrome-manifest
           fixSchemas: true          # <-- handles custom formats like "match-pattern"
 
+      - name: Check the tag matches the manifest version
+        run: |
+          version=$(jq -r .version manifest.json)
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME doesn't match manifest.json version $version"
+            exit 1
+          fi
+
       - name: Pack extension ZIP
-        uses: TheDoctor0/zip-release@v0.3.0
-        with:
-          filename: yt-better-subscriptions-latest.zip
-          exclusions: '*.git* .editorconfig chrome_promo_tiles tests node_modules package.json package-lock.json jest.config.js coverage CLAUDE.md tools pr-media'
+        # Directory patterns need the trailing /*: zip -x matches file paths, not directory names
+        run: |
+          zip -r -q yt-better-subscriptions-latest.zip . -x \
+            '.git' '.git/*' '.github/*' '.gitignore' '.editorconfig' \
+            'chrome_promo_tiles/*' 'tests/*' 'tools/*' 'node_modules/*' 'coverage/*' 'pr-media/*' \
+            'package.json' 'package-lock.json' 'jest.config.js' 'CLAUDE.md'
+          unzip -Z1 yt-better-subscriptions-latest.zip
+          if unzip -Z1 yt-better-subscriptions-latest.zip | grep -E '^(\.git|tests/|tools/|node_modules/|chrome_promo_tiles/)'; then
+            echo "::error::Development files ended up in the ZIP"
+            exit 1
+          fi
 
       - name: Generate checksums
         run: |
@@ -68,28 +85,14 @@ jobs:
           asset_name: SHA256SUMS.txt
           asset_content_type: text/plain
 
-        # Publish to stores - disabled as its not working atm
-
-#      - name: Publish on Chrome Webstore
-#        uses: benc-uk/workflow-dispatch@4c044c1613fabbe5250deadc65452d54c4ad4fc7 # pin@v1
-#        if: "!contains(github.event.head_commit.message, '[skip chrome]')"
-#        with:
-#          workflow: publish-on-chrome-web-store
-#          token: ${{ secrets.WORKFLOWS_TOKEN }}
-#          inputs: '{ "tag": "${{ steps.get_version.outputs.VERSION }}" }'
-#
-#      - name: Publish on Firefox Add-ons
-#        uses: benc-uk/workflow-dispatch@4c044c1613fabbe5250deadc65452d54c4ad4fc7 # pin@v1
-#        if: "!contains(github.event.head_commit.message, '[skip firefox]')"
-#        with:
-#          workflow: publish-on-firefox-add-ons
-#          token: ${{ secrets.WORKFLOWS_TOKEN }}
-#          inputs: '{ "tag": "${{ steps.get_version.outputs.VERSION }}" }'
-
-      # - name: Publish on Edge Add-ons
-      #   uses: benc-uk/workflow-dispatch@4c044c1613fabbe5250deadc65452d54c4ad4fc7 # pin@v1
-      #   if: "!contains(github.event.head_commit.message, '[skip edge]')"
-      #   with:
-      #     workflow: publish-on-edge-add-ons
-      #     token: ${{ secrets.WORKFLOWS_TOKEN }}
-      #     inputs: '{ "tag": "${{ steps.get_version.outputs.VERSION }}" }'
+  # Uploads the release ZIP to the Chrome Web Store and Firefox Add-ons. To retry a store, or to
+  # publish an older release, run "Publish to stores" by hand from the Actions tab.
+  publish:
+    name: Publish to stores
+    needs: build
+    permissions:
+      contents: read
+    uses: ./.github/workflows/publish.yml
+    with:
+      tag: ${{ github.ref_name }}
+    secrets: inherit

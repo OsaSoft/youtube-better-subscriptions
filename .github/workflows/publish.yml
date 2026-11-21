@@ -1,0 +1,184 @@
+name: Publish to stores
+
+# Uploads a GitHub release's ZIP to the Chrome Web Store and Firefox Add-ons.
+# Called by release.yml after a tag push, or run by hand (Actions > Publish to stores) to retry or
+# to check credentials. With dry_run, it only signs in and reads the store's status: nothing is uploaded.
+#
+# Secrets:
+#   CWS_SERVICE_ACCOUNT_KEY  JSON key of the Google Cloud service account added in the Chrome Web Store
+#                            Developer Dashboard (Account > Service account)
+#   CWS_PUBLISHER_ID         Developer Dashboard > Publisher > Settings
+#   G_EXTENSION_ID           Chrome Web Store item ID
+#   FF_JWT_ISSUER            addons.mozilla.org API key (Developer Hub > Manage API keys)
+#   FF_JWT_SECRET            addons.mozilla.org API secret
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        type: string
+        required: true
+      dry_run:
+        type: boolean
+        default: false
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to publish, e.g. v0.28.1
+        type: string
+        required: true
+      stores:
+        description: Stores to publish to
+        type: choice
+        options: [both, chrome, firefox]
+        default: both
+      dry_run:
+        description: Only check sign-in and store status, upload nothing
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  chrome:
+    name: Chrome Web Store
+    if: ${{ inputs.stores != 'firefox' }}
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ inputs.tag }}
+      PUBLISHER_ID: ${{ secrets.CWS_PUBLISHER_ID }}
+      ITEM_ID: ${{ secrets.G_EXTENSION_ID }}
+    steps:
+      - name: Check secrets
+        env:
+          KEY: ${{ secrets.CWS_SERVICE_ACCOUNT_KEY }}
+        run: |
+          missing=""
+          [ -n "$KEY" ] || missing="$missing CWS_SERVICE_ACCOUNT_KEY"
+          [ -n "$PUBLISHER_ID" ] || missing="$missing CWS_PUBLISHER_ID"
+          [ -n "$ITEM_ID" ] || missing="$missing G_EXTENSION_ID"
+          if [ -n "$missing" ]; then echo "::error::Missing secrets:$missing"; exit 1; fi
+
+      - name: Get an access token
+        id: auth
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
+        with:
+          credentials_json: ${{ secrets.CWS_SERVICE_ACCOUNT_KEY }}
+          token_format: access_token
+          access_token_scopes: https://www.googleapis.com/auth/chromewebstore
+          create_credentials_file: false
+
+      - name: Read the item's status
+        env:
+          TOKEN: ${{ steps.auth.outputs.access_token }}
+        run: |
+          code=$(curl -sS -o status.json -w '%{http_code}' -H "Authorization: Bearer $TOKEN" \
+            "https://chromewebstore.googleapis.com/v2/publishers/$PUBLISHER_ID/items/$ITEM_ID:fetchStatus")
+          cat status.json; echo
+          if [ "$code" != 200 ]; then
+            echo "::error::fetchStatus returned HTTP $code. Check that the service account is added in the Developer Dashboard and the publisher and item IDs are right."
+            exit 1
+          fi
+
+      - name: Download the release ZIP
+        if: ${{ !inputs.dry_run }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release download "$TAG" -R "$GITHUB_REPOSITORY" -p 'yt-better-subscriptions-*.zip' -O extension.zip
+
+      - name: Upload
+        if: ${{ !inputs.dry_run }}
+        env:
+          TOKEN: ${{ steps.auth.outputs.access_token }}
+        run: |
+          api="https://chromewebstore.googleapis.com"
+          item="publishers/$PUBLISHER_ID/items/$ITEM_ID"
+          code=$(curl -sS -o upload.json -w '%{http_code}' -X POST -H "Authorization: Bearer $TOKEN" \
+            -T extension.zip "$api/upload/v2/$item:upload")
+          cat upload.json; echo
+          [ "$code" = 200 ] || { echo "::error::Upload returned HTTP $code"; exit 1; }
+          state=$(jq -r '.uploadState' upload.json)
+          # large or busy uploads are processed asynchronously: poll until done (up to 10 minutes)
+          for i in $(seq 1 40); do
+            [ "$state" = IN_PROGRESS ] || break
+            sleep 15
+            curl -sS -H "Authorization: Bearer $TOKEN" "$api/v2/$item:fetchStatus" -o status.json
+            state=$(jq -r '.lastAsyncUploadState // "IN_PROGRESS"' status.json)
+            echo "Upload state: $state"
+          done
+          [ "$state" = SUCCEEDED ] || { echo "::error::Upload ended in state $state"; cat status.json 2>/dev/null; exit 1; }
+
+      - name: Submit for review
+        if: ${{ !inputs.dry_run }}
+        env:
+          TOKEN: ${{ steps.auth.outputs.access_token }}
+        run: |
+          code=$(curl -sS -o publish.json -w '%{http_code}' -X POST -H "Authorization: Bearer $TOKEN" \
+            -H 'Content-Length: 0' \
+            "https://chromewebstore.googleapis.com/v2/publishers/$PUBLISHER_ID/items/$ITEM_ID:publish")
+          cat publish.json; echo
+          [ "$code" = 200 ] || { echo "::error::Publish returned HTTP $code"; exit 1; }
+          echo "Submitted $TAG to the Chrome Web Store. It goes live once review passes." >> "$GITHUB_STEP_SUMMARY"
+
+  firefox:
+    name: Firefox Add-ons
+    if: ${{ inputs.stores != 'chrome' }}
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ inputs.tag }}
+      WEB_EXT_API_KEY: ${{ secrets.FF_JWT_ISSUER }}
+      WEB_EXT_API_SECRET: ${{ secrets.FF_JWT_SECRET }}
+    steps:
+      - name: Check secrets
+        run: |
+          missing=""
+          [ -n "$WEB_EXT_API_KEY" ] || missing="$missing FF_JWT_ISSUER"
+          [ -n "$WEB_EXT_API_SECRET" ] || missing="$missing FF_JWT_SECRET"
+          if [ -n "$missing" ]; then echo "::error::Missing secrets:$missing"; exit 1; fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Download and unpack the release ZIP
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download "$TAG" -R "$GITHUB_REPOSITORY" -p 'yt-better-subscriptions-*.zip' -O extension.zip
+          mkdir ext && unzip -q extension.zip -d ext
+          jq -r '"Version \(.version), add-on ID \(.browser_specific_settings.gecko.id)"' ext/manifest.json
+
+      - name: Check the API key and add-on access
+        run: |
+          # A signed request for the add-on's versions, including unlisted ones: only its authors may read these
+          node - <<'EOF'
+          const crypto = require('crypto');
+          const fs = require('fs');
+          const b64 = o => Buffer.from(JSON.stringify(o)).toString('base64url');
+          const now = Math.floor(Date.now() / 1000);
+          const unsigned = b64({alg: 'HS256', typ: 'JWT'}) + '.' +
+              b64({iss: process.env.WEB_EXT_API_KEY, jti: crypto.randomUUID(), iat: now, exp: now + 60});
+          const sig = crypto.createHmac('sha256', process.env.WEB_EXT_API_SECRET).update(unsigned).digest('base64url');
+          const id = JSON.parse(fs.readFileSync('ext/manifest.json')).browser_specific_settings.gecko.id;
+          const url = `https://addons.mozilla.org/api/v5/addons/addon/${encodeURIComponent(id)}/versions/?filter=all_with_unlisted&page_size=3`;
+          fetch(url, {headers: {Authorization: `JWT ${unsigned}.${sig}`}}).then(async r => {
+              const body = await r.text();
+              if (!r.ok) {
+                  console.log(`::error::addons.mozilla.org returned HTTP ${r.status}: ${body.slice(0, 300)}`);
+                  process.exit(1);
+              }
+              const versions = JSON.parse(body).results.map(v => `${v.version} (${v.channel}, ${v.file?.status})`);
+              console.log('Signed in. Latest versions on AMO: ' + versions.join(', '));
+          });
+          EOF
+
+      - name: Lint
+        run: npx --yes web-ext@10.8.0 lint --source-dir ext
+
+      - name: Submit for review
+        if: ${{ !inputs.dry_run }}
+        run: |
+          # --approval-timeout 0: submit and return, don't wait for Mozilla's review
+          npx --yes web-ext@10.8.0 sign --source-dir ext --channel listed --approval-timeout 0 --artifacts-dir artifacts
+          echo "Submitted $TAG to Firefox Add-ons. It goes live once review passes." >> "$GITHUB_STEP_SUMMARY"
