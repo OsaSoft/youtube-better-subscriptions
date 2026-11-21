@@ -1,0 +1,34 @@
+name: Update Firefox listing screenshots
+
+# Replaces the screenshots on the Firefox Add-ons listing with store-assets/screenshot-*.png
+# (made by tools/store/). The Chrome Web Store has no API for listing images: upload those in the
+# Developer Dashboard. Run from Actions; with dry_run it only lists the current screenshots.
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Only list the current screenshots, change nothing
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  amo:
+    name: Firefox Add-ons screenshots
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Replace screenshots
+        env:
+          WEB_EXT_API_KEY: ${{ secrets.FF_JWT_ISSUER }}
+          WEB_EXT_API_SECRET: ${{ secrets.FF_JWT_SECRET }}
+          APPLY: ${{ !inputs.dry_run && '--apply' || '' }}
+        run: node tools/store/amo-previews.mjs $APPLY
