@@ -1,0 +1,85 @@
+{
+  "feed-hide": {
+    "width": 1152,
+    "height": 639,
+    "callouts": [
+      {
+        "x": 644.015625,
+        "y": 8,
+        "w": 376.8125,
+        "h": 40,
+        "label": "Watched videos: hidden",
+        "side": "below"
+      }
+    ]
+  },
+  "feed-stop": {
+    "width": 796,
+    "height": 453,
+    "callouts": [
+      {
+        "x": 561.625,
+        "y": 387,
+        "w": 224.375,
+        "h": 48,
+        "label": "Stops endless loading",
+        "side": "left"
+      }
+    ]
+  },
+  "marquee-feed": {
+    "width": 796,
+    "height": 393,
+    "callouts": []
+  },
+  "feed-marked": {
+    "width": 880,
+    "height": 461,
+    "callouts": [
+      {
+        "x": 839.96875,
+        "y": 206.46875,
+        "w": 36,
+        "h": 36,
+        "label": "Mark watched",
+        "side": "below"
+      },
+      {
+        "x": 195.65625,
+        "y": 206.46875,
+        "w": 107,
+        "h": 36,
+        "label": "Undo with one click",
+        "side": "below"
+      }
+    ]
+  },
+  "settings": {
+    "width": 652,
+    "height": 359,
+    "callouts": [
+      {
+        "x": 574,
+        "y": 9.796875,
+        "w": 60,
+        "h": 36,
+        "label": "Shorts: hidden",
+        "side": "left"
+      }
+    ]
+  },
+  "dark-feed": {
+    "width": 796,
+    "height": 457,
+    "callouts": [
+      {
+        "x": 296.015625,
+        "y": 8,
+        "w": 376.8125,
+        "h": 40,
+        "label": "Hide watched: off",
+        "side": "left"
+      }
+    ]
+  }
+}
