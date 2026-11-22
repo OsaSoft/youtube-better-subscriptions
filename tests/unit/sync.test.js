@@ -1022,4 +1022,91 @@ describe('Sync functionality', () => {
             expect(localStore['wCONFLICT001']).toBeUndefined();
         });
     });
+
+    describe('Sync quota budget', () => {
+        // bytes as the sync quota counts them: each key and its value as JSON, in UTF-8
+        function syncBytes(store) {
+            return Object.keys(store).reduce((sum, key) => sum + global.syncItemBytes(key, store[key]), 0);
+        }
+
+        function manyVideos(count) {
+            const now = Date.now();
+            const local = {};
+            for (let i = 0; i < count; i++) {
+                local['w' + String(i).padStart(11, '0')] = now - i * 1000;
+            }
+            return local;
+        }
+
+        test('history leaves room for the other keys and the reserve', async () => {
+            const settings = { blob: 'x'.repeat(40000) };
+            const exceptions = Array.from({ length: 10 }, (_, i) => '@' + 'ä'.repeat(25) + i);
+            browser._setSyncStore({ settings, channel_exceptions: exceptions });
+            browser._setLocalStore(manyVideos(4000));
+
+            await commonContext.loadWatchedVideos();
+            await new Promise(resolve => setTimeout(resolve, 1100));
+            const synced = await commonContext.syncWatchedVideos();
+
+            const store = browser._getSyncStore();
+            expect(synced).toBeGreaterThan(1000);
+            expect(synced).toBeLessThan(4000);
+            expect(syncBytes(store)).toBeLessThanOrEqual(102400 - 1024);
+            expect(store.settings).toEqual(settings);
+            expect(store.channel_exceptions).toEqual(exceptions);
+        });
+
+        test('a write with fewer batches than before still fits: old batches are emptied in it', async () => {
+            browser._setSyncStore({ settings: { a: 1 } });
+            browser._setLocalStore(manyVideos(6000));
+            await commonContext.loadWatchedVideos();
+            await new Promise(resolve => setTimeout(resolve, 1100));
+            await commonContext.syncWatchedVideos();
+            const batchesBefore = Object.keys(browser._getSyncStore()).filter(k => /^vw_\d+$/.test(k)).length;
+
+            // settings grew elsewhere: history gets less room, so fewer batches
+            browser._getSyncStore().settings = { a: 1, blob: 'x'.repeat(17000) };
+            const realSet = browser.storage.sync.set.getMockImplementation();
+            browser.storage.sync.set.mockImplementation((items, callback) => {
+                // the quota as Chrome checks it: the store as it would be after the write
+                if (syncBytes({ ...browser._getSyncStore(), ...items }) > 102400) {
+                    browser._setLastError('QUOTA_BYTES quota exceeded');
+                    callback();
+                    browser._clearLastError();
+                    return;
+                }
+                realSet(items, callback);
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 1100));
+            await commonContext.syncWatchedVideos();
+
+            const store = browser._getSyncStore();
+            const batchesAfter = Object.keys(store).filter(k => /^vw_\d+$/.test(k));
+            expect(batchesAfter.length).toBeLessThan(batchesBefore);
+            expect(batchesAfter.every(k => store[k].length > 0)).toBe(true);
+            expect(syncBytes(store)).toBeLessThanOrEqual(102400);
+        });
+
+        test('the budget is the quota less the other keys in UTF-8 and the reserve', () => {
+            const store = { settings: { a: 'é' }, channel_exceptions: ['@あいう'], vw_0: ['wABC12345678:1'], vw_meta: { version: 2 } };
+            const other = global.syncItemBytes('settings', store.settings) + global.syncItemBytes('channel_exceptions', store.channel_exceptions);
+            expect(commonContext.getSyncHistoryBudget(store)).toBe(102400 - other - 1536);
+        });
+
+        test('with only settings in sync storage history keeps about as much room as before', () => {
+            const settings = { ...global.DEFAULT_SETTINGS };
+            expect(Object.keys(settings).length).toBeGreaterThan(10);
+            expect(commonContext.getSyncHistoryBudget({ settings })).toBeGreaterThan(99000);
+        });
+
+        test('uses the quota the browser reports', () => {
+            browser.storage.sync.QUOTA_BYTES = 50000;
+            try {
+                expect(commonContext.getSyncHistoryBudget({})).toBe(50000 - 1536);
+            } finally {
+                delete browser.storage.sync.QUOTA_BYTES;
+            }
+        });
+    });
 });
