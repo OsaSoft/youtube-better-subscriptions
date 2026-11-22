@@ -269,3 +269,111 @@ html[dark] .subs-btn-stop-loading[data-state="stopped"]:hover {
   z-index: 1;
   width: fit-content;
 }
+
+/* "Show … here" switch in the header controls of a channel page (#280). Same look as YouTube's
+   switches (and the restyled Hide watched switch): a 36x14 track with a 20px knob, blue with the knob
+   on the right when ON, grey with the knob on the left when OFF. Self-contained: the container is an
+   h2 that YouTube's scoped .ytd-compact-link-renderer rules style (typography only wanted), so the
+   rules go through the id and every size is explicit; nothing relies on tp-yt-paper-toggle-button. */
+#osasoft-better-subscriptions_channel-exception-toggle {
+  --ybs-exception-track: #909090;
+  --ybs-exception-knob: #ffffff;
+  --ybs-exception-ring: #606060;
+  --ybs-exception-halo: rgba(0, 0, 0, .1);
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  user-select: none;
+  cursor: pointer;
+  opacity: 1;
+}
+
+#osasoft-better-subscriptions_channel-exception-toggle[aria-checked="true"] {
+  --ybs-exception-track: #065fd4;
+  --ybs-exception-knob: #ffffff;
+  --ybs-exception-ring: #065fd4;
+  --ybs-exception-halo: rgba(6, 95, 212, .2);
+}
+
+html[dark] #osasoft-better-subscriptions_channel-exception-toggle {
+  --ybs-exception-track: #717171;
+  --ybs-exception-knob: #aaaaaa;
+  --ybs-exception-ring: #aaaaaa;
+  --ybs-exception-halo: rgba(255, 255, 255, .15);
+}
+
+html[dark] #osasoft-better-subscriptions_channel-exception-toggle[aria-checked="true"] {
+  --ybs-exception-track: #3ea6ff;
+  --ybs-exception-knob: #ffffff;
+  --ybs-exception-ring: #3ea6ff;
+  --ybs-exception-halo: rgba(62, 166, 255, .3);
+}
+
+#osasoft-better-subscriptions_channel-exception-toggle:focus-visible {
+  outline: 2px solid #065fd4;
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+html[dark] #osasoft-better-subscriptions_channel-exception-toggle:focus-visible {
+  outline-color: #3ea6ff;
+}
+
+#osasoft-better-subscriptions_channel-exception-toggle .subs-channel-exception__track {
+  display: inline-block;
+  position: relative;
+  flex: none;
+  box-sizing: border-box;
+  width: 36px;
+  height: 14px;
+  /* margin and vertical-align rather than gap/align-items: still right if the container isn't flex */
+  margin: 3px 0 3px 12px;
+  vertical-align: middle;
+  border-radius: 7px;
+  background-color: var(--ybs-exception-track);
+  transition: background-color .15s;
+}
+
+#osasoft-better-subscriptions_channel-exception-toggle .subs-channel-exception__knob {
+  display: block;
+  position: absolute;
+  top: -3px;
+  left: 0;
+  box-sizing: border-box;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: var(--ybs-exception-knob);
+  /* inset ring keeps a white knob visible on the white masthead; the outer ring is the hover halo */
+  box-shadow: inset 0 0 0 2px var(--ybs-exception-ring), 0 0 0 0 var(--ybs-exception-halo);
+  transition: transform .15s, background-color .15s, box-shadow .15s;
+}
+
+#osasoft-better-subscriptions_channel-exception-toggle[aria-checked="true"] .subs-channel-exception__knob {
+  transform: translateX(16px);
+}
+
+#osasoft-better-subscriptions_channel-exception-toggle:hover .subs-channel-exception__knob {
+  box-shadow: inset 0 0 0 2px var(--ybs-exception-ring), 0 0 0 6px var(--ybs-exception-halo);
+}
+
+#osasoft-better-subscriptions_channel-exception-toggle:active .subs-channel-exception__knob {
+  box-shadow: inset 0 0 0 2px var(--ybs-exception-ring), 0 0 0 9px var(--ybs-exception-halo);
+}
+
+/* why the switch's last change wasn't saved (the list is full, sync storage refused it) */
+.subs-channel-exception-message {
+  font-size: 1.2rem;
+  line-height: 1.6rem;
+  color: #cc0000;
+  white-space: normal;
+  max-width: 320px;
+}
+
+.subs-channel-exception-message:not(:empty) {
+  margin-left: 8px;
+}
+
+html[dark] .subs-channel-exception-message {
+  color: #ff6e6e;
+}

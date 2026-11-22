@@ -16,7 +16,11 @@ function _injectPageContextScript() {
 async function buildSubscriptionCache() {
     if (_subscribedChannelIds !== null && _subscribedChannelIds.size > 0) return;
 
+    // pageContext.js builds the cache only when asked: it's also loaded for the channel exceptions.
+    // The attribute asks a script still loading, the event one already running.
+    document.documentElement.dataset.ybsWantSubscriptionCache = "1";
     _injectPageContextScript();
+    document.dispatchEvent(new Event('ybs-build-subscription-cache'));
 
     // Poll for result from pageContext.js (stored in DOM data attribute)
     let cacheData = null;

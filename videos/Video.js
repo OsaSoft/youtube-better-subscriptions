@@ -108,6 +108,49 @@ function getPosterChannelId(video) {
     return null;
 }
 
+// The channel pageContext.js read from the card's data (data-ybs-channel-*), if it was read for this
+// video: YouTube may reuse a renderer for another one
+function getTaggedVideoChannel(video) {
+    const renderer = video.containingDiv.closest('ytd-rich-item-renderer');
+    if (!renderer || !renderer.dataset.ybsChannelId || renderer.dataset.ybsChannelVideo !== video.videoId) {
+        return null;
+    }
+    const fromUrl = channelFromHref(renderer.dataset.ybsChannelUrl || "");
+    return makeChannel(renderer.dataset.ybsChannelId || null, fromUrl ? fromUrl.handle : null);
+}
+
+// Whether pageContext.js read this card's data (for this video) and found no channel in it
+function isReadWithoutChannel(video) {
+    const renderer = video.containingDiv.closest('ytd-rich-item-renderer');
+    return Boolean(renderer && renderer.dataset.ybsChannelVideo === video.videoId && !renderer.dataset.ybsChannelId);
+}
+
+// The channel a card belongs to, for the channel exceptions (#280), as {id, handle} with what is
+// known of each, or null while it isn't known (pageContext.js tags cards asynchronously). On a
+// channel page that's the page's channel (its cards don't name it). Elsewhere the channel
+// pageContext.js tagged, completed from the card's channel link; for a collab only the tagged
+// uploader, as its first channel link may be a co-creator's.
+function getVideoChannel(video) {
+    let channel = getCurrentChannel();
+    if (channel) {
+        return channel;
+    }
+
+    let tagged = getTaggedVideoChannel(video);
+    if (video.isCollaboration) {
+        let posterChannelId = getPosterChannelId(video);
+        return tagged || (posterChannelId ? {id: posterChannelId, handle: null} : null);
+    }
+
+    for (let link of video.containingDiv.querySelectorAll('a[href^="/@"], a[href^="/channel/"]')) {
+        channel = channelFromHref(link.getAttribute("href"));
+        if (channel) {
+            return mergeChannels(channel, tagged);
+        }
+    }
+    return tagged;
+}
+
 function changeMarkWatchedToMarkUnwatched(video) {
     // find Mark as watched button and change it to Unmark as watched
     let item = video.containingDiv;
@@ -180,14 +223,34 @@ class Video {
         return Boolean(hideWatched && this.isStored && !this.isMix);
     }
 
+    // The filters a channel on the exception list skips: premieres, live streams and members-only
+    hidesByChannelFilters() {
+        return Boolean(
+                (hidePremieres && this.isPremiere) ||
+                (hideLives && this.isLivestream) ||
+                (hideMembersOnly && this.isMembersOnly)
+        );
+    }
+
+    // With exceptions set, a card whose channel isn't known yet counts as exempt for now: it stays
+    // visible and the next scan checks it again, while a hidden card wouldn't be scanned again
+    isFromExemptChannel() {
+        if (!hasChannelExceptions()) {
+            return false;
+        }
+        let channel = getVideoChannel(this);
+        // not known yet: leave it visible until pageContext.js has read the card; read with no
+        // channel (and no channel link): no exception can apply
+        return channel === null ? !isReadWithoutChannel(this) : isChannelExempt(channel);
+    }
+
     shouldHide() {
+        // the exception never overrides "Hide watched", Hide Shorts or the collab filter
         return Boolean(
                 this.hidesAsWatched() ||
-                (hidePremieres && this.isPremiere) ||
                 (hideShorts && this.isShort) ||
-                (hideLives && this.isLivestream) ||
-                (hideMembersOnly && this.isMembersOnly) ||
-                (hideCollabsUnsubscribed && this.isCollaboration && isSubscriptionsPage() && !isSubscribedToChannel(getPosterChannelId(this)))
+                (hideCollabsUnsubscribed && this.isCollaboration && isSubscriptionsPage() && !isSubscribedToChannel(getPosterChannelId(this))) ||
+                (this.hidesByChannelFilters() && !this.isFromExemptChannel())
         );
     }
 

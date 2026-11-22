@@ -675,3 +675,105 @@
         box-shadow: 0 0 0 3px rgba(255, 78, 69, 0.45);
     }
 }
+
+/* Channel exceptions (#280) */
+.channel-exceptions__form {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-md);
+}
+
+.input-text {
+    flex: 1;
+    min-width: 0;
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-base);
+    font-family: inherit;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-field);
+    color: var(--color-text);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.input-text::placeholder {
+    color: var(--color-text-secondary);
+}
+
+.input-text:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.1);
+}
+
+.input-text[aria-invalid="true"] {
+    border-color: var(--color-danger-text);
+}
+
+.channel-exceptions__error {
+    margin: var(--spacing-sm) 0 0;
+    font-size: var(--font-size-sm);
+    color: var(--color-danger-text);
+}
+
+.channel-exceptions__list {
+    list-style: none;
+    margin: var(--spacing-md) 0 0;
+    padding: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.channel-exceptions__list:empty {
+    display: none;
+}
+
+.channel-exceptions__item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--color-field);
+}
+
+.channel-exceptions__item + .channel-exceptions__item {
+    border-top: 1px solid var(--color-divider);
+}
+
+.channel-exceptions__channel {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.channel-exceptions__handle {
+    font-size: var(--font-size-base);
+    color: var(--color-text);
+}
+
+.channel-exceptions__id {
+    margin-left: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+}
+
+.channel-exceptions__channel > .channel-exceptions__id:first-child {
+    margin-left: 0;
+    font-size: var(--font-size-base);
+    color: var(--color-text);
+}
+
+.channel-exceptions__remove {
+    flex-shrink: 0;
+    padding: var(--spacing-xs) var(--spacing-md);
+    font-size: var(--font-size-sm);
+}
+
+.channel-exceptions__empty {
+    margin: var(--spacing-md) 0 0;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+}

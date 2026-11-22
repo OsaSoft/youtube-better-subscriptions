@@ -183,6 +183,13 @@ async function initSubs() {
         return;
     }
 
+    // before the first hide pass: a card hidden by mistake isn't scanned again
+    await loadChannelExceptions();
+    if (run !== subsRun) {
+        log("Initializing subs page... superseded by a navigation");
+        return;
+    }
+
     if (hideWatched == null || !settings["settings.hide.watched.keep.state"]) {
         hideWatched = settings["settings.hide.watched.default"];
     }
@@ -207,6 +214,10 @@ async function initSubs() {
 
     if (hideCollabsUnsubscribed && isSubscriptionsPage()) {
         buildSubscriptionCache();
+    }
+    // pageContext.js tells the channel exceptions which channel each card and the channel page belong to
+    if (hidePremieres || hideLives || hideMembersOnly) {
+        _injectPageContextScript();
     }
 
     // before buildUI() applies it and before the first hide pass, which may ask YouTube for more videos
@@ -240,6 +251,39 @@ async function initSubs() {
 
     log("Initializing subs page... DONE");
 }
+
+// The exception list changed (here, in another tab or on another device): re-apply the filters
+// while the feed is being handled
+channelExceptionsChangedCallbacks.push(function () {
+    if (feedObserver) {
+        applyChannelExceptions();
+    }
+});
+
+// pageContext.js tagged cards with their channel's id: cards hidden before it did may belong to a
+// channel on the list by id. Not on a channel page, whose cards all belong to the page's channel.
+// Once per frame: the page-world observer can send several of these while one batch renders.
+let cardChannelsFrame = null;
+document.addEventListener("ybs-card-channels", function () {
+    if (cardChannelsFrame != null || !feedObserver || !hasIdOnlyChannelExceptions() || getCurrentChannel()) {
+        return;
+    }
+    cardChannelsFrame = window.requestAnimationFrame(function () {
+        cardChannelsFrame = null;
+        try {
+            showNewlyExemptCards();
+        } catch (e) {
+            logError(e);
+        }
+    });
+});
+
+// pageContext.js tagged <html> with the channel page's channel, read from YouTube's data
+document.addEventListener("ybs-page-channel", function () {
+    if (feedObserver) {
+        pageChannelChanged();
+    }
+});
 
 function stopSubs() {
     log("Stopping subs page behaviour");

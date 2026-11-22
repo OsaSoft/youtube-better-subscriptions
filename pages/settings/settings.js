@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", setupButtons);
 document.addEventListener("DOMContentLoaded", initSettings);
 document.addEventListener("DOMContentLoaded", displayVersion);
 document.addEventListener("DOMContentLoaded", runSyncDiagnostics);
+document.addEventListener("DOMContentLoaded", initChannelExceptions);
 
 // Track the element that opened the modal for focus restoration
 let previouslyFocusedElement = null;
@@ -507,5 +508,123 @@ async function clearOldestVideosHandler() {
     } catch (error) {
         resultEl.textContent = "Failed to clear videos: " + error.message;
         resultEl.className = "sync-result sync-result--error";
+    }
+}
+
+// --- Channel exceptions (#280) ---
+// Saved straight away on add and remove, under their own storage key (see channelExceptions.js),
+// so the "Save Settings" button neither needs to be pressed nor can drop them.
+
+function initChannelExceptions() {
+    const form = document.getElementById("channel-exceptions-form");
+    if (!form) {
+        return;
+    }
+    form.addEventListener("submit", addChannelExceptionFromInput);
+    document.getElementById("channel-exceptions-input").addEventListener("input", () => showChannelExceptionError(null));
+
+    // edits from a channel page, another settings tab or another device
+    channelExceptionsChangedCallbacks.push(renderChannelExceptions);
+
+    loadChannelExceptions().then(renderChannelExceptions).catch(logError);
+}
+
+function showChannelExceptionError(message) {
+    const error = document.getElementById("channel-exceptions-error");
+    const input = document.getElementById("channel-exceptions-input");
+    error.textContent = message || "";
+    error.classList.toggle("hidden", !message);
+    if (message) {
+        input.setAttribute("aria-invalid", "true");
+    } else {
+        input.removeAttribute("aria-invalid");
+    }
+}
+
+function describeChannel(channel) {
+    return channel.handle ? "@" + channel.handle : channel.id;
+}
+
+function renderChannelExceptions(list) {
+    const listElem = document.getElementById("channel-exceptions-list");
+    if (!listElem) {
+        return;
+    }
+    listElem.replaceChildren();
+
+    for (const entry of list) {
+        const channel = parseChannelException(entry);
+        if (!channel) {
+            continue;
+        }
+
+        const item = document.createElement("li");
+        item.classList.add("channel-exceptions__item");
+
+        const name = document.createElement("span");
+        name.classList.add("channel-exceptions__channel");
+        if (channel.handle) {
+            const handle = document.createElement("span");
+            handle.classList.add("channel-exceptions__handle");
+            handle.textContent = "@" + channel.handle;
+            name.appendChild(handle);
+        }
+        if (channel.id) {
+            const id = document.createElement("span");
+            id.classList.add("channel-exceptions__id");
+            id.textContent = channel.id;
+            name.appendChild(id);
+        }
+        name.title = [channel.handle ? "@" + channel.handle : null, channel.id].filter(Boolean).join(" · ");
+
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.classList.add("btn", "btn-secondary", "channel-exceptions__remove");
+        remove.textContent = "Remove";
+        remove.setAttribute("aria-label", "Remove " + describeChannel(channel));
+        remove.addEventListener("click", () => removeChannelExceptionClicked(channel));
+
+        item.appendChild(name);
+        item.appendChild(remove);
+        listElem.appendChild(item);
+    }
+
+    document.getElementById("channel-exceptions-empty").classList.toggle("hidden", listElem.childElementCount > 0);
+}
+
+async function addChannelExceptionFromInput(event) {
+    event.preventDefault();
+    const input = document.getElementById("channel-exceptions-input");
+    const channel = parseChannelInput(input.value);
+    if (!channel) {
+        showChannelExceptionError("Enter a channel as @handle, youtube.com/@handle or youtube.com/channel/UC…");
+        return;
+    }
+
+    let added = false;
+    try {
+        const list = await updateChannelExceptions(current => {
+            added = !isChannelInExceptions(current, channel);
+            return addChannelException(current, channel).list;
+        });
+        renderChannelExceptions(list);
+    } catch (e) {
+        showChannelExceptionError(e.message);
+        return;
+    }
+
+    input.value = "";
+    showChannelExceptionError(null);
+    showToast(added ? "Added " + describeChannel(channel) + " to channel exceptions" : describeChannel(channel) + " is already on the list", "success");
+}
+
+async function removeChannelExceptionClicked(channel) {
+    try {
+        const list = await updateChannelExceptions(current => removeChannelException(current, channel));
+        renderChannelExceptions(list);
+        showToast("Removed " + describeChannel(channel) + " from channel exceptions", "success");
+    } catch (e) {
+        logError(e);
+        showToast("Failed to remove " + describeChannel(channel) + ": " + e.message, "error");
     }
 }
