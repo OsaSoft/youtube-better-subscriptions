@@ -20,6 +20,8 @@ const STOP_LOADING_KEY = "subs_stop_loading_older";
 const STOP_LOADING_STYLES = ["text", "icon-text", "icon", "off"];
 const STOP_LOADING_LABEL = "Stop loading older videos";
 const RESUME_LOADING_LABEL = "Resume loading older videos";
+const MARK_WATCHED_LABEL = "Mark as watched";
+const MARK_UNWATCHED_LABEL = "Watched: click to mark as unwatched";
 const SVG_NS = "http://www.w3.org/2000/svg";
 // crossed-out clock / rewind clock, drawn in currentColor so they follow the theme
 const STOP_LOADING_ICON = [
@@ -404,6 +406,10 @@ function buildMarkWatchedButton(dismissibleDiv, item, videoId, isMarkWatchedBtn 
     button.setAttribute("id", isMarkWatchedBtn ? MARK_WATCHED_BTN : MARK_UNWATCHED_BTN);
     button.classList.add(isMarkWatchedBtn ? "subs-btn-mark-watched" : "subs-btn-mark-unwatched");
     button.setAttribute("role", "button");
+    // Both buttons are images (WATCHED is only its crossed eye in the compact layout): name them
+    let label = isMarkWatchedBtn ? MARK_WATCHED_LABEL : MARK_UNWATCHED_LABEL;
+    button.setAttribute("title", label);
+    button.setAttribute("aria-label", label);
 
     let vid = new SubscriptionVideo(item);
     if (isMarkWatchedBtn) {

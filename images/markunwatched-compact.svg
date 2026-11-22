@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <!-- Compact WATCHED button (#292): the mark-watched eye with one slash through it, so it reads as
+       "watched" without the label. A gap is cut around the slash so it stays legible at 24px. -->
+  <mask id="slash-gap">
+    <rect width="24" height="24" fill="#fff"/>
+    <line x1="3" y1="3" x2="21" y2="21" stroke="#000" stroke-width="4.5"/>
+  </mask>
+  <g mask="url(#slash-gap)">
+    <path d="M 12,6 C 7,6 1,12 1,12 c 0,0 6,6 11,6 5,0 11,-6 11,-6 0,0 -6,-6 -11,-6 z M 12,16 C 9.8,16 8,14.2 8,12 8,9.8 9.8,8 12,8 c 2.2,0 4,1.8 4,4 0,2.2 -1.8,4 -4,4 z"/>
+  </g>
+  <line x1="4" y1="4" x2="20" y2="20" stroke="#000" stroke-width="2" stroke-linecap="round"/>
+</svg>
