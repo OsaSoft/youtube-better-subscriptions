@@ -22,7 +22,13 @@ function playlistVideoQuery() {
 // layout, ytd-playlist-video-renderer rows: not one video. Checked in JS, as :not(:has()) in vidQuery()
 // doesn't parse in jsdom.
 function isPlaylistSection(item) {
-    return item.querySelector("ytd-playlist-video-renderer") != null;
+    return item.querySelector("ytd-playlist-video-renderer, ytd-playlist-video-list-renderer") != null;
+}
+
+// YouTube keeps pages visited earlier in the DOM as hidden ytd-browse elements. Their videos match
+// vidQuery() too, but belong to a page that isn't on screen: leave them alone.
+function isOnInactivePage(item) {
+    return item.closest("ytd-browse[hidden]") != null;
 }
 
 function sectionsQuery() {

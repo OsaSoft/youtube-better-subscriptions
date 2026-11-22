@@ -277,6 +277,38 @@ describe('playlist page scan', () => {
         expect(global.watchVideo).not.toHaveBeenCalled();
     });
 
+    test('rows of a page left earlier (hidden ytd-browse) are left alone', async () => {
+        setup({ hideWatched: true });
+        await initSubs();
+        document.getElementById('page').innerHTML =
+            `<ytd-browse hidden>${playlistHTML}</ytd-browse><ytd-browse></ytd-browse>`;
+        await flushObserver();
+        await jest.advanceTimersByTimeAsync(3000);
+
+        subsCtx.markAllAsWatched();
+
+        expect(global.watchVideo).not.toHaveBeenCalled();
+        for (const item of rows()) {
+            expect(item.style.display).toBe('');
+            expect(item.querySelector('.subs-btn-container')).toBeNull();
+        }
+    });
+
+    test('older layout before its rows render: the list section is still not one video', async () => {
+        setup({ hideWatched: true });
+        global.hideShorts = true;
+        await initSubs();
+        document.getElementById('page').innerHTML = `
+            <ytd-section-list-renderer>
+                <ytd-item-section-renderer class="style-scope ytd-section-list-renderer">
+                    <div id="contents"><ytd-playlist-video-list-renderer></ytd-playlist-video-list-renderer></div>
+                </ytd-item-section-renderer>
+            </ytd-section-list-renderer>`;
+        await jest.advanceTimersByTimeAsync(3000);
+
+        expect(document.querySelector('ytd-item-section-renderer').style.display).toBe('');
+    });
+
     test('"Mark all as watched" marks every loaded row', async () => {
         setup({ hideWatched: true });
         await initSubs();

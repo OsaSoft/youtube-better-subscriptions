@@ -55,7 +55,8 @@ function initExtension() {
                     if (settings["settings.hide.watched.support.home"]) initSubs();
                     break;
                 case PAGES.playlist:
-                    if (settings["settings.hide.watched.support.playlist"]) await initSubs();
+                    // not on YouTube Music, whose playlist pages share the path
+                    if (settings["settings.hide.watched.support.playlist"] && !location.hostname.startsWith("music.")) await initSubs();
                     break;
                 default:
                     if (page.includes(PAGES.short)) {

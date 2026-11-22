@@ -71,7 +71,7 @@ function markAllAsWatched() {
     let els = document.querySelectorAll(vidQuery());
 
     for (let item of els) {
-        if (isPlaylistSection(item)) continue;
+        if (isPlaylistSection(item) || isOnInactivePage(item)) continue;
         new SubscriptionVideo(item).markWatched();
     }
 
@@ -127,7 +127,7 @@ function onFeedMutations(records) {
         let query = vidQuery();
         let hiddenCount = 0;
         for (let card of cards) {
-            if (card.isConnected && card.matches(query) && processRenderedVideo(card)) {
+            if (card.isConnected && card.matches(query) && !isOnInactivePage(card) && processRenderedVideo(card)) {
                 hiddenCount++;
             }
         }

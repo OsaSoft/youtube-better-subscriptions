@@ -504,7 +504,7 @@ function removeWatchedAndAddButton() {
     let hiddenCount = 0;
 
     for (let item of els) {
-        if (isPlaylistSection(item)) continue;
+        if (isPlaylistSection(item) || isOnInactivePage(item)) continue;
         let vid = new SubscriptionVideo(item);
 
         if (!vid.isStored && isYouTubeWatched(item)) {
