@@ -18,6 +18,13 @@ function playlistVideoQuery() {
     return "yt-item-section-renderer > #contents > div:has(> yt-lockup-view-model)";
 }
 
+// A list-view section (matched by vidQuery()) that holds a whole playlist in YouTube's older playlist
+// layout, ytd-playlist-video-renderer rows: not one video. Checked in JS, as :not(:has()) in vidQuery()
+// doesn't parse in jsdom.
+function isPlaylistSection(item) {
+    return item.querySelector("ytd-playlist-video-renderer") != null;
+}
+
 function sectionsQuery() {
     return "ytd-item-section-renderer.style-scope.ytd-section-list-renderer";
 }

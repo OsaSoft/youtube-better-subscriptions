@@ -254,6 +254,29 @@ describe('playlist page scan', () => {
         expect(other.style.display).toBe('');
     });
 
+    test('older layout: a section holding the whole playlist is not taken for one video', async () => {
+        setup({ hideWatched: true, watchedVideos: { wOldRow00001: 1 } });
+        await initSubs();
+        document.getElementById('page').innerHTML = `
+            <ytd-section-list-renderer>
+                <ytd-item-section-renderer class="style-scope ytd-section-list-renderer">
+                    <div id="contents"><ytd-playlist-video-list-renderer>
+                        <ytd-playlist-video-renderer><a id="video-title" href="/watch?v=OldRow00001&list=PLx">Old row</a></ytd-playlist-video-renderer>
+                        <ytd-playlist-video-renderer><a id="video-title" href="/watch?v=OldRow00002&list=PLx">Old row</a></ytd-playlist-video-renderer>
+                    </ytd-playlist-video-list-renderer></div>
+                </ytd-item-section-renderer>
+            </ytd-section-list-renderer>`;
+        const section = document.querySelector('ytd-item-section-renderer');
+        expect(document.querySelectorAll(vidQuery())).toHaveLength(1);
+
+        await jest.advanceTimersByTimeAsync(3000);
+        subsCtx.markAllAsWatched();
+
+        expect(section.style.display).toBe('');
+        expect(section.querySelector('.subs-btn-container')).toBeNull();
+        expect(global.watchVideo).not.toHaveBeenCalled();
+    });
+
     test('"Mark all as watched" marks every loaded row', async () => {
         setup({ hideWatched: true });
         await initSubs();

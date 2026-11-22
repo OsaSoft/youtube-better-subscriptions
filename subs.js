@@ -71,6 +71,7 @@ function markAllAsWatched() {
     let els = document.querySelectorAll(vidQuery());
 
     for (let item of els) {
+        if (isPlaylistSection(item)) continue;
         new SubscriptionVideo(item).markWatched();
     }
 

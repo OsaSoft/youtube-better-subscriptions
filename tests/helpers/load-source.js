@@ -139,6 +139,7 @@ function loadQueries() {
 
     global.vidQuery = context.vidQuery;
     global.playlistVideoQuery = context.playlistVideoQuery;
+    global.isPlaylistSection = context.isPlaylistSection;
     global.sectionsQuery = context.sectionsQuery;
     global.sectionTitleQuery = context.sectionTitleQuery;
     global.sectionDismissableQuery = context.sectionDismissableQuery;
