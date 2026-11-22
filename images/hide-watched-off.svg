@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <!-- Knob glyph of the "Hide watched" toggle when it is OFF: an open eye (watched videos are shown) -->
+  <path d="M 12,6 C 7,6 1,12 1,12 c 0,0 6,6 11,6 5,0 11,-6 11,-6 0,0 -6,-6 -11,-6 z M 12,16 C 9.8,16 8,14.2 8,12 8,9.8 9.8,8 12,8 c 2.2,0 4,1.8 4,4 0,2.2 -1.8,4 -4,4 z"/>
+  <circle cx="12" cy="12" r="2"/>
+</svg>

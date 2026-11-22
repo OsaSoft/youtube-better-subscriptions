@@ -5,27 +5,106 @@
   background-repeat: no-repeat;
 }
 
+/* "Hide watched" switch. Its geometry (36x14 track, 20px knob) still comes from YouTube's
+   tp-yt-paper-toggle-button styles, only the colours are set here, copied from YouTube's own
+   switches (Settings pages): a translucent grey track, a blue knob on the right when ON, a grey knob
+   on the left when OFF. The eye on the knob says what the switch does, for users who hide the
+   "Hide watched" label. Rules use two classes on the container so they
+   outrank YouTube's scoped .toggle-bar.tp-yt-paper-toggle-button / .toggle-button rules. */
 .subs-btn-hide-watched-checked, .subs-btn-hide-watched-unchecked {
-  opacity: .8;
   margin: 0 12px !important;
 }
 
-.subs-btn-hide-watched-checked .toggle-button {
-  background-color: var(--paper-toggle-button-checked-button-color, var(--primary-color));
+.toggle-container.subs-btn-hide-watched-checked {
+  --ybs-toggle-track: rgba(144, 144, 144, .5);
+  --ybs-toggle-knob: #065fd4;
+  --ybs-toggle-icon: #ffffff;
+  --ybs-toggle-halo: rgba(6, 95, 212, .2);
+}
 
-  -webkit-mask-image: url('images/markunwatched.svg'), /*works in Firefox*/ url('chrome-extension://__MSG_@@extension_id__/images/markunwatched.svg'); /*works in Chrome*/
-  mask-image: url('images/markunwatched.svg'), /*works in Firefox*/ url('chrome-extension://__MSG_@@extension_id__/images/markunwatched.svg'); /*works in Chrome*/
-  -webkit-mask-size: cover;
-  mask-size: cover;
+.toggle-container.subs-btn-hide-watched-unchecked {
+  --ybs-toggle-track: rgba(144, 144, 144, .4);
+  --ybs-toggle-knob: #606060;
+  --ybs-toggle-icon: #ffffff;
+  --ybs-toggle-halo: rgba(0, 0, 0, .1);
+}
+
+html[dark] .toggle-container.subs-btn-hide-watched-checked {
+  --ybs-toggle-track: rgba(113, 113, 113, .5);
+  --ybs-toggle-knob: #3ea6ff;
+  --ybs-toggle-icon: #0f0f0f;
+  --ybs-toggle-halo: rgba(62, 166, 255, .3);
+}
+
+html[dark] .toggle-container.subs-btn-hide-watched-unchecked {
+  --ybs-toggle-track: rgba(113, 113, 113, .4);
+  --ybs-toggle-knob: #aaaaaa;
+  --ybs-toggle-icon: #0f0f0f;
+  --ybs-toggle-halo: rgba(255, 255, 255, .15);
+}
+
+/* Full opacity at rest (the old .8 washed the colours out); hover/active feedback is the halo */
+.toggle-container.subs-btn-hide-watched-checked, .toggle-container.subs-btn-hide-watched-unchecked,
+.toggle-container.subs-btn-hide-watched-checked:hover, .toggle-container.subs-btn-hide-watched-unchecked:hover,
+.toggle-container.subs-btn-hide-watched-checked:active, .toggle-container.subs-btn-hide-watched-unchecked:active {
+  opacity: 1;
+  cursor: pointer;
+}
+
+.toggle-container.subs-btn-hide-watched-checked .toggle-bar, .toggle-container.subs-btn-hide-watched-unchecked .toggle-bar {
+  background-color: var(--ybs-toggle-track);
+  opacity: 1;
+  transition: background-color .15s;
+}
+
+.toggle-container.subs-btn-hide-watched-checked .toggle-button, .toggle-container.subs-btn-hide-watched-unchecked .toggle-button {
+  background-color: var(--ybs-toggle-knob);
+  border-radius: 50%;
+  /* YouTube's knob shadow; the outer ring is the hover/active halo */
+  box-shadow: 0 1px 5px 0 rgba(0, 0, 0, .6), 0 0 0 0 var(--ybs-toggle-halo);
+  -webkit-mask-image: none;
+  mask-image: none;
+  transition: transform .15s, background-color .15s, box-shadow .15s;
+}
+
+.toggle-container.subs-btn-hide-watched-checked .toggle-button {
   transform: translate(16px, 0);
 }
 
-.subs-btn-hide-watched-unchecked .toggle-button {
-  background-color: var(--yt-spec-icon-inactive, #606060);
-  -webkit-mask-image: url('images/markwatched.svg'), /*works in Firefox*/ url('chrome-extension://__MSG_@@extension_id__/images/markwatched.svg'); /*works in Chrome*/
-  mask-image: url('images/markwatched.svg'), /*works in Firefox*/ url('chrome-extension://__MSG_@@extension_id__/images/markwatched.svg'); /*works in Chrome*/
-  -webkit-mask-size: cover;
-  mask-size: cover;
+.toggle-container.subs-btn-hide-watched-unchecked .toggle-button {
+  transform: none;
+}
+
+.toggle-container.subs-btn-hide-watched-checked:hover .toggle-button, .toggle-container.subs-btn-hide-watched-unchecked:hover .toggle-button {
+  box-shadow: 0 1px 5px 0 rgba(0, 0, 0, .6), 0 0 0 6px var(--ybs-toggle-halo);
+}
+
+.toggle-container.subs-btn-hide-watched-checked:active .toggle-button, .toggle-container.subs-btn-hide-watched-unchecked:active .toggle-button {
+  box-shadow: 0 1px 5px 0 rgba(0, 0, 0, .6), 0 0 0 9px var(--ybs-toggle-halo);
+}
+
+.toggle-container.subs-btn-hide-watched-checked .toggle-button::after, .toggle-container.subs-btn-hide-watched-unchecked .toggle-button::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  background-color: var(--ybs-toggle-icon);
+  -webkit-mask-size: 14px 14px;
+  mask-size: 14px 14px;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+.toggle-container.subs-btn-hide-watched-checked .toggle-button::after {
+  -webkit-mask-image: url('images/hide-watched-on.svg'), /*works in Firefox*/ url('chrome-extension://__MSG_@@extension_id__/images/hide-watched-on.svg'); /*works in Chrome*/
+  mask-image: url('images/hide-watched-on.svg'), /*works in Firefox*/ url('chrome-extension://__MSG_@@extension_id__/images/hide-watched-on.svg'); /*works in Chrome*/
+}
+
+.toggle-container.subs-btn-hide-watched-unchecked .toggle-button::after {
+  -webkit-mask-image: url('images/hide-watched-off.svg'), /*works in Firefox*/ url('chrome-extension://__MSG_@@extension_id__/images/hide-watched-off.svg'); /*works in Chrome*/
+  mask-image: url('images/hide-watched-off.svg'), /*works in Firefox*/ url('chrome-extension://__MSG_@@extension_id__/images/hide-watched-off.svg'); /*works in Chrome*/
 }
 
 .subs-btn-mark-watched, .subs-btn-mark-unwatched {
@@ -61,12 +140,12 @@ html[dark] .subs-btn-mark-watched, html[dark] .subs-btn-mark-unwatched {
   mask-size: cover;
 }
 
-.subs-btn-mark-watched:hover, .subs-btn-mark-unwatched:hover, .subs-btn-hide-watched-checked:hover, .subs-btn-hide-watched-unchecked:hover {
+.subs-btn-mark-watched:hover, .subs-btn-mark-unwatched:hover {
   opacity: .95;
   cursor: pointer;
 }
 
-.subs-btn-mark-watched:active, .subs-btn-mark-unwatched:active, .subs-btn-hide-watched-checked:active, .subs-btn-hide-watched-unchecked:active {
+.subs-btn-mark-watched:active, .subs-btn-mark-unwatched:active {
   opacity: 1.0;
   cursor: pointer;
 }
@@ -334,14 +413,13 @@ html[dark] .subs-btn-stop-loading[data-state="stopped"]:hover {
 }
 
 /* "Show … here" switch in the header controls of a channel page (#280). Same look as YouTube's
-   switches (and the restyled Hide watched switch): a 36x14 track with a 20px knob, blue with the knob
-   on the right when ON, grey with the knob on the left when OFF. Self-contained: the container is an
+   switches (and the Hide watched switch): a translucent grey 36x14 track with a 20px knob, blue on
+   the right when ON, grey on the left when OFF. Self-contained: the container is an
    h2 that YouTube's scoped .ytd-compact-link-renderer rules style (typography only wanted), so the
    rules go through the id and every size is explicit; nothing relies on tp-yt-paper-toggle-button. */
 #osasoft-better-subscriptions_channel-exception-toggle {
-  --ybs-exception-track: #909090;
-  --ybs-exception-knob: #ffffff;
-  --ybs-exception-ring: #606060;
+  --ybs-exception-track: rgba(144, 144, 144, .4);
+  --ybs-exception-knob: #606060;
   --ybs-exception-halo: rgba(0, 0, 0, .1);
   display: inline-flex;
   align-items: center;
@@ -352,23 +430,20 @@ html[dark] .subs-btn-stop-loading[data-state="stopped"]:hover {
 }
 
 #osasoft-better-subscriptions_channel-exception-toggle[aria-checked="true"] {
-  --ybs-exception-track: #065fd4;
-  --ybs-exception-knob: #ffffff;
-  --ybs-exception-ring: #065fd4;
+  --ybs-exception-track: rgba(144, 144, 144, .5);
+  --ybs-exception-knob: #065fd4;
   --ybs-exception-halo: rgba(6, 95, 212, .2);
 }
 
 html[dark] #osasoft-better-subscriptions_channel-exception-toggle {
-  --ybs-exception-track: #717171;
+  --ybs-exception-track: rgba(113, 113, 113, .4);
   --ybs-exception-knob: #aaaaaa;
-  --ybs-exception-ring: #aaaaaa;
   --ybs-exception-halo: rgba(255, 255, 255, .15);
 }
 
 html[dark] #osasoft-better-subscriptions_channel-exception-toggle[aria-checked="true"] {
-  --ybs-exception-track: #3ea6ff;
-  --ybs-exception-knob: #ffffff;
-  --ybs-exception-ring: #3ea6ff;
+  --ybs-exception-track: rgba(113, 113, 113, .5);
+  --ybs-exception-knob: #3ea6ff;
   --ybs-exception-halo: rgba(62, 166, 255, .3);
 }
 
@@ -407,8 +482,8 @@ html[dark] #osasoft-better-subscriptions_channel-exception-toggle:focus-visible 
   height: 20px;
   border-radius: 50%;
   background-color: var(--ybs-exception-knob);
-  /* inset ring keeps a white knob visible on the white masthead; the outer ring is the hover halo */
-  box-shadow: inset 0 0 0 2px var(--ybs-exception-ring), 0 0 0 0 var(--ybs-exception-halo);
+  /* YouTube's knob shadow; the outer ring is the hover halo */
+  box-shadow: 0 1px 5px 0 rgba(0, 0, 0, .6), 0 0 0 0 var(--ybs-exception-halo);
   transition: transform .15s, background-color .15s, box-shadow .15s;
 }
 
@@ -417,11 +492,11 @@ html[dark] #osasoft-better-subscriptions_channel-exception-toggle:focus-visible 
 }
 
 #osasoft-better-subscriptions_channel-exception-toggle:hover .subs-channel-exception__knob {
-  box-shadow: inset 0 0 0 2px var(--ybs-exception-ring), 0 0 0 6px var(--ybs-exception-halo);
+  box-shadow: 0 1px 5px 0 rgba(0, 0, 0, .6), 0 0 0 6px var(--ybs-exception-halo);
 }
 
 #osasoft-better-subscriptions_channel-exception-toggle:active .subs-channel-exception__knob {
-  box-shadow: inset 0 0 0 2px var(--ybs-exception-ring), 0 0 0 9px var(--ybs-exception-halo);
+  box-shadow: 0 1px 5px 0 rgba(0, 0, 0, .6), 0 0 0 9px var(--ybs-exception-halo);
 }
 
 /* why the switch's last change wasn't saved (the list is full, sync storage refused it) */
