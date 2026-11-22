@@ -32,3 +32,26 @@ describe('settings page saveSettings', () => {
         expect(brwsr._getSyncStore().settings).toEqual(saved);
     });
 });
+
+describe('settings page controls', () => {
+    const fs = require('fs');
+    const path = require('path');
+
+    beforeEach(() => {
+        const html = fs.readFileSync(path.join(__dirname, '../../pages/settings/settings.html'), 'utf8');
+        document.documentElement.innerHTML = html.replace(/^<!DOCTYPE html>/i, '');
+    });
+
+    test('"Enable on playlist pages" is a toggle next to the homepage and channel page ones (#209)', () => {
+        const toggle = document.getElementById('settings.hide.watched.support.playlist');
+        expect(toggle.matches('input[type="checkbox"]')).toBe(true);
+        const item = toggle.closest('.setting-item');
+        expect(item.querySelector('.setting-title').textContent).toBe('Enable on playlist pages');
+        const list = [...item.parentElement.querySelectorAll('input[type="checkbox"]')].map(input => input.id);
+        expect(list).toEqual([
+            'settings.hide.watched.support.channel',
+            'settings.hide.watched.support.home',
+            'settings.hide.watched.support.playlist',
+        ]);
+    });
+});

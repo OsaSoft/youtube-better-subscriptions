@@ -11,6 +11,7 @@ const DEFAULT_SETTINGS = {
     "settings.log.level": 1, // 1=ERROR, 2=WARN, 3=INFO, 4=DEBUG
     "settings.hide.watched.support.channel": true,
     "settings.hide.watched.support.home": true,
+    "settings.hide.watched.support.playlist": true,
     "settings.hide.watched.auto.store": true,
     "settings.hide.premieres": false,
     "settings.hide.shorts": false,

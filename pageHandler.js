@@ -7,6 +7,8 @@ function initExtension() {
         "short": "/shorts",
         "channel": "/videos",
         "channelLive": "/streams",
+        // /playlist?list=…; a video played from a playlist (/watch?v=…&list=…) is the video page
+        "playlist": "/playlist",
         "home": ""
     });
 
@@ -51,6 +53,10 @@ function initExtension() {
                     break
                 case PAGES.home:
                     if (settings["settings.hide.watched.support.home"]) initSubs();
+                    break;
+                case PAGES.playlist:
+                    // not on YouTube Music, whose playlist pages share the path
+                    if (settings["settings.hide.watched.support.playlist"] && !location.hostname.startsWith("music.")) await initSubs();
                     break;
                 default:
                     if (page.includes(PAGES.short)) {

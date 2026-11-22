@@ -260,3 +260,12 @@ html[dark] .subs-btn-stop-loading[data-state="stopped"]:hover {
   width: 36px;
   padding: 0;
 }
+
+/* Playlist page rows (#209, horizontal lockups): the button goes under the row's metadata. Raised
+   above YouTube's touch-feedback overlay, which covers the row, so it gets the clicks; only as wide
+   as the button, so the rest of the row stays clickable. */
+.subs-btn-container--row {
+  position: relative;
+  z-index: 1;
+  width: fit-content;
+}
