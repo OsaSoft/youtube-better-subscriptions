@@ -199,6 +199,15 @@ describe('settingsLoader.js', () => {
             expect(loaded).toHaveBeenCalledTimes(1);
         });
 
+        test('settings saved before playlist page support (#209) get it turned on', async () => {
+            browser._setSyncStore({ [SETTINGS_KEY]: { "settings.hide.watched.support.home": false } });
+
+            await load();
+
+            expect(loadedSettings()["settings.hide.watched.support.playlist"]).toBe(true);
+            expect(loadedSettings()["settings.hide.watched.support.home"]).toBe(false);
+        });
+
         test('without a cache or sync settings (first install), uses the defaults', async () => {
             await load();
 

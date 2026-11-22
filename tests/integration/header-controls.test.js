@@ -241,6 +241,77 @@ describe('page handler', () => {
         expect(callOrder).toEqual(['removeControls', 'stopSubs', 'initSubs']);
     });
 
+    describe('playlist pages (#209)', () => {
+        afterEach(() => {
+            settings["settings.hide.watched.support.playlist"] = DEFAULT_SETTINGS["settings.hide.watched.support.playlist"];
+        });
+
+        test('are on by default', () => {
+            expect(DEFAULT_SETTINGS["settings.hide.watched.support.playlist"]).toBe(true);
+        });
+
+        test('get the controls when enabled', async () => {
+            settings["settings.hide.watched.support.playlist"] = true;
+            page = '/playlist';
+            loadPageHandler();
+            await jest.advanceTimersByTimeAsync(0);
+            expect(callOrder).toEqual(['stopSubs', 'initSubs']);
+        });
+
+        test('stay without them when disabled', async () => {
+            settings["settings.hide.watched.support.playlist"] = false;
+            page = '/playlist';
+            loadPageHandler();
+            await jest.advanceTimersByTimeAsync(0);
+            expect(callOrder).toEqual(['stopSubs']);
+        });
+
+        test('leaving one for a video from it (/watch?v=…&list=…) unloads it and handles the video page', async () => {
+            page = '/playlist';
+            loadPageHandler();
+            callOrder.length = 0;
+
+            document.dispatchEvent(new Event('yt-navigate-start'));
+            page = '/watch';
+            document.dispatchEvent(new Event('yt-navigate-finish'));
+            await jest.advanceTimersByTimeAsync(100);
+
+            expect(callOrder).toEqual(['removeControls', 'stopSubs', 'onVideoPage']);
+        });
+
+        test('leaving one for the subscriptions feed rebuilds the controls there', async () => {
+            page = '/playlist';
+            loadPageHandler();
+            callOrder.length = 0;
+
+            document.dispatchEvent(new Event('yt-navigate-start'));
+            page = '/feed/subscriptions';
+            document.dispatchEvent(new Event('yt-navigate-finish'));
+            await jest.advanceTimersByTimeAsync(100);
+
+            expect(callOrder).toEqual(['removeControls', 'stopSubs', 'initSubs']);
+        });
+
+        test('another playlist is handled again', async () => {
+            page = '/playlist';
+            loadPageHandler();
+            callOrder.length = 0;
+
+            document.dispatchEvent(new Event('yt-navigate-start'));
+            document.dispatchEvent(new Event('yt-navigate-finish'));
+            await jest.advanceTimersByTimeAsync(100);
+
+            expect(callOrder).toEqual(['removeControls', 'stopSubs', 'initSubs']);
+        });
+
+        test('the Playlists tab of a channel is not a playlist page', async () => {
+            page = '/@channel/playlists';
+            loadPageHandler();
+            await jest.advanceTimersByTimeAsync(0);
+            expect(callOrder).toEqual(['stopSubs']);
+        });
+    });
+
     describe('a navigation that never finishes', () => {
         test('after 5 s on the same page the controls are restored, without unloading the page', async () => {
             loadPageHandler();

@@ -14,8 +14,9 @@ let feedSectionsFrame = null;
 let subsRun = 0;
 
 // Cards the feed observer reacts to. List-view sections (ytd-item-section-renderer) are left to the
-// periodic scan: a mutation anywhere in a section would otherwise rescan it.
-const FEED_CARD_QUERY = "ytd-rich-item-renderer, ytd-grid-video-renderer";
+// periodic scan: a mutation anywhere in a section would otherwise rescan it. Playlist rows are small,
+// like grid cards.
+const FEED_CARD_QUERY = "ytd-rich-item-renderer, ytd-grid-video-renderer, " + playlistVideoQuery();
 
 function isYouTubeWatched(item) {
     let ytWatchedPercentThreshold = settings["settings.mark.watched.youtube.watched"];

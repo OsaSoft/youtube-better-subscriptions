@@ -138,6 +138,7 @@ function loadQueries() {
     });
 
     global.vidQuery = context.vidQuery;
+    global.playlistVideoQuery = context.playlistVideoQuery;
     global.sectionsQuery = context.sectionsQuery;
     global.sectionTitleQuery = context.sectionTitleQuery;
     global.sectionDismissableQuery = context.sectionDismissableQuery;
@@ -432,6 +433,7 @@ function loadSubs() {
         logWarn: global.logWarn,
         logError: global.logError,
         vidQuery: global.vidQuery,
+        playlistVideoQuery: global.playlistVideoQuery,
         SubscriptionVideo: global.SubscriptionVideo,
         loadWatchedVideos: global.loadWatchedVideos,
         buildUI: global.buildUI,

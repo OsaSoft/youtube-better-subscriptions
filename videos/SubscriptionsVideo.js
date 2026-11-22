@@ -47,6 +47,15 @@ class SubscriptionVideo extends Video {
                 : null;
     }
 
+    // The text column of a horizontal lockup row (playlist pages, #209), or null on other layouts
+    getRowTextDiv() {
+        return this.contentDiv
+                ? this.contentDiv.querySelector(
+                        ".ytLockupViewModelHorizontal .ytLockupMetadataViewModelTextContainer, " +
+                        ".yt-lockup-view-model--horizontal .yt-lockup-metadata-view-model__text-container")
+                : null;
+    }
+
     // The element faded while the video is marked watched (the whole card on lockup layouts). On the
     // old layouts it's also where addButton() puts the button. Every path that builds a mark/unmark
     // button passes this one, so marking by click and loading as watched fade the same element.
@@ -91,6 +100,15 @@ class SubscriptionVideo extends Video {
         let container = document.createElement("div");
         container.classList.add("subs-btn-container");
         container.appendChild(markButton);
+
+        // Horizontal lockup row (playlist pages): below the title, channel and views, clear of the ⋮,
+        // which has a column of its own to the right of the text
+        let rowTextDiv = this.getRowTextDiv();
+        if (rowTextDiv) {
+            container.classList.add("subs-btn-container--row");
+            rowTextDiv.appendChild(container);
+            return;
+        }
 
         // Detect new lockup layout by presence of vertical container. YouTube renamed the lockup
         // classes from dashed BEM (yt-lockup-view-model--vertical) to camelCase

@@ -73,7 +73,7 @@ Scripts load sequentially on YouTube pages:
 - Throttles sync operations (1000ms)
 
 **Page Routing (pageHandler.js):**
-Handles different YouTube pages: `/feed/subscriptions`, `/watch`, `/shorts`, homepage, channel pages
+Handles different YouTube pages: `/feed/subscriptions`, `/watch`, `/shorts`, homepage, channel pages, `/playlist`
 
 **DOM Selectors (queries.js):**
 Centralized CSS selectors for YouTube elements. These break frequently when YouTube updates their layout.
