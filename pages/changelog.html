@@ -26,16 +26,15 @@
                 <svg class="card__icon" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
                 </svg>
-                <h2 class="card__title">What's New in v0.28.1</h2>
+                <h2 class="card__title">What's New in v0.29.0</h2>
                 <span class="badge badge--latest">LATEST</span>
             </div>
             <div class="card__content">
                 <ul class="feature-list">
-                    <li class="feature-list__item">"Stop loading older videos" button on the subscriptions feed, so the feed ends instead of loading years of history (you can change its look or turn it off in Settings)</li>
-                    <li class="feature-list__item">Dark theme for the settings and changelog pages</li>
-                    <li class="feature-list__item">"Hide members-only content" works again in YouTube's new layout</li>
-                    <li class="feature-list__item">"Hide Premieres" no longer hides live streams, Shorts or members-only videos</li>
-                    <li class="feature-list__item">Mark-watched buttons appear straight away, line up across a row and no longer make rows jump</li>
+                    <li class="feature-list__item">Channel exceptions: keep hiding Premieres, live streams or members-only videos, but still see them from channels you choose. Add channels in Settings, or with the "Show … here" switch on a channel's Videos page</li>
+                    <li class="feature-list__item">Playlist pages: hide watched videos and mark videos as watched on playlists too (you can turn this off in Settings)</li>
+                    <li class="feature-list__item">The mark-watched button no longer covers the date on collab and narrow cards. In the compact layout, a watched video now shows a crossed-out eye</li>
+                    <li class="feature-list__item">The "Hide watched" switch now looks like YouTube's own switches, so it's clear when it's on</li>
                 </ul>
             </div>
         </section>
@@ -64,6 +63,19 @@
                 <h2 class="card__title">Complete Changelog</h2>
             </div>
             <div class="card__content changelog-content">
+                <article class="version-entry">
+                    <h3 class="version-entry__title">0.29.0 <span class="version-entry__date">November 23, 2026</span></h3>
+                    <ul class="version-entry__changes">
+                        <li>Channel exceptions for Hide Premieres, Hide currently live streams and Hide members-only content: in Settings, or with the "Show … here" switch on a channel's Videos and Live pages</li>
+                        <li>Hide watched and mark-watched buttons on playlist pages ("Enable on playlist pages" in Settings)</li>
+                        <li>The mark-watched button no longer covers the date on collab and narrow cards; channel names are shortened first and view counts are never cut</li>
+                        <li>In the compact layout, a watched video shows a crossed-out eye instead of the WATCHED label</li>
+                        <li>The "Hide watched" switch looks like YouTube's own switches, with the eye kept on it</li>
+                        <li>Fixed: "Mark all as watched" could also mark videos from a page you had visited before</li>
+                        <li>Watch history sync leaves room for your other synced settings, so syncing can't fail when sync storage is nearly full</li>
+                    </ul>
+                </article>
+
                 <article class="version-entry">
                     <h3 class="version-entry__title">0.28.1 <span class="version-entry__date">November 21, 2026</span></h3>
                     <ul class="version-entry__changes">
