@@ -129,18 +129,81 @@ yt-lockup-view-model:has(> .subs-btn-container--bottom) {
   position: relative;
 }
 
+/* Centered under the dots: the eye, and WATCHED, which is the same size there (below) */
 .subs-btn-container--compact {
   position: absolute;
   top: 100%;
-  right: 0;
+  left: 50%;
+  transform: translateX(-50%);
   padding: 0;
 }
 
-/* Center the eye icon under the dots in compact mode */
-.subs-btn-container--compact:has(.subs-btn-mark-watched) {
-  left: 50%;
-  right: auto;
-  transform: translateX(-50%);
+/* Compact layout: WATCHED is the eye with a slash through it, in the eye's footprint, so marking a
+   card doesn't change what the button covers. The faded card shows the state, and the button's
+   title and aria-label carry the word. The row below
+   the metadata keeps the labelled 95px button. */
+.subs-btn-container--compact .subs-btn-mark-unwatched {
+  width: 24px;
+  -webkit-mask-image: url('images/markunwatched-compact.svg'), /*works in Firefox*/ url('chrome-extension://__MSG_@@extension_id__/images/markunwatched-compact.svg'); /*works in Chrome*/
+  mask-image: url('images/markunwatched-compact.svg'), /*works in Firefox*/ url('chrome-extension://__MSG_@@extension_id__/images/markunwatched-compact.svg'); /*works in Chrome*/
+}
+
+/* Keep card text clear of the compact button (#292). YouTube's ⋮ is 40px square at top:-6px,
+   right:-10px of the metadata host, so the button below it spans y 34-58px and the last 22px of the
+   host's width: beside the title's second line or the first metadata row. YouTube already keeps the
+   title 24px clear of the right edge for the ⋮, so only the metadata needs room. The padding goes on
+   the block, not the rows: each row is an overflow:hidden flex box, and padding on it would still
+   let unshrinkable parts paint under the button. The same 24px in both states, so marking a card
+   never reflows it. */
+yt-lockup-metadata-view-model:has(.subs-btn-container--compact) :is(.ytLockupMetadataViewModelMetadata, .yt-lockup-metadata-view-model__metadata) {
+  padding-right: 24px;
+}
+
+/* YouTube lets only the date shrink, so a long byline ("X by Y and Z", "A and 2 more") pushes the
+   date out and is itself cut off without an ellipsis. Bylines give way first, down to an ellipsis:
+   every text part may shrink, with a huge weight, except the view count (right after the row's ▷
+   leading icon), which never shrinks so it can't read as a wrong number, and the date (the last
+   part), which keeps YouTube's own rules (shrink 1, ellipsis), so it only gives way once the bylines
+   are gone. A collab byline is two parts. Every part has role="text" on live YouTube, so position
+   tells them apart. */
+yt-lockup-metadata-view-model:has(.subs-btn-container--compact) :is(.ytContentMetadataViewModelMetadataText, .yt-content-metadata-view-model__metadata-text) {
+  flex-shrink: 100000;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* YouTube marks the parts pre-wrap; the ellipsis needs a single line */
+  white-space: nowrap;
+}
+
+/* A collab byline's later parts ("and Veritasium", "and 2 more"; the verified badge may sit between)
+   give way only once the first name is down to a few letters, and before the date: a squeezed row
+   reads "InGenius by Ve… and Veritasium", then "In… and Verit… ▷ 888k 2 wk ago". The weights (first
+   100000, later parts 10, date 1) are far enough apart that a part barely shares a sub-pixel of the
+   cut while an earlier one can still give, so no stray ellipsis appears. */
+yt-lockup-metadata-view-model:has(.subs-btn-container--compact) :is(.ytContentMetadataViewModelMetadataText, .yt-content-metadata-view-model__metadata-text):first-child:not(:last-child) {
+  min-width: 3em;
+}
+
+yt-lockup-metadata-view-model:has(.subs-btn-container--compact) :is(.ytContentMetadataViewModelMetadataText, .yt-content-metadata-view-model__metadata-text) ~ :is(.ytContentMetadataViewModelMetadataText, .yt-content-metadata-view-model__metadata-text):not(:last-child) {
+  flex-shrink: 10;
+}
+
+/* The views: after the byline rules, and as specific, so they win */
+yt-lockup-metadata-view-model:has(.subs-btn-container--compact) :is(.ytContentMetadataViewModelLeadingIcon, .yt-content-metadata-view-model__leading-icon) + :is(.ytContentMetadataViewModelMetadataText, .yt-content-metadata-view-model__metadata-text):not(:last-child) {
+  flex-shrink: 0;
+  min-width: auto;
+  overflow: visible;
+}
+
+/* The older two-row layout's second row is "171k views • date", with no ▷: keep its views whole too */
+yt-lockup-metadata-view-model:has(.subs-btn-container--compact) :is(.ytContentMetadataViewModelMetadataText, .yt-content-metadata-view-model__metadata-text):first-child:nth-last-child(3) {
+  flex-shrink: 0;
+  min-width: auto;
+  overflow: visible;
+}
+
+yt-lockup-metadata-view-model:has(.subs-btn-container--compact) :is(.ytContentMetadataViewModelMetadataText, .yt-content-metadata-view-model__metadata-text):last-child {
+  flex-shrink: 1;
 }
 
 .subs-btn-container .subs-btn-mark-watched {
