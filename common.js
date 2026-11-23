@@ -39,8 +39,12 @@ const CLEAR_SENTINEL_KEY = "vw_last_cleared";
 
 // browser.storage.sync total quota (same in Chrome and Firefox)
 const SYNC_QUOTA_BYTES = 102400;
-// syncWatchedVideos() caps watch history at 100000 bytes (below the quota to leave room for settings),
-// so sync storage above this threshold means older videos were dropped because of the quota
+// Room syncWatchedVideos() keeps free on top of what the other keys take: the channel exception list
+// may still grow to its cap (MAX_CHANNEL_EXCEPTIONS_BYTES in channelExceptions.js), plus some slack
+// for settings to grow
+const SYNC_RESERVED_BYTES = 1024 + 512;
+// syncWatchedVideos() fills the quota with watch history up to that reserve, so sync storage above
+// this threshold means older videos were dropped because of the quota
 const SYNC_QUOTA_NEARLY_FULL_BYTES = SYNC_QUOTA_BYTES * 0.95;
 
 function isVideoKey(key) {
@@ -222,6 +226,20 @@ async function loadWatchedVideos() {
     }
 }
 
+// How many bytes watch history may take in sync storage: the quota less what the other keys (settings,
+// channel exceptions) take now and SYNC_RESERVED_BYTES. A write over the quota fails as a whole, so
+// history must leave them room.
+function getSyncHistoryBudget(syncData) {
+    const quota = (brwsr.storage.sync && brwsr.storage.sync.QUOTA_BYTES) || SYNC_QUOTA_BYTES;
+    let otherBytes = 0;
+    for (const key in syncData) {
+        if (key.indexOf(VIDEO_WATCH_KEY) !== 0) {
+            otherBytes += syncItemBytes(key, syncData[key]);
+        }
+    }
+    return quota - otherBytes - SYNC_RESERVED_BYTES;
+}
+
 let lastSyncUpdate = Date.now();
 let saveTimeout;
 let lastSyncError = null;
@@ -232,6 +250,11 @@ async function syncWatchedVideos() {
         saveTimeout = setTimeout(syncWatchedVideos, WATCHED_SYNC_THROTTLE - (Date.now() - lastSyncUpdate));
         return;
     }
+    // Get existing keys: the other keys' size sets the room left for history, and stale batch keys
+    // are cleaned up after the write
+    const existingSyncData = await syncStorageGet(null) || {};
+    const historyBudget = getSyncHistoryBudget(existingSyncData);
+
     const batches = { [SYNC_META_KEY]: { version: SYNC_FORMAT_VERSION } };
     let currentBatch = [];
     let batchCount = 0;
@@ -255,7 +278,7 @@ async function syncWatchedVideos() {
         if (JSON.stringify({
             ...batches,
             [batchKey]: potentialBatch
-        }).length > 100000) {
+        }).length > historyBudget) {
             // quota exhausted, count remaining as dropped
             const syncedSoFar = Object.values(batches)
                 .filter(v => Array.isArray(v))
@@ -278,8 +301,6 @@ async function syncWatchedVideos() {
     }
 
     try {
-        // Get existing batch keys to clean up stale ones after write
-        const existingSyncData = await syncStorageGet(null) || {};
         const existingBatchKeys = Object.keys(existingSyncData)
             .filter(key => key.indexOf(VIDEO_WATCH_KEY) === 0);
 
@@ -288,9 +309,19 @@ async function syncWatchedVideos() {
             batches[SYNC_META_KEY].clearedAt = existingMeta.clearedAt;
         }
 
+        // Old batch keys this write doesn't replace are emptied in it: with history's room set by the
+        // other keys, there may be fewer batches than before, and the old content of the rest must not
+        // count against the quota while the write is checked. They're removed after it.
+        const newBatchKeys = Object.keys(batches);
+        const keysToRemove = existingBatchKeys.filter(key => key !== SYNC_META_KEY && !newBatchKeys.includes(key));
+        const written = { ...batches };
+        for (const key of keysToRemove) {
+            written[key] = [];
+        }
+
         // Write new batches
         await new Promise((resolve, reject) => {
-            brwsr.storage.sync.set(batches, () => {
+            brwsr.storage.sync.set(written, () => {
                 if (brwsr.runtime.lastError) {
                     reject(new Error(brwsr.runtime.lastError.message));
                 } else {
@@ -300,8 +331,6 @@ async function syncWatchedVideos() {
         });
 
         // Remove old batch keys that are no longer needed (preserve vw_meta)
-        const newBatchKeys = Object.keys(batches);
-        const keysToRemove = existingBatchKeys.filter(key => key !== SYNC_META_KEY && !newBatchKeys.includes(key));
         if (keysToRemove.length > 0) {
             await new Promise((resolve, reject) => {
                 brwsr.storage.sync.remove(keysToRemove, () => {

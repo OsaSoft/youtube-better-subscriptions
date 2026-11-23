@@ -74,6 +74,8 @@ function loadUtil() {
     global.prepareMessage = context.prepareMessage;
     global.download = context.download;
     global.isRendered = context.isRendered;
+    global.utf8ByteLength = context.utf8ByteLength;
+    global.syncItemBytes = context.syncItemBytes;
 
     return context;
 }
@@ -129,6 +131,52 @@ function loadCommon() {
     return context;
 }
 
+const CHANNEL_EXCEPTIONS_EXPORTS = [
+    'normalizeHandle', 'normalizeChannelId', 'channelFromPath', 'channelFromHref', 'parseChannelInput',
+    'formatChannelException', 'parseChannelException', 'normalizeChannelExceptions', 'sameChannel',
+    'findChannelExceptionIndex', 'isChannelInExceptions', 'addChannelException', 'removeChannelException',
+    'isChannelExempt', 'hasChannelExceptions', 'getCurrentChannel', 'loadChannelExceptions',
+    'saveChannelExceptions', 'updateChannelExceptions', 'makeChannel', 'mergeChannels',
+    'completeChannelException', 'channelPagePrefix', 'getChannelExceptionsBytes', 'hasIdOnlyChannelExceptions',
+];
+
+/**
+ * Load channelExceptions.js (it registers a storage listener on the current browser mock) and expose
+ * its functions globally. The scripts loaded after it see them, as in the extension.
+ */
+function loadChannelExceptionsSource() {
+    if (!global.log) {
+        loadUtil();
+    }
+
+    const context = loadSource('channelExceptions.js', {
+        log: global.log,
+        logDebug: global.logDebug,
+        logWarn: global.logWarn,
+        logError: global.logError,
+        brwsr: global.brwsr,
+        URL: window.URL,
+    });
+
+    for (const name of CHANNEL_EXCEPTIONS_EXPORTS) {
+        global[name] = context[name];
+    }
+    global.CHANNEL_EXCEPTIONS_KEY = readBinding(context, 'CHANNEL_EXCEPTIONS_KEY');
+    global.MAX_CHANNEL_EXCEPTIONS = readBinding(context, 'MAX_CHANNEL_EXCEPTIONS');
+    global.MAX_CHANNEL_EXCEPTIONS_BYTES = readBinding(context, 'MAX_CHANNEL_EXCEPTIONS_BYTES');
+    global.channelExceptionsChangedCallbacks = readBinding(context, 'channelExceptionsChangedCallbacks');
+    global.channelExceptionsBrwsr = global.brwsr;
+
+    return context;
+}
+
+// Loads channelExceptions.js unless it's already loaded against this test's browser mock
+function ensureChannelExceptions() {
+    if (!global.getCurrentChannel || global.channelExceptionsBrwsr !== global.brwsr) {
+        loadChannelExceptionsSource();
+    }
+}
+
 /**
  * Load queries.js
  */
@@ -156,6 +204,7 @@ function loadVideo() {
     if (!global.log) {
         loadUtil();
     }
+    ensureChannelExceptions();
 
     const context = loadSource('videos/Video.js', {
         settings: global.settings,
@@ -208,6 +257,7 @@ function loadSubscriptionsVideo() {
     if (!global.log) {
         loadUtil();
     }
+    ensureChannelExceptions();
 
     const projectRoot = path.join(__dirname, '../..');
     const videoCode = fs.readFileSync(path.join(projectRoot, 'videos/Video.js'), 'utf8');
@@ -357,6 +407,7 @@ function loadSubsUI() {
     if (!global.SubscriptionVideo) {
         loadSubscriptionsVideo();
     }
+    ensureChannelExceptions();
 
     const context = loadSource('subs-ui.js', {
         settings: global.settings,
@@ -407,6 +458,10 @@ function loadSubsUI() {
     global.removeUI = context.removeUI;
     global.rebuildUI = context.rebuildUI;
     global.showWatched = context.showWatched;
+    global.applyChannelExceptions = context.applyChannelExceptions;
+    global.showNewlyExemptCards = context.showNewlyExemptCards;
+    global.addChannelExceptionToggle = context.addChannelExceptionToggle;
+    global.pageChannelChanged = context.pageChannelChanged;
 
     return context;
 }
@@ -427,6 +482,7 @@ function loadSubs() {
     if (!global.buildUI) {
         loadSubsUI();
     }
+    ensureChannelExceptions();
 
     const context = loadSource('subs.js', {
         settings: global.settings,
@@ -452,6 +508,7 @@ function loadSubs() {
         sectionContentsQuery: global.sectionContentsQuery,
         isSubscriptionsPage: global.isSubscriptionsPage,
         loadStopLoadingOlder: global.loadStopLoadingOlder || (async () => {}),
+        _injectPageContextScript: global._injectPageContextScript || (() => {}),
         STOP_LOADING_ATTR: global.STOP_LOADING_ATTR
     });
 
@@ -474,6 +531,7 @@ module.exports = {
     readBinding,
     loadUtil,
     loadCommon,
+    loadChannelExceptionsSource,
     loadQueries,
     loadVideo,
     loadSubscriptionsVideo,

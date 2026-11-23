@@ -10,6 +10,7 @@
     <link rel="stylesheet" type="text/css" href="settings.css"/>
 
     <script src="../../common.js"></script>
+    <script src="../../channelExceptions.js"></script>
     <script src="../../settingsLoader.js"></script>
     <script src="../../util.js"></script>
     <script src="settings.js"></script>
@@ -111,6 +112,25 @@
                                 <input type="checkbox" id="settings.hide.members.only" aria-labelledby="setting-hide-members-only-title" aria-describedby="setting-hide-members-only-desc">
                                 <span class="toggle-slider"></span>
                             </label>
+                        </div>
+
+                        <!-- Channel exceptions (#280): saved on add/remove under their own storage key, not by "Save Settings" -->
+                        <div class="setting-item channel-exceptions" id="channel-exceptions">
+                            <div class="setting-info">
+                                <span class="setting-title" id="channel-exceptions-title">Channel exceptions</span>
+                                <span class="setting-description" id="channel-exceptions-desc">Premieres, live streams and members-only videos from these channels stay visible while the three options above hide them from everyone else. Hide watched and Hide Shorts still apply. On a channel's Videos or Live page, the "Show … here" switch adds the channel or removes it.</span>
+                                <form class="channel-exceptions__form" id="channel-exceptions-form" novalidate>
+                                    <input type="text" id="channel-exceptions-input" class="input-text"
+                                           placeholder="@handle or channel URL"
+                                           autocomplete="off" spellcheck="false"
+                                           aria-label="Channel to add, as @handle or channel URL"
+                                           aria-describedby="channel-exceptions-desc channel-exceptions-error">
+                                    <button type="submit" id="channel-exceptions-add" class="btn btn-secondary">Add</button>
+                                </form>
+                                <p class="channel-exceptions__error hidden" id="channel-exceptions-error" role="alert"></p>
+                                <ul class="channel-exceptions__list" id="channel-exceptions-list" aria-labelledby="channel-exceptions-title"></ul>
+                                <p class="channel-exceptions__empty" id="channel-exceptions-empty">No channels yet.</p>
+                            </div>
                         </div>
 
                         <div class="setting-item">

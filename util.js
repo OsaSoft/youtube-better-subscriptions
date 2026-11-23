@@ -61,3 +61,29 @@ function isRendered(domObj) {
     }
     return false;
 }
+
+// Length of a string in UTF-8 bytes (TextEncoder isn't available everywhere this runs)
+function utf8ByteLength(text) {
+    let bytes = 0;
+    for (let i = 0; i < text.length; i++) {
+        let code = text.charCodeAt(i);
+        if (code < 0x80) {
+            bytes += 1;
+        } else if (code < 0x800) {
+            bytes += 2;
+        } else if (code >= 0xD800 && code <= 0xDBFF && (text.charCodeAt(i + 1) & 0xFC00) === 0xDC00) {
+            // a surrogate pair: one 4-byte character
+            bytes += 4;
+            i++;
+        } else {
+            bytes += 3;
+        }
+    }
+    return bytes;
+}
+
+// The bytes a storage.sync item counts against the quota, measured as Chrome does: the key's length
+// plus the length of the value as JSON, both in UTF-8
+function syncItemBytes(key, value) {
+    return utf8ByteLength(key) + utf8ByteLength(JSON.stringify(value));
+}

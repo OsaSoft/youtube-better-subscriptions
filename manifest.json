@@ -39,6 +39,7 @@
       "js": [
         "util.js",
         "common.js",
+        "channelExceptions.js",
         "settingsLoader.js",
         "queries.js",
         "subscriptionCache.js",

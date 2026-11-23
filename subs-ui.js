@@ -6,6 +6,8 @@ const MARK_WATCHED_BTN = PREFIX + "mark-watched";
 const MARK_UNWATCHED_BTN = PREFIX + "mark-unwatched";
 const METADATA_LINE = PREFIX + "metadata-line";
 const COLLAPSE_SECTION_CHECKBOX = PREFIX + "collapse-section";
+const CHANNEL_EXCEPTION_TOGGLE = PREFIX + "channel-exception-toggle";
+const CHANNEL_EXCEPTION_MESSAGE = PREFIX + "channel-exception-message";
 
 const HIDDEN_CLASS = PREFIX + "hidden";
 const COLLAPSE_CLASS = PREFIX + "collapse-section";
@@ -82,6 +84,7 @@ function buildUI() {
 
     addHideWatchedCheckbox();
     addHideAllMenuButton();
+    addChannelExceptionToggle();
     addSettingsButton();
 
     // empty when addElementToMenuUI() found no place for them
@@ -365,6 +368,212 @@ function addHideWatchedCheckbox() {
     addElementToMenuUI(toggleContainer);
 
     toggleContainer.addEventListener("click", hideWatchedChanged);
+}
+
+// --- Channel exception switch (#280) ---
+
+// Short names of the filters an exception skips that are on now, e.g. ["members-only", "lives"]
+function getActiveChannelFilterNames() {
+    let names = [];
+    if (hidePremieres) names.push("premieres");
+    if (hideLives) names.push("live streams");
+    if (hideMembersOnly) names.push("members-only videos");
+    return names;
+}
+
+// What the switch says: the one filter that is on, or "hidden types" while several are; the title
+// lists them in full
+function getChannelExceptionLabel() {
+    let shortNames = [];
+    if (hidePremieres) shortNames.push("premieres");
+    if (hideLives) shortNames.push("live streams");
+    if (hideMembersOnly) shortNames.push("members-only");
+    return "Show " + (shortNames.length === 1 ? shortNames[0] : "hidden types") + " here";
+}
+
+function renderChannelExceptionToggle(toggle) {
+    let exempt = isChannelExempt(getCurrentChannel());
+    let names = getActiveChannelFilterNames();
+    let list = names.length > 1 ? names.slice(0, -1).join(", ") + " and " + names[names.length - 1] : names[0];
+    let title = exempt
+        ? "On: " + list + " from this channel are shown. Click to hide them again."
+        : "Off: " + list + " from this channel are hidden. Click to show them (other channels stay filtered).";
+
+    toggle.setAttribute("aria-checked", exempt ? "true" : "false");
+    toggle.setAttribute("title", title);
+    let label = toggle.querySelector(".subs-channel-exception__label");
+    if (label) {
+        label.textContent = getChannelExceptionLabel();
+    }
+}
+
+// A "Show ... here" switch in the header controls of a channel page, while at least one of the
+// filters it affects is on: it adds the channel to the exception list or takes it off. Added late
+// (pageContext.js named the channel of a /c/ or /user/ page after buildUI()), it goes before the
+// settings button, where buildUI() puts it.
+function addChannelExceptionToggle(late = false) {
+    deleteOldButton(CHANNEL_EXCEPTION_TOGGLE);
+    deleteOldButton(CHANNEL_EXCEPTION_MESSAGE);
+
+    let channel = getCurrentChannel();
+    if (!channel || getActiveChannelFilterNames().length === 0) {
+        return;
+    }
+
+    let toggle = buildMenuButtonContainer();
+    toggle.setAttribute("id", CHANNEL_EXCEPTION_TOGGLE);
+    toggle.setAttribute("role", "switch");
+    toggle.setAttribute("tabindex", "0");
+    toggle.classList.add("subs-channel-exception");
+
+    // real elements with explicit sizes in subs.css (not YouTube's paper-toggle styles)
+    let label = document.createElement("span");
+    label.classList.add("subs-channel-exception__label");
+    let track = document.createElement("span");
+    track.classList.add("subs-channel-exception__track");
+    track.setAttribute("aria-hidden", "true");
+    let knob = document.createElement("span");
+    knob.classList.add("subs-channel-exception__knob");
+    track.appendChild(knob);
+    toggle.appendChild(label);
+    toggle.appendChild(track);
+
+    renderChannelExceptionToggle(toggle);
+    let settingsButton = late ? document.getElementById(SETTINGS_BTN) : null;
+    if (settingsButton && settingsButton.parentNode) {
+        settingsButton.before(toggle);
+        addedElems.push(toggle);
+    } else {
+        addElementToMenuUI(toggle);
+    }
+
+    // where a failed save says why (the list is full, sync storage refused it)
+    let message = document.createElement("span");
+    message.setAttribute("id", CHANNEL_EXCEPTION_MESSAGE);
+    message.classList.add("subs-channel-exception-message");
+    message.setAttribute("role", "status");
+    message.setAttribute("aria-live", "polite");
+    if (toggle.parentNode) {
+        toggle.after(message);
+        addedElems.push(message);
+    }
+
+    toggle.addEventListener("click", channelExceptionToggleClicked);
+    toggle.addEventListener("keydown", event => {
+        if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            channelExceptionToggleClicked();
+        }
+    });
+
+    completeCurrentChannelException();
+}
+
+// An entry added by @handle or by channel URL gets the other half once the page knows both. Decided
+// on the list as stored, so a channel just removed in another tab isn't added back.
+function completeCurrentChannelException() {
+    let channel = getCurrentChannel();
+    if (channel && channel.id && channel.handle && isChannelExempt(channel)) {
+        updateChannelExceptions(list => completeChannelException(list, channel).list).catch(logError);
+    }
+}
+
+let channelExceptionMessageTimeout = null;
+
+// Shows a message next to the switch for a few seconds (announced by screen readers), or clears it
+function showChannelExceptionMessage(text) {
+    clearTimeout(channelExceptionMessageTimeout);
+    let message = document.getElementById(CHANNEL_EXCEPTION_MESSAGE);
+    if (!message) {
+        return;
+    }
+    message.textContent = text || "";
+    if (text) {
+        channelExceptionMessageTimeout = setTimeout(() => {
+            message.textContent = "";
+        }, 8000);
+    }
+}
+
+let channelExceptionSaving = false;
+
+async function channelExceptionToggleClicked() {
+    let channel = getCurrentChannel();
+    // a second click before the first is saved would decide on a list about to change
+    if (!channel || channelExceptionSaving) {
+        return;
+    }
+    channelExceptionSaving = true;
+    showChannelExceptionMessage(null);
+    try {
+        // add or remove decided on the list as stored, which may have changed in another tab
+        await updateChannelExceptions(list => {
+            let exempt = isChannelInExceptions(list, channel);
+            log((exempt ? "Removing" : "Adding") + " channel exception " + formatChannelException(channel));
+            return exempt ? removeChannelException(list, channel) : addChannelException(list, channel).list;
+        });
+    } catch (e) {
+        logError(e);
+        showChannelExceptionMessage(e.message);
+        return;
+    } finally {
+        channelExceptionSaving = false;
+    }
+    // the storage listener does this too, but only once the change event arrives
+    applyChannelExceptions();
+}
+
+// pageContext.js has read which channel this page is, after buildUI(): a /c/ or /user/ page gets its
+// switch only now, and elsewhere the switch and the filters may now match an entry saved by id
+function pageChannelChanged() {
+    if (navigatingAway || !channelPagePrefix(window.location.pathname)) {
+        return;
+    }
+    if (document.getElementById(CHANNEL_EXCEPTION_TOGGLE)) {
+        completeCurrentChannelException();
+    } else {
+        addChannelExceptionToggle(true);
+    }
+    applyChannelExceptions();
+}
+
+// Re-applies the filters after the exception list changed: shows everything hidden and hides again
+// what should be, so cards of a channel just added come back and those of one just removed go.
+// Both happen in one task, so nothing is painted in between.
+// Cards pageContext.js tagged after they were hidden may now belong to a listed channel: show just
+// those, without re-scanning (and re-hiding) the whole feed or loading more
+function showNewlyExemptCards() {
+    if (navigatingAway) {
+        return;
+    }
+    let shown = 0;
+    for (let item of document.querySelectorAll("." + HIDDEN_CLASS)) {
+        if (new SubscriptionVideo(item).shouldHide()) {
+            continue;
+        }
+        item.style.display = '';
+        item.classList.remove(HIDDEN_CLASS);
+        let index = hidden.indexOf(item);
+        if (index !== -1) {
+            hidden.splice(index, 1);
+        }
+        shown++;
+    }
+    if (shown > 0) {
+        processSections();
+    }
+}
+
+function applyChannelExceptions() {
+    if (navigatingAway) {
+        return;
+    }
+    let toggle = document.getElementById(CHANNEL_EXCEPTION_TOGGLE);
+    if (toggle) {
+        renderChannelExceptionToggle(toggle);
+    }
+    showWatched();
+    removeWatchedAndAddButton();
 }
 
 function addElementToMenuUI(element) {

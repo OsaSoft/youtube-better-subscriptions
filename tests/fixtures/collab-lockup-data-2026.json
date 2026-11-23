@@ -1,0 +1,115 @@
+{
+  "_comment": "Trimmed from a real subscriptions-feed collab card (ytd-rich-item-renderer .data, 2026): only the fields pageContext.js reads, plus the channel name row",
+  "content": {
+    "lockupViewModel": {
+      "contentId": "WCKCGqkKiII",
+      "contentType": "LOCKUP_CONTENT_TYPE_VIDEO",
+      "metadata": {
+        "lockupMetadataViewModel": {
+          "title": {
+            "content": "The Airline Killed His PC"
+          },
+          "image": {
+            "avatarStackViewModel": {
+              "rendererContext": {
+                "commandContext": {
+                  "onTap": {
+                    "innertubeCommand": {
+                      "showDialogCommand": {
+                        "panelLoadingStrategy": {
+                          "inlineContent": {
+                            "dialogViewModel": {
+                              "customContent": {
+                                "listViewModel": {
+                                  "listItems": [
+                                    {
+                                      "listItemViewModel": {
+                                        "title": {
+                                          "content": "Linus Tech Tips"
+                                        },
+                                        "subtitle": {
+                                          "content": "‎⁨@LinusTechTips⁩ • ⁨16.8m subscribers⁩"
+                                        },
+                                        "rendererContext": {
+                                          "commandContext": {
+                                            "onTap": {
+                                              "innertubeCommand": {
+                                                "commandMetadata": {
+                                                  "webCommandMetadata": {
+                                                    "url": "/channel/UCXuqSBlHAE6Xw-yeJA0Tunw",
+                                                    "webPageType": "WEB_PAGE_TYPE_CHANNEL",
+                                                    "rootVe": 3611,
+                                                    "apiUrl": "/youtubei/v1/browse"
+                                                  }
+                                                },
+                                                "browseEndpoint": {
+                                                  "browseId": "UCXuqSBlHAE6Xw-yeJA0Tunw"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "listItemViewModel": {
+                                        "title": {
+                                          "content": "DankPods"
+                                        },
+                                        "subtitle": {
+                                          "content": "‎⁨@DankPods⁩ • ⁨1.83m subscribers⁩"
+                                        },
+                                        "rendererContext": {
+                                          "commandContext": {
+                                            "onTap": {
+                                              "innertubeCommand": {
+                                                "commandMetadata": {
+                                                  "webCommandMetadata": {
+                                                    "url": "/channel/UC7Jwj9fkrf1adN4fMmTkpug",
+                                                    "webPageType": "WEB_PAGE_TYPE_CHANNEL",
+                                                    "rootVe": 3611,
+                                                    "apiUrl": "/youtubei/v1/browse"
+                                                  }
+                                                },
+                                                "browseEndpoint": {
+                                                  "browseId": "UC7Jwj9fkrf1adN4fMmTkpug"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "metadata": {
+            "contentMetadataViewModel": {
+              "metadataRows": [
+                {
+                  "metadataParts": [
+                    {
+                      "text": {
+                        "content": "Linus Tech Tips and DankPods"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}
