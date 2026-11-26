@@ -156,25 +156,6 @@ function onFeedMutations(records) {
     }
 }
 
-function getVideoTitle(item) {
-    // Try old layout
-    let titleElem = item.querySelector("#video-title");
-    if (titleElem && titleElem.title) {
-        return titleElem.title;
-    }
-
-    // Try new lockupViewModel layout - the title is in an anchor tag
-    let lockupViewModel = item.querySelector("lockup-view-model");
-    if (lockupViewModel) {
-        let link = lockupViewModel.querySelector("a");
-        if (link) {
-            return link.getAttribute("title") || link.textContent.trim();
-        }
-    }
-
-    return "";
-}
-
 async function initSubs() {
     log("Initializing subs page...");
     const run = subsRun;
