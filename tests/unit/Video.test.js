@@ -569,6 +569,128 @@ describe('Video.js', () => {
             expect(new (videoClass({ flags: { hideShorts: true, hidePremieres: true } }))(card('/watch?v=abc12345678')).shouldHide()).toBe(false);
         });
 
+        describe('duration filters (#69)', () => {
+            const SHORTER = { 'settings.hide.duration.shorter': true, 'settings.hide.duration.shorter.minutes': 20 };
+            const LONGER = { 'settings.hide.duration.longer': true, 'settings.hide.duration.longer.minutes': 60 };
+
+            function hides(duration, durationSettings, href = '/watch?v=abc12345678', flags = {}) {
+                global.settings = { ...DEFAULT_SETTINGS, ...durationSettings };
+                const Video = videoClass({ flags });
+                return new Video(card(href, duration)).shouldHide();
+            }
+
+            test.each([
+                ['0:45', 45],
+                ['9:59', 599],
+                ['56:28', 3388],
+                ['1:29:19', 5359],
+                ['10:00:00', 36000],
+                ['  12:05 \n', 725],
+            ])('parseDurationSeconds(%j) is %d', (text, seconds) => {
+                expect(parseDurationSeconds(text)).toBe(seconds);
+            });
+
+            test.each(['SHORTS', 'LIVE', '', '1:2', '1:2:3', '12', ':45', '1:60x', null, undefined])
+            ('parseDurationSeconds(%j) is null', (text) => {
+                expect(parseDurationSeconds(text)).toBeNull();
+            });
+
+            test('both filters are off by default and hide nothing', () => {
+                for (const duration of ['0:45', '19:59', '1:00:01', '10:00:00']) {
+                    expect(hides(duration, {})).toBe(false);
+                }
+            });
+
+            test('"shorter than" hides videos under the limit; exactly the limit stays', () => {
+                expect(hides('19:59', SHORTER)).toBe(true);
+                expect(hides('0:45', SHORTER)).toBe(true);
+                expect(hides('20:00', SHORTER)).toBe(false);
+                expect(hides('1:29:19', SHORTER)).toBe(false);
+            });
+
+            test('"longer than" hides videos over the limit; exactly the limit stays', () => {
+                expect(hides('1:00:01', LONGER)).toBe(true);
+                expect(hides('3:12:45', LONGER)).toBe(true);
+                expect(hides('1:00:00', LONGER)).toBe(false);
+                expect(hides('60:00', LONGER)).toBe(false);
+                expect(hides('0:45', LONGER)).toBe(false);
+            });
+
+            test('both on keep only videos in between, limits included', () => {
+                const both = { ...SHORTER, ...LONGER };
+                expect(hides('19:59', both)).toBe(true);
+                expect(hides('20:00', both)).toBe(false);
+                expect(hides('56:28', both)).toBe(false);
+                expect(hides('1:00:00', both)).toBe(false);
+                expect(hides('1:00:01', both)).toBe(true);
+            });
+
+            test('reads the duration past a "Members only" badge before it', () => {
+                global.settings = { ...DEFAULT_SETTINGS, ...SHORTER };
+                const Video = videoClass();
+                document.body.innerHTML = `
+                    <div id="container">
+                        <a id="video-title" href="/watch?v=abc12345678">Title</a>
+                        <div class="ytBadgeShapeText">Members only</div>
+                        <div class="ytBadgeShapeText">5:10</div>
+                    </div>
+                `;
+                expect(new Video(document.getElementById('container')).shouldHide()).toBe(true);
+            });
+
+            test('Shorts, live streams and premieres are never hidden by it', () => {
+                const both = { ...SHORTER, ...LONGER };
+                expect(hides(null, both, '/shorts/abc12345678')).toBe(false);
+                expect(hides('0:30', both, '/shorts/abc12345678')).toBe(false);
+                expect(hides(null, both)).toBe(false); // premiere: no badge
+
+                global.settings = { ...DEFAULT_SETTINGS, ...both };
+                const Video = videoClass();
+                document.body.innerHTML = `
+                    <div id="container">
+                        <a id="video-title" href="/watch?v=abc12345678">Title</a>
+                        <div class="ytBadgeShapeThumbnailLive"><div class="ytBadgeShapeText">LIVE</div></div>
+                    </div>
+                `;
+                const live = new Video(document.getElementById('container'));
+                expect(live.isLivestream).toBe(true);
+                expect(live.shouldHide()).toBe(false);
+            });
+
+            test('a live stream showing a running time is not hidden by it', () => {
+                global.settings = { ...DEFAULT_SETTINGS, ...SHORTER };
+                const Video = videoClass();
+                document.body.innerHTML = `
+                    <div id="container">
+                        <a id="video-title" href="/watch?v=abc12345678">Title</a>
+                        <div class="ytBadgeShapeThumbnailLive"><div class="ytBadgeShapeText">1:05</div></div>
+                    </div>
+                `;
+                expect(new Video(document.getElementById('container')).shouldHide()).toBe(false);
+            });
+
+            test('an odd badge text is not a duration and hides nothing', () => {
+                expect(hides('1:2', { ...SHORTER, ...LONGER })).toBe(false);
+                expect(hides('12:34 extra', { ...SHORTER, ...LONGER })).toBe(false);
+            });
+
+            test.each(['', 0, -5, 'abc', null, NaN])('a minutes value of %j turns that filter off', (minutes) => {
+                expect(hides('0:45', { ...SHORTER, 'settings.hide.duration.shorter.minutes': minutes })).toBe(false);
+                expect(hides('10:00:00', { ...LONGER, 'settings.hide.duration.longer.minutes': minutes })).toBe(false);
+            });
+
+            test('minutes saved as a string still work', () => {
+                expect(hides('5:00', { ...SHORTER, 'settings.hide.duration.shorter.minutes': '10' })).toBe(true);
+                expect(hides('15:00', { ...SHORTER, 'settings.hide.duration.shorter.minutes': '10' })).toBe(false);
+            });
+
+            test('a watched video outside the limits is hidden even with Hide watched off', () => {
+                global.settings = { ...DEFAULT_SETTINGS, ...SHORTER };
+                const Video = videoClass({ watched: { 'wabc12345678': 1000 }, flags: { hideWatched: false } });
+                expect(new Video(card('/watch?v=abc12345678', '3:00')).shouldHide()).toBe(true);
+            });
+        });
+
         test('hide() hides the card and remembers it', () => {
             const Video = videoClass();
             const div = card('/watch?v=abc12345678');

@@ -39,6 +39,8 @@ function hideWatchedChanged(event) {
             toggle.classList.remove("subs-btn-hide-watched-checked");
             toggle.classList.add("subs-btn-hide-watched-unchecked");
             showWatched();
+            // showWatched() shows every hidden card: hide again the ones the other filters hide
+            removeWatchedAndAddButton();
         } else {
             hideWatched = true;
             toggle.classList.remove("subs-btn-hide-watched-unchecked");

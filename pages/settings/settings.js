@@ -60,6 +60,12 @@ function saveSettings() {
         } else if (elem.matches('select')) {
             // numeric selects (log level) store numbers, the others their option value
             values[elem.id] = typeof DEFAULT_SETTINGS[elem.id] === "number" ? parseInt(elem.value, 10) : elem.value;
+        } else if (elem.matches('input[type="number"]') && typeof DEFAULT_SETTINGS[elem.id] === "number") {
+            // numeric settings store numbers; an empty or invalid field keeps the default, and a
+            // number under the field's min is raised to it
+            let number = Number(elem.value);
+            let min = elem.min === "" ? -Infinity : Number(elem.min);
+            values[elem.id] = elem.value.trim() !== "" && Number.isFinite(number) ? Math.max(number, min) : DEFAULT_SETTINGS[elem.id];
         } else {
             values[elem.id] = elem.value;
         }

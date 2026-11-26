@@ -239,6 +239,7 @@ function loadVideo() {
     global.getVideoUrl = context.getVideoUrl;
     global.getVideoId = context.getVideoId;
     global.getVideoDuration = context.getVideoDuration;
+    global.parseDurationSeconds = context.parseDurationSeconds;
     global.isLivestream = context.isLivestream;
     global.isMembersOnly = context.isMembersOnly;
     global.getPosterChannelId = context.getPosterChannelId;

@@ -218,6 +218,14 @@
     color: var(--color-text-secondary);
 }
 
+/* A number field and a switch side by side (duration filters, #69) */
+.setting-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex-shrink: 0;
+}
+
 /* Select Dropdown */
 .select-wrapper {
     position: relative;
@@ -650,6 +658,10 @@
 
     .toggle {
         align-self: flex-start;
+    }
+
+    .setting-controls .toggle {
+        align-self: center;
     }
 
     .data-action {

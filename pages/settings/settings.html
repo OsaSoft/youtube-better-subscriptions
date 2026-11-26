@@ -118,7 +118,7 @@
                         <div class="setting-item channel-exceptions" id="channel-exceptions">
                             <div class="setting-info">
                                 <span class="setting-title" id="channel-exceptions-title">Channel exceptions</span>
-                                <span class="setting-description" id="channel-exceptions-desc">Premieres, live streams and members-only videos from these channels stay visible while the three options above hide them from everyone else. Hide watched and Hide Shorts still apply. On a channel's Videos or Live page, the "Show … here" switch adds the channel or removes it.</span>
+                                <span class="setting-description" id="channel-exceptions-desc">Premieres, live streams and members-only videos from these channels stay visible while the three options above hide them from everyone else. Hide watched, Hide Shorts and the duration filters still apply. On a channel's Videos or Live page, the "Show … here" switch adds the channel or removes it.</span>
                                 <form class="channel-exceptions__form" id="channel-exceptions-form" novalidate>
                                     <input type="text" id="channel-exceptions-input" class="input-text"
                                            placeholder="@handle or channel URL"
@@ -142,6 +142,40 @@
                                 <input type="checkbox" id="settings.hide.collabs.unsubscribed" aria-labelledby="setting-hide-collabs-title" aria-describedby="setting-hide-collabs-desc">
                                 <span class="toggle-slider"></span>
                             </label>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <span class="setting-title" id="setting-hide-duration-shorter-title">Hide videos shorter than</span>
+                                <span class="setting-description" id="setting-hide-duration-shorter-desc">Shorts, premieres and live streams are not affected</span>
+                            </div>
+                            <div class="setting-controls">
+                                <div class="input-group">
+                                    <input type="number" id="settings.hide.duration.shorter.minutes" class="input-number" min="1" step="1" aria-label="Hide videos shorter than, in minutes" aria-describedby="setting-hide-duration-shorter-desc">
+                                    <span class="input-unit" aria-hidden="true">min</span>
+                                </div>
+                                <label class="toggle">
+                                    <input type="checkbox" id="settings.hide.duration.shorter" aria-labelledby="setting-hide-duration-shorter-title" aria-describedby="setting-hide-duration-shorter-desc">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <span class="setting-title" id="setting-hide-duration-longer-title">Hide videos longer than</span>
+                                <span class="setting-description" id="setting-hide-duration-longer-desc">Premieres and live streams are not affected</span>
+                            </div>
+                            <div class="setting-controls">
+                                <div class="input-group">
+                                    <input type="number" id="settings.hide.duration.longer.minutes" class="input-number" min="1" step="1" aria-label="Hide videos longer than, in minutes" aria-describedby="setting-hide-duration-longer-desc">
+                                    <span class="input-unit" aria-hidden="true">min</span>
+                                </div>
+                                <label class="toggle">
+                                    <input type="checkbox" id="settings.hide.duration.longer" aria-labelledby="setting-hide-duration-longer-title" aria-describedby="setting-hide-duration-longer-desc">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
                         </div>
                     </div>
 

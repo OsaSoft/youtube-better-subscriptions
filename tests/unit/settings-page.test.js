@@ -31,6 +31,56 @@ describe('settings page saveSettings', () => {
         expect(saved["settings.hide.shorts"]).toBe(true);
         expect(brwsr._getSyncStore().settings).toEqual(saved);
     });
+
+    test('saves number fields of numeric settings as numbers, empty or invalid ones as the default (#69)', () => {
+        document.body.innerHTML = `
+            <input type="number" id="settings.hide.duration.shorter.minutes" value="25">
+            <input type="number" id="settings.hide.duration.longer.minutes" value="">
+            <input type="number" id="settings.hide.watched.refresh.rate" min="100" value="5000">
+            <input type="checkbox" id="settings.hide.duration.shorter" checked>`;
+        loadUtil();
+        const page = loadSource('pages/settings/settings.js', {
+            log: global.log,
+            logError: global.logError,
+            brwsr: global.brwsr,
+            DEFAULT_SETTINGS: global.DEFAULT_SETTINGS,
+            SETTINGS_KEY: 'settings',
+            SETTINGS_LOCAL_KEY: 'settings_cache',
+        });
+        page.showToast = jest.fn();
+
+        page.saveSettings();
+
+        const saved = brwsr._getLocalStore().settings_cache;
+        expect(saved["settings.hide.duration.shorter.minutes"]).toBe(25);
+        expect(saved["settings.hide.duration.longer.minutes"]).toBe(120);
+        expect(saved["settings.hide.watched.refresh.rate"]).toBe(5000);
+        expect(saved["settings.hide.duration.shorter"]).toBe(true);
+    });
+
+    test('raises a number under the field\'s min to the min', () => {
+        document.body.innerHTML = `
+            <input type="number" id="settings.hide.duration.shorter.minutes" min="1" value="0">
+            <input type="number" id="settings.hide.duration.longer.minutes" min="1" value="-5">
+            <input type="number" id="settings.hide.watched.refresh.rate" min="100" value="0">`;
+        loadUtil();
+        const page = loadSource('pages/settings/settings.js', {
+            log: global.log,
+            logError: global.logError,
+            brwsr: global.brwsr,
+            DEFAULT_SETTINGS: global.DEFAULT_SETTINGS,
+            SETTINGS_KEY: 'settings',
+            SETTINGS_LOCAL_KEY: 'settings_cache',
+        });
+        page.showToast = jest.fn();
+
+        page.saveSettings();
+
+        const saved = brwsr._getLocalStore().settings_cache;
+        expect(saved["settings.hide.duration.shorter.minutes"]).toBe(1);
+        expect(saved["settings.hide.duration.longer.minutes"]).toBe(1);
+        expect(saved["settings.hide.watched.refresh.rate"]).toBe(100);
+    });
 });
 
 describe('settings page controls', () => {
@@ -53,6 +103,54 @@ describe('settings page controls', () => {
             'settings.hide.watched.support.home',
             'settings.hide.watched.support.playlist',
         ]);
+    });
+});
+
+describe('settings page duration filters (#69)', () => {
+    const fs = require('fs');
+    const path = require('path');
+
+    beforeEach(() => {
+        const html = fs.readFileSync(path.join(__dirname, '../../pages/settings/settings.html'), 'utf8');
+        document.documentElement.innerHTML = html.replace(/^<!DOCTYPE html>/i, '');
+    });
+
+    test('every default setting has an element on the page', () => {
+        const missing = Object.keys(DEFAULT_SETTINGS).filter(key => !document.getElementById(key));
+        expect(missing).toEqual([]);
+    });
+
+    test.each([
+        ['settings.hide.duration.shorter', 'Hide videos shorter than'],
+        ['settings.hide.duration.longer', 'Hide videos longer than'],
+    ])('%s is a row with a switch and a minutes field at the end of Content Filters', (key, title) => {
+        const toggle = document.getElementById(key);
+        const minutes = document.getElementById(key + '.minutes');
+        expect(toggle.matches('.toggle input[type="checkbox"]')).toBe(true);
+        expect(minutes.matches('input[type="number"].input-number')).toBe(true);
+        expect(minutes.getAttribute('min')).toBe('1');
+        expect(minutes.getAttribute('aria-label')).toBeTruthy();
+        expect(minutes.parentElement.querySelector('.input-unit').textContent).toBe('min');
+
+        const item = toggle.closest('.setting-item');
+        expect(minutes.closest('.setting-item')).toBe(item);
+        expect(item.querySelector('.setting-title').textContent).toBe(title);
+        expect(item.querySelector('.setting-description').textContent).not.toBe('');
+        const titleId = toggle.getAttribute('aria-labelledby');
+        expect(document.getElementById(titleId).textContent).toBe(title);
+        expect(document.getElementById(toggle.getAttribute('aria-describedby'))).not.toBeNull();
+
+        const group = item.closest('.settings-group');
+        expect(group.querySelector('.settings-group__title').textContent).toBe('Content Filters');
+        const rows = [...group.querySelectorAll('.setting-item')];
+        expect(rows.slice(-2).map(row => row.querySelector('.toggle input').id)).toEqual([
+            'settings.hide.duration.shorter',
+            'settings.hide.duration.longer',
+        ]);
+    });
+
+    test('the channel exceptions description says the duration filters still apply', () => {
+        expect(document.getElementById('channel-exceptions-desc').textContent).toContain('duration filters still apply');
     });
 });
 
