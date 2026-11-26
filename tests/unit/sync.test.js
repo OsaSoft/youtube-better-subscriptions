@@ -1091,19 +1091,20 @@ describe('Sync functionality', () => {
         test('the budget is the quota less the other keys in UTF-8 and the reserve', () => {
             const store = { settings: { a: 'é' }, channel_exceptions: ['@あいう'], vw_0: ['wABC12345678:1'], vw_meta: { version: 2 } };
             const other = global.syncItemBytes('settings', store.settings) + global.syncItemBytes('channel_exceptions', store.channel_exceptions);
-            expect(commonContext.getSyncHistoryBudget(store)).toBe(102400 - other - 1536);
+            // reserve: channel exceptions cap + title patterns cap (#70) + slack
+            expect(commonContext.getSyncHistoryBudget(store)).toBe(102400 - other - (1024 + 1024 + 512));
         });
 
         test('with only settings in sync storage history keeps about as much room as before', () => {
             const settings = { ...global.DEFAULT_SETTINGS };
             expect(Object.keys(settings).length).toBeGreaterThan(10);
-            expect(commonContext.getSyncHistoryBudget({ settings })).toBeGreaterThan(99000);
+            expect(commonContext.getSyncHistoryBudget({ settings })).toBeGreaterThan(98000);
         });
 
         test('uses the quota the browser reports', () => {
             browser.storage.sync.QUOTA_BYTES = 50000;
             try {
-                expect(commonContext.getSyncHistoryBudget({})).toBe(50000 - 1536);
+                expect(commonContext.getSyncHistoryBudget({})).toBe(50000 - 2560);
             } finally {
                 delete browser.storage.sync.QUOTA_BYTES;
             }

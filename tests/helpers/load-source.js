@@ -127,8 +127,38 @@ function loadCommon() {
     global.decodeTimestamp = context.decodeTimestamp;
     global.packSyncEntry = context.packSyncEntry;
     global.unpackSyncEntry = context.unpackSyncEntry;
+    global.MAX_TITLE_PATTERNS_BYTES = readBinding(context, 'MAX_TITLE_PATTERNS_BYTES');
+    global.SYNC_RESERVED_BYTES = readBinding(context, 'SYNC_RESERVED_BYTES');
+    global.parseTitlePatterns = context.parseTitlePatterns;
+    global.getTitlePatternsBytes = context.getTitlePatternsBytes;
+    global.getTitlePatterns = context.getTitlePatterns;
+    global.matchesTitlePattern = context.matchesTitlePattern;
 
     return context;
+}
+
+// The title pattern matcher (#70) from common.js, for scripts tested without loadCommon(): loaded in
+// a context of its own so it doesn't replace the globals loadCommon() sets (brwsr, watchedVideos)
+// Loaded once per test file: each load of common.js adds a storage listener to the shared mock.
+let titlePatternMatcher = null;
+function loadTitlePatternMatcher() {
+    if (titlePatternMatcher) {
+        return titlePatternMatcher;
+    }
+    if (!global.log) {
+        loadUtil();
+    }
+    titlePatternMatcher = loadSource('common.js', {
+        settings: global.settings,
+        log: global.log,
+        logDebug: global.logDebug,
+        logWarn: global.logWarn,
+        logError: global.logError,
+        utf8ByteLength: global.utf8ByteLength,
+        browser: global.browser,
+        chrome: global.chrome
+    }).matchesTitlePattern;
+    return titlePatternMatcher;
 }
 
 const CHANNEL_EXCEPTIONS_EXPORTS = [
@@ -232,10 +262,12 @@ function loadVideo() {
         syncWatchedVideos: global.syncWatchedVideos,
         processSections: global.processSections,
         buildMarkWatchedButton: global.buildMarkWatchedButton,
-        changeMarkWatchedToMarkUnwatched: global.changeMarkWatchedToMarkUnwatched
+        changeMarkWatchedToMarkUnwatched: global.changeMarkWatchedToMarkUnwatched,
+        matchesTitlePattern: global.matchesTitlePattern || loadTitlePatternMatcher()
     });
 
     global.getVideoIdFromUrl = context.getVideoIdFromUrl;
+    global.getVideoTitle = context.getVideoTitle;
     global.getVideoUrl = context.getVideoUrl;
     global.getVideoId = context.getVideoId;
     global.getVideoDuration = context.getVideoDuration;
@@ -307,7 +339,8 @@ function loadSubscriptionsVideo() {
         processSections: global.processSections,
         buildMarkWatchedButton: global.buildMarkWatchedButton,
         changeMarkWatchedToMarkUnwatched: global.changeMarkWatchedToMarkUnwatched,
-        getVideoId: global.getVideoId
+        getVideoId: global.getVideoId,
+        matchesTitlePattern: global.matchesTitlePattern || loadTitlePatternMatcher()
     };
 
     vm.createContext(context);
@@ -514,7 +547,6 @@ function loadSubs() {
     });
 
     global.isYouTubeWatched = context.isYouTubeWatched;
-    global.getVideoTitle = context.getVideoTitle;
     global.initSubs = context.initSubs;
     global.stopSubs = context.stopSubs;
     global.hidden = readBinding(context, 'hidden');
