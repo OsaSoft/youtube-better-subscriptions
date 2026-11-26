@@ -800,7 +800,8 @@ function processRenderedVideo(item) {
     if (!vid.isStored && isYouTubeWatched(item)) {
         vid.recordWatched();
     }
-    let isHidden = vid.hidesAsWatched();
+    // and the duration filters (#69), which only act on a badge that's there and parses
+    let isHidden = vid.hidesAsWatched() || vid.hidesByDuration();
     if (isHidden) {
         vid.hide();
     }

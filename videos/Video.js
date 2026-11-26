@@ -76,6 +76,29 @@ function getVideoDuration(item) {
     return getBadgeDuration(item, ".yt-badge-shape__text");
 }
 
+// Seconds in a duration badge text ("0:45", "56:28", "1:29:19"), or null for anything else
+// ("SHORTS", "LIVE", empty, not loaded yet)
+function parseDurationSeconds(text) {
+    if (typeof text !== "string") {
+        return null;
+    }
+    let trimmed = text.trim();
+    if (!/^\d+(:\d{2}){1,2}$/.test(trimmed)) {
+        return null;
+    }
+    return trimmed.split(":").reduce((seconds, part) => seconds * 60 + parseInt(part, 10), 0);
+}
+
+// A duration filter's limit in minutes, or null when the filter is off or its value isn't a
+// positive number (an empty, zero or negative value turns the filter off)
+function durationFilterMinutes(enabledKey, minutesKey) {
+    if (typeof settings === "undefined" || !settings || !settings[enabledKey]) {
+        return null;
+    }
+    let minutes = Number(settings[minutesKey]);
+    return Number.isFinite(minutes) && minutes > 0 ? minutes : null;
+}
+
 function isLivestream(item) {
     // Check for LIVE badge using CSS class (language-independent)
     // ytBadgeShapeThumbnailLive since 2026-08, yt-badge-shape--thumbnail-live before
@@ -244,11 +267,32 @@ class Video {
         return channel === null ? !isReadWithoutChannel(this) : isChannelExempt(channel);
     }
 
+    // "Hide videos shorter/longer than" (#69): only cards with a known duration; Shorts, live
+    // streams, premieres and cards whose badge hasn't loaded yet are never hidden by it. A video
+    // of exactly the limit stays visible.
+    hidesByDuration() {
+        if (this.isShort || this.isLivestream || this.isPremiere) {
+            return false;
+        }
+        let seconds = parseDurationSeconds(this.videoDuration);
+        if (seconds === null) {
+            return false;
+        }
+        let shorterMinutes = durationFilterMinutes("settings.hide.duration.shorter", "settings.hide.duration.shorter.minutes");
+        let longerMinutes = durationFilterMinutes("settings.hide.duration.longer", "settings.hide.duration.longer.minutes");
+        return Boolean(
+                (shorterMinutes !== null && seconds < shorterMinutes * 60) ||
+                (longerMinutes !== null && seconds > longerMinutes * 60)
+        );
+    }
+
     shouldHide() {
-        // the exception never overrides "Hide watched", Hide Shorts or the collab filter
+        // the exception never overrides "Hide watched", Hide Shorts, the duration filters or the
+        // collab filter
         return Boolean(
                 this.hidesAsWatched() ||
                 (hideShorts && this.isShort) ||
+                this.hidesByDuration() ||
                 (hideCollabsUnsubscribed && this.isCollaboration && isSubscriptionsPage() && !isSubscribedToChannel(getPosterChannelId(this))) ||
                 (this.hidesByChannelFilters() && !this.isFromExemptChannel())
         );
