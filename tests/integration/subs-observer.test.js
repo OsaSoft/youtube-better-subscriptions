@@ -103,6 +103,75 @@ describe('initSubs feed observer', () => {
         }
     });
 
+    test('cards outside the duration limits are hidden as they render, not at the next tick (#69)', async () => {
+        setup();
+        settings["settings.hide.duration.shorter"] = true;
+        settings["settings.hide.duration.shorter.minutes"] = 20;
+        settings["settings.hide.duration.longer"] = true;
+        settings["settings.hide.duration.longer.minutes"] = 45;
+        try {
+            await initSubs();
+
+            const items = addFeed(camelHTML);
+            await flushObserver();
+
+            // 50:38 and 13:48 are outside 20-45 min, 20:57 is inside
+            expect(items.map(item => item.style.display === 'none')).toEqual([true, false, true]);
+            expect(global.removeWatchedAndAddButton).toHaveBeenCalledTimes(1);
+        } finally {
+            settings["settings.hide.duration.shorter"] = false;
+            settings["settings.hide.duration.longer"] = false;
+        }
+    });
+
+    test('a card whose duration badge arrives later is hidden by the duration filter then, not before (#69)', async () => {
+        setup();
+        settings["settings.hide.duration.shorter"] = true;
+        settings["settings.hide.duration.shorter.minutes"] = 20;
+        try {
+            await initSubs();
+
+            const tmp = document.createElement('div');
+            tmp.innerHTML = camelHTML;
+            const card = [...tmp.querySelectorAll('ytd-rich-item-renderer')][2]; // 13:48
+            const badge = card.querySelector('badge-shape, .ytBadgeShapeText');
+            const badgeParent = badge.parentNode;
+            badge.remove();
+
+            addFeed('<ytd-rich-grid-renderer class="style-scope ytd-two-column-browse-results-renderer"><div id="contents" class="style-scope ytd-rich-grid-renderer"></div></ytd-rich-grid-renderer>');
+            document.querySelector('#contents').appendChild(card);
+            await flushObserver();
+            expect(card.style.display).not.toBe('none');
+
+            badgeParent.appendChild(badge);
+            await flushObserver();
+            expect(card.style.display).toBe('none');
+        } finally {
+            settings["settings.hide.duration.shorter"] = false;
+        }
+    });
+
+    test('switching Hide watched off keeps cards the duration filter hides hidden (#69)', async () => {
+        const subs = setup({ hideWatched: true });
+        settings["settings.hide.duration.shorter"] = true;
+        settings["settings.hide.duration.shorter.minutes"] = 20;
+        try {
+            await initSubs();
+            const toggle = document.createElement('div');
+            toggle.id = HIDE_WATCHED_TOGGLE;
+            document.body.appendChild(toggle);
+            const items = addFeed(camelHTML);
+            await flushObserver();
+            expect(items.map(item => item.style.display === 'none')).toEqual([false, false, true]);
+
+            subs.hideWatchedChanged();
+
+            expect(items.map(item => item.style.display === 'none')).toEqual([false, false, true]);
+        } finally {
+            settings["settings.hide.duration.shorter"] = false;
+        }
+    });
+
     test('compact on: the button goes under the menu button', async () => {
         setup({ compact: true });
         await initSubs();

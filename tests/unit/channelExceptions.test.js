@@ -327,6 +327,22 @@ describe('Video.shouldHide with channel exceptions', () => {
         expect(new Video(card('short', '/@LinusTechTips')).shouldHide()).toBe(true);
     });
 
+    test('never overrides the duration filters (#69)', async () => {
+        global.settings = {
+            ...DEFAULT_SETTINGS,
+            'settings.hide.duration.shorter': true, 'settings.hide.duration.shorter.minutes': 10,
+        };
+        try {
+            const Video = await videoClass({ exceptions: ['@linustechtips'], flags: ALL_THREE });
+            // the regular and members cards are 3:45 long
+            expect(new Video(card('regular', '/@LinusTechTips')).shouldHide()).toBe(true);
+            expect(new Video(card('members', '/@LinusTechTips')).shouldHide()).toBe(true);
+            expect(new Video(card('premiere', '/@LinusTechTips')).shouldHide()).toBe(false);
+        } finally {
+            global.settings = { ...DEFAULT_SETTINGS };
+        }
+    });
+
     test('never overrides the collab filter', async () => {
         global.isSubscriptionsPage = () => true;
         global.isSubscribedToChannel = () => false;
