@@ -302,13 +302,25 @@ class Video {
         );
     }
 
+    // "Hide videos by title" (#70): the title matches one of the patterns (one per line, regular
+    // expressions, case-insensitive). Shorts and mixes included: a title is a title. A card whose
+    // title hasn't rendered yet isn't hidden; the next scan checks it again.
+    hidesByTitle() {
+        let text = typeof settings !== "undefined" && settings ? settings["settings.hide.title.patterns"] : "";
+        if (typeof text !== "string" || text.trim() === "") {
+            return false;
+        }
+        return matchesTitlePattern(getVideoTitle(this.containingDiv), text);
+    }
+
     shouldHide() {
-        // the exception never overrides "Hide watched", Hide Shorts, the duration filters or the
-        // collab filter
+        // the exception never overrides "Hide watched", Hide Shorts, the duration and title filters
+        // or the collab filter
         return Boolean(
                 this.hidesAsWatched() ||
                 (hideShorts && this.isShort) ||
                 this.hidesByDuration() ||
+                this.hidesByTitle() ||
                 (hideCollabsUnsubscribed && this.isCollaboration && isSubscriptionsPage() && !isSubscribedToChannel(getPosterChannelId(this))) ||
                 (this.hidesByChannelFilters() && !this.isFromExemptChannel())
         );

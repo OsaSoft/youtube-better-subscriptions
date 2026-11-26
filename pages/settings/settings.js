@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", initSettings);
 document.addEventListener("DOMContentLoaded", displayVersion);
 document.addEventListener("DOMContentLoaded", runSyncDiagnostics);
 document.addEventListener("DOMContentLoaded", initChannelExceptions);
+document.addEventListener("DOMContentLoaded", initTitlePatterns);
 
 // Track the element that opened the modal for focus restoration
 let previouslyFocusedElement = null;
@@ -37,6 +38,8 @@ function updateSettings() {
             });
         }
     }
+    // setting a field's value fires no input event
+    updateTitlePatternsStatus();
 }
 
 function showSettings() {
@@ -52,6 +55,10 @@ function hideSpinners() {
 }
 
 function saveSettings() {
+    if (!checkTitlePatternsFit()) {
+        return;
+    }
+
     let values = {};
 
     for (let elem of document.querySelectorAll("[id^='settings.']")) {
@@ -633,4 +640,72 @@ async function removeChannelExceptionClicked(channel) {
         logError(e);
         showToast("Failed to remove " + describeChannel(channel) + ": " + e.message, "error");
     }
+}
+
+// --- Title patterns (#70) ---
+// Saved with "Save Settings" like the other settings (settings.hide.title.patterns). The summary of
+// the collapsed "Advanced filters" section says how many patterns are active, so a hidden video isn't
+// a mystery while it's closed.
+
+function initTitlePatterns() {
+    const textarea = document.getElementById("settings.hide.title.patterns");
+    if (!textarea) {
+        return;
+    }
+    textarea.addEventListener("input", updateTitlePatternsStatus);
+    updateTitlePatternsStatus();
+}
+
+function pluralize(count, singular, plural) {
+    return count + " " + (count === 1 ? singular : plural);
+}
+
+// The summary's status and the inline errors, for what's in the text area now
+function updateTitlePatternsStatus() {
+    const textarea = document.getElementById("settings.hide.title.patterns");
+    const status = document.getElementById("advanced-filters-status");
+    const error = document.getElementById("title-patterns-error");
+    if (!textarea || !status || !error) {
+        return;
+    }
+
+    const {patterns, errors} = parseTitlePatterns(textarea.value);
+    const bytes = getTitlePatternsBytes(textarea.value);
+    const tooLong = bytes > MAX_TITLE_PATTERNS_BYTES;
+
+    const parts = [];
+    if (patterns.length > 0) {
+        parts.push(pluralize(patterns.length, "title pattern", "title patterns"));
+    }
+    if (errors.length > 0) {
+        parts.push(errors.length + " invalid");
+    }
+    status.textContent = parts.join(" · ");
+    status.classList.toggle("hidden", parts.length === 0);
+
+    const messages = errors.map(e => "Line " + e.line + " is not a valid pattern and is skipped (" + e.message + ")");
+    if (tooLong) {
+        messages.unshift("Too long to save: " + bytes + " of " + MAX_TITLE_PATTERNS_BYTES + " bytes. Remove some patterns.");
+    }
+    error.textContent = messages.join("\n");
+    error.classList.toggle("hidden", messages.length === 0);
+    if (messages.length > 0) {
+        textarea.setAttribute("aria-invalid", "true");
+    } else {
+        textarea.removeAttribute("aria-invalid");
+    }
+}
+
+// Whether the patterns fit their share of sync storage; if not, says so and shows them. Invalid lines
+// don't stop a save: they're skipped where videos are hidden.
+function checkTitlePatternsFit() {
+    const textarea = document.getElementById("settings.hide.title.patterns");
+    if (!textarea || getTitlePatternsBytes(textarea.value) <= MAX_TITLE_PATTERNS_BYTES) {
+        return true;
+    }
+    updateTitlePatternsStatus();
+    document.getElementById("advanced-filters").open = true;
+    textarea.focus();
+    showToast("Title patterns are too long to save", "error");
+    return false;
 }
