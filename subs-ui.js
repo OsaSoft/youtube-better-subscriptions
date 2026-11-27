@@ -783,8 +783,9 @@ function isVideoRendered(item) {
 }
 
 // Handles a card the feed observer (see initSubs) saw YouTube render, before the browser paints it.
-// Unlike removeWatchedAndAddButton() it only hides on positive evidence that the video is watched
-// (stored as watched, or YouTube's progress bar): the other filters read badges that may not have
+// Unlike removeWatchedAndAddButton() it only hides on positive evidence: the video is watched (stored
+// as watched, or YouTube's progress bar), its duration badge is there and out of range (#69), or its
+// title is there and matches a pattern (#70). The other filters read badges that may not have
 // rendered yet, and a card hidden by mistake is never rescanned, so those are left to the periodic
 // scan. Returns whether the card was hidden.
 function processRenderedVideo(item) {
@@ -800,8 +801,9 @@ function processRenderedVideo(item) {
     if (!vid.isStored && isYouTubeWatched(item)) {
         vid.recordWatched();
     }
-    // and the duration filters (#69), which only act on a badge that's there and parses
-    let isHidden = vid.hidesAsWatched() || vid.hidesByDuration();
+    // and the duration filters (#69), which only act on a badge that's there and parses, and the
+    // title filter (#70), which only acts on a title that's there
+    let isHidden = vid.hidesAsWatched() || vid.hidesByDuration() || vid.hidesByTitle();
     if (isHidden) {
         vid.hide();
     }

@@ -172,6 +172,45 @@ describe('initSubs feed observer', () => {
         }
     });
 
+    test('cards whose title matches a pattern are hidden as they render, not at the next tick (#70)', async () => {
+        setup();
+        settings["settings.hide.title.patterns"] = "video two\n(invalid";
+        try {
+            await initSubs();
+
+            const items = addFeed(camelHTML);
+            await flushObserver();
+
+            expect(items.map(item => item.style.display === 'none')).toEqual([false, true, false]);
+            expect(global.removeWatchedAndAddButton).toHaveBeenCalledTimes(1);
+            // hidden, not stored as watched
+            expect(global.watchVideo).not.toHaveBeenCalled();
+            expect(items[1].querySelector('#' + MARK_WATCHED_BTN)).not.toBeNull();
+        } finally {
+            settings["settings.hide.title.patterns"] = "";
+        }
+    });
+
+    test('switching Hide watched off keeps cards the title filter hides hidden (#70)', async () => {
+        const subs = setup({ hideWatched: true });
+        settings["settings.hide.title.patterns"] = "VIDEO THREE";
+        try {
+            await initSubs();
+            const toggle = document.createElement('div');
+            toggle.id = HIDE_WATCHED_TOGGLE;
+            document.body.appendChild(toggle);
+            const items = addFeed(camelHTML);
+            await flushObserver();
+            expect(items.map(item => item.style.display === 'none')).toEqual([false, false, true]);
+
+            subs.hideWatchedChanged();
+
+            expect(items.map(item => item.style.display === 'none')).toEqual([false, false, true]);
+        } finally {
+            settings["settings.hide.title.patterns"] = "";
+        }
+    });
+
     test('compact on: the button goes under the menu button', async () => {
         setup({ compact: true });
         await initSubs();

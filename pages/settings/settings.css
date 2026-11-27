@@ -789,3 +789,103 @@
     font-size: var(--font-size-sm);
     color: var(--color-text-secondary);
 }
+
+/* Advanced filters (#70): a disclosure row at the end of Content Filters, collapsed by default */
+.advanced-filters {
+    border-top: 1px solid var(--color-divider);
+}
+
+.advanced-filters__summary {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-lg);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    transition: background-color var(--transition-fast);
+}
+
+.advanced-filters__summary::-webkit-details-marker {
+    display: none;
+}
+
+.advanced-filters__summary:hover {
+    background-color: var(--color-hover);
+}
+
+.advanced-filters__summary:focus {
+    outline: none;
+}
+
+.advanced-filters__summary:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: -2px;
+}
+
+.advanced-filters__title {
+    font-size: var(--font-size-base);
+    font-weight: 500;
+    color: var(--color-text);
+}
+
+.advanced-filters__status {
+    padding: 1px var(--spacing-sm);
+    border-radius: 999px;
+    background: var(--color-btn-secondary);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    white-space: nowrap;
+}
+
+.advanced-filters__chevron {
+    width: 24px;
+    height: 24px;
+    margin-left: auto;
+    flex-shrink: 0;
+    color: var(--color-text-secondary);
+    transition: transform var(--transition-fast);
+}
+
+.advanced-filters[open] > .advanced-filters__summary .advanced-filters__chevron {
+    transform: rotate(180deg);
+}
+
+.advanced-filters__item {
+    border-top: 1px solid var(--color-divider);
+}
+
+.advanced-filters__item .setting-description code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.95em;
+    padding: 0 3px;
+    border-radius: 3px;
+    background: var(--color-btn-secondary);
+    color: var(--color-text);
+}
+
+.input-textarea {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    margin-top: var(--spacing-md);
+    min-height: 5.5em;
+    resize: vertical;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+}
+
+.advanced-filters__error {
+    margin: var(--spacing-sm) 0 0;
+    font-size: var(--font-size-sm);
+    color: var(--color-danger-text);
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
+
+@media (prefers-color-scheme: dark) {
+    .input-textarea:focus {
+        box-shadow: 0 0 0 3px rgba(255, 78, 69, 0.45);
+    }
+}

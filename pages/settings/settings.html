@@ -118,7 +118,7 @@
                         <div class="setting-item channel-exceptions" id="channel-exceptions">
                             <div class="setting-info">
                                 <span class="setting-title" id="channel-exceptions-title">Channel exceptions</span>
-                                <span class="setting-description" id="channel-exceptions-desc">Premieres, live streams and members-only videos from these channels stay visible while the three options above hide them from everyone else. Hide watched, Hide Shorts and the duration filters still apply. On a channel's Videos or Live page, the "Show … here" switch adds the channel or removes it.</span>
+                                <span class="setting-description" id="channel-exceptions-desc">Premieres, live streams and members-only videos from these channels stay visible while the three options above hide them from everyone else. Hide watched, Hide Shorts, the duration filters and the title patterns still apply. On a channel's Videos or Live page, the "Show … here" switch adds the channel or removes it.</span>
                                 <form class="channel-exceptions__form" id="channel-exceptions-form" novalidate>
                                     <input type="text" id="channel-exceptions-input" class="input-text"
                                            placeholder="@handle or channel URL"
@@ -177,6 +177,28 @@
                                 </label>
                             </div>
                         </div>
+
+                        <!-- Advanced filters (#70): collapsed by default, as most people never use them -->
+                        <details class="advanced-filters" id="advanced-filters">
+                            <summary class="advanced-filters__summary">
+                                <span class="advanced-filters__title">Advanced filters</span>
+                                <span class="advanced-filters__status hidden" id="advanced-filters-status"></span>
+                                <svg class="advanced-filters__chevron" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                    <path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>
+                                </svg>
+                            </summary>
+                            <div class="setting-item advanced-filters__item">
+                                <div class="setting-info">
+                                    <label class="setting-title" for="settings.hide.title.patterns" id="setting-hide-title-patterns-title">Hide videos by title</label>
+                                    <span class="setting-description" id="setting-hide-title-patterns-desc">One pattern per line, ignoring upper and lower case. A video whose title contains a line is hidden. Lines are regular expressions, so <code>trailer|teaser</code> or <code>^live:</code> work too, and <code>\blive\b</code> matches a whole word (spaces at the ends of a line are ignored). Videos are hidden, not marked as watched: delete the line to bring them back.</span>
+                                    <textarea id="settings.hide.title.patterns" class="input-text input-textarea" rows="4"
+                                              spellcheck="false" autocomplete="off" autocapitalize="off"
+                                              placeholder="e.g. trailer|teaser"
+                                              aria-describedby="setting-hide-title-patterns-desc title-patterns-error"></textarea>
+                                    <p class="advanced-filters__error hidden" id="title-patterns-error" aria-live="polite"></p>
+                                </div>
+                            </div>
+                        </details>
                     </div>
 
                     <div class="settings-group">

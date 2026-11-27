@@ -142,7 +142,8 @@ describe('settings page duration filters (#69)', () => {
 
         const group = item.closest('.settings-group');
         expect(group.querySelector('.settings-group__title').textContent).toBe('Content Filters');
-        const rows = [...group.querySelectorAll('.setting-item')];
+        // the group's own rows, not the ones inside the collapsed Advanced filters (#70) after them
+        const rows = [...group.querySelectorAll(':scope > .setting-item')];
         expect(rows.slice(-2).map(row => row.querySelector('.toggle input').id)).toEqual([
             'settings.hide.duration.shorter',
             'settings.hide.duration.longer',
@@ -150,7 +151,7 @@ describe('settings page duration filters (#69)', () => {
     });
 
     test('the channel exceptions description says the duration filters still apply', () => {
-        expect(document.getElementById('channel-exceptions-desc').textContent).toContain('duration filters still apply');
+        expect(document.getElementById('channel-exceptions-desc').textContent).toMatch(/duration filters and the title patterns still apply/);
     });
 });
 
@@ -257,5 +258,158 @@ describe('settings page channel exceptions', () => {
 
         expect(brwsr._getSyncStore().channel_exceptions).toEqual(['@linustechtips']);
         expect(Object.keys(brwsr._getSyncStore().settings)).toEqual(['settings.hide.members.only']);
+    });
+});
+
+describe('settings page advanced filters (#70)', () => {
+    const fs = require('fs');
+    const path = require('path');
+    const { loadCommon } = require('../helpers/load-source');
+
+    const KEY = 'settings.hide.title.patterns';
+    let page;
+
+    function setup(patterns) {
+        const html = fs.readFileSync(path.join(__dirname, '../../pages/settings/settings.html'), 'utf8');
+        document.documentElement.innerHTML = html.replace(/^<!DOCTYPE html>/i, '');
+        loadUtil();
+        loadCommon();
+        global.settings = { ...DEFAULT_SETTINGS, [KEY]: patterns };
+        page = loadSource('pages/settings/settings.js', {
+            log: global.log,
+            logError: global.logError,
+            brwsr: global.brwsr,
+            settings: global.settings,
+            DEFAULT_SETTINGS: global.DEFAULT_SETTINGS,
+            SETTINGS_KEY: 'settings',
+            SETTINGS_LOCAL_KEY: 'settings_cache',
+        });
+        page.showToast = jest.fn();
+        page.initTitlePatterns();
+        page.updateSettings();
+    }
+
+    const details = () => document.getElementById('advanced-filters');
+    const status = () => document.getElementById('advanced-filters-status');
+    const error = () => document.getElementById('title-patterns-error');
+    const textarea = () => document.getElementById(KEY);
+
+    function type(value) {
+        textarea().value = value;
+        textarea().dispatchEvent(new Event('input'));
+    }
+
+    test('is a disclosure, collapsed by default, at the end of Content Filters after the duration filters', () => {
+        setup('');
+        expect(details().tagName).toBe('DETAILS');
+        expect(details().open).toBe(false);
+        expect(details().hasAttribute('open')).toBe(false);
+
+        const summary = details().firstElementChild;
+        expect(summary.tagName).toBe('SUMMARY');
+        expect(summary.textContent).toContain('Advanced filters');
+
+        const group = details().closest('.settings-group');
+        expect(group.querySelector('.settings-group__title').textContent).toBe('Content Filters');
+        expect(group.lastElementChild).toBe(details());
+        expect(details().previousElementSibling.querySelector('.toggle input').id).toBe('settings.hide.duration.longer');
+    });
+
+    test('the pattern field lives inside it, labelled and described', () => {
+        setup('');
+        expect(textarea().tagName).toBe('TEXTAREA');
+        expect(details().contains(textarea())).toBe(true);
+        expect(document.querySelector(`label[for="${KEY}"]`).textContent).toBe('Hide videos by title');
+        const describedBy = textarea().getAttribute('aria-describedby').split(' ');
+        expect(describedBy).toEqual(['setting-hide-title-patterns-desc', 'title-patterns-error']);
+        expect(document.getElementById('setting-hide-title-patterns-desc').textContent).toMatch(/one pattern per line/i);
+    });
+
+    test('clicking the summary opens and closes it', () => {
+        setup('');
+        const summary = details().querySelector('summary');
+        summary.click();
+        expect(details().open).toBe(true);
+        summary.click();
+        expect(details().open).toBe(false);
+    });
+
+    test('without patterns the summary shows no count', () => {
+        setup('');
+        expect(status().classList.contains('hidden')).toBe(true);
+        expect(status().textContent).toBe('');
+        expect(error().classList.contains('hidden')).toBe(true);
+    });
+
+    test('saved patterns show their count in the summary while collapsed', () => {
+        setup('doomsday\n\ngta (6|vi)\n');
+        expect(details().open).toBe(false);
+        expect(textarea().value).toBe('doomsday\n\ngta (6|vi)\n');
+        expect(status().classList.contains('hidden')).toBe(false);
+        expect(status().textContent).toBe('2 title patterns');
+    });
+
+    test('one pattern is singular', () => {
+        setup('trailer');
+        expect(status().textContent).toBe('1 title pattern');
+    });
+
+    test('the count follows typing', () => {
+        setup('');
+        type('a\nb\nc');
+        expect(status().textContent).toBe('3 title patterns');
+        type('  \n');
+        expect(status().classList.contains('hidden')).toBe(true);
+    });
+
+    test('an invalid line shows an inline error naming it, marks the field invalid, and the rest still count', () => {
+        setup('');
+        type('doomsday\n(unclosed\ngta');
+        expect(status().textContent).toBe('2 title patterns · 1 invalid');
+        expect(error().classList.contains('hidden')).toBe(false);
+        expect(error().textContent).toMatch(/^Line 2 is not a valid pattern and is skipped \(.+\)$/);
+        expect(error().textContent).not.toMatch(/Invalid regular expression|\/i:/);
+        expect(textarea().getAttribute('aria-invalid')).toBe('true');
+
+        type('doomsday\ngta');
+        expect(error().classList.contains('hidden')).toBe(true);
+        expect(textarea().hasAttribute('aria-invalid')).toBe(false);
+    });
+
+    test('invalid lines are saved anyway, as typed (they are skipped where videos are hidden)', () => {
+        setup('');
+        type('doomsday\n(unclosed');
+        page.saveSettings();
+        expect(brwsr._getLocalStore().settings_cache[KEY]).toBe('doomsday\n(unclosed');
+        expect(brwsr._getSyncStore().settings[KEY]).toBe('doomsday\n(unclosed');
+    });
+
+    test('text over the cap shows an error and is not saved', () => {
+        setup('');
+        brwsr._setLocalStore({});
+        brwsr._setSyncStore({});
+        const tooLong = 'x'.repeat(MAX_TITLE_PATTERNS_BYTES);
+        type(tooLong);
+        expect(error().textContent).toMatch(/^Too long to save: \d+ of 1024 bytes/);
+        expect(textarea().getAttribute('aria-invalid')).toBe('true');
+
+        page.saveSettings();
+
+        expect(page.showToast).toHaveBeenCalledWith('Title patterns are too long to save', 'error');
+        expect(brwsr._getLocalStore().settings_cache).toBeUndefined();
+        expect(brwsr._getSyncStore().settings).toBeUndefined();
+        expect(details().open).toBe(true);
+    });
+
+    test('text at the cap saves', () => {
+        setup('');
+        type('x'.repeat(MAX_TITLE_PATTERNS_BYTES - 2)); // + the JSON quotes
+        page.saveSettings();
+        expect(brwsr._getLocalStore().settings_cache[KEY]).toHaveLength(MAX_TITLE_PATTERNS_BYTES - 2);
+    });
+
+    test('the settings item stays well under sync storage\'s per-item limit with patterns at their cap', () => {
+        const full = { ...DEFAULT_SETTINGS, [KEY]: 'x'.repeat(MAX_TITLE_PATTERNS_BYTES - 2) };
+        expect(syncItemBytes('settings', full)).toBeLessThan(8192 / 2);
     });
 });

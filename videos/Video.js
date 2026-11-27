@@ -42,6 +42,22 @@ function getVideoId(item) {
     return url ? getVideoIdFromUrl(url) : null;
 }
 
+// The video's title, or "" when the card hasn't rendered it yet. The lockup layouts (feed, home,
+// channel, playlist rows, Shorts) put it in the title attribute of the heading (lockups) or of the
+// link inside it (Shorts); the older layout in #video-title. Not the link's aria-label: YouTube
+// appends the duration to it.
+function getVideoTitle(item) {
+    let heading = item.querySelector("h3[title]");
+    if (heading && heading.getAttribute("title").trim()) {
+        return heading.getAttribute("title").trim();
+    }
+    let link = item.querySelector("h3 a[title], #video-title");
+    if (link) {
+        return (link.getAttribute("title") || link.textContent || "").trim();
+    }
+    return "";
+}
+
 function getBadgeDuration(item, badgeTextSelector) {
     // A card can have several badges (e.g. "Members only" before the duration), so check all of them
     for (const badgeText of item.containingDiv.querySelectorAll(badgeTextSelector)) {
@@ -286,13 +302,25 @@ class Video {
         );
     }
 
+    // "Hide videos by title" (#70): the title matches one of the patterns (one per line, regular
+    // expressions, case-insensitive). Shorts and mixes included: a title is a title. A card whose
+    // title hasn't rendered yet isn't hidden; the next scan checks it again.
+    hidesByTitle() {
+        let text = typeof settings !== "undefined" && settings ? settings["settings.hide.title.patterns"] : "";
+        if (typeof text !== "string" || text.trim() === "") {
+            return false;
+        }
+        return matchesTitlePattern(getVideoTitle(this.containingDiv), text);
+    }
+
     shouldHide() {
-        // the exception never overrides "Hide watched", Hide Shorts, the duration filters or the
-        // collab filter
+        // the exception never overrides "Hide watched", Hide Shorts, the duration and title filters
+        // or the collab filter
         return Boolean(
                 this.hidesAsWatched() ||
                 (hideShorts && this.isShort) ||
                 this.hidesByDuration() ||
+                this.hidesByTitle() ||
                 (hideCollabsUnsubscribed && this.isCollaboration && isSubscriptionsPage() && !isSubscribedToChannel(getPosterChannelId(this))) ||
                 (this.hidesByChannelFilters() && !this.isFromExemptChannel())
         );

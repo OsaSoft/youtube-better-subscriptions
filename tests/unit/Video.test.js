@@ -691,6 +691,127 @@ describe('Video.js', () => {
             });
         });
 
+        describe('title patterns (#70)', () => {
+            afterEach(() => {
+                global.settings = { ...DEFAULT_SETTINGS };
+            });
+
+            // markup as on the live feed, home, channel and playlist pages (2026-11): the title is in
+            // the heading's title attribute, and the link's aria-label has the duration appended
+            function lockupCard(title, href = '/watch?v=abc12345678') {
+                document.body.innerHTML = `
+                    <div id="container">
+                        <yt-lockup-view-model>
+                            <a href="${href}" class="ytLockupViewModelContentImage"><div class="ytBadgeShapeText">12:34</div></a>
+                            <h3 class="ytLockupMetadataViewModelHeadingReset" title="${title}">
+                                <a href="${href}" class="ytLockupMetadataViewModelTitle" aria-label="${title} 12 minutes">
+                                    <span class="ytAttributedStringHost" role="text">${title}</span>
+                                </a>
+                            </h3>
+                        </yt-lockup-view-model>
+                    </div>
+                `;
+                return document.getElementById('container');
+            }
+
+            function hides(item, patterns, flags = {}) {
+                global.settings = { ...DEFAULT_SETTINGS, 'settings.hide.title.patterns': patterns };
+                const Video = videoClass({ flags });
+                return new Video(item).shouldHide();
+            }
+
+            test('reads the title from the lockup heading, not the thumbnail link or the aria-label', () => {
+                expect(getVideoTitle(lockupCard('GTA 6 Prologue Breakdown!'))).toBe('GTA 6 Prologue Breakdown!');
+            });
+
+            test('reads the title of a Shorts card from its title link', () => {
+                document.body.innerHTML = `
+                    <div id="container">
+                        <a href="/shorts/abc12345678" class="shortsLockupViewModelHostEndpoint reel-item-endpoint"></a>
+                        <h3 class="shortsLockupViewModelHostMetadataTitle">
+                            <a href="/shorts/abc12345678" class="shortsLockupViewModelHostEndpoint" title="Beware of Static Discharge #experiment">
+                                <span role="text">Beware of Static Discharge #experiment</span>
+                            </a>
+                        </h3>
+                    </div>
+                `;
+                expect(getVideoTitle(document.getElementById('container'))).toBe('Beware of Static Discharge #experiment');
+            });
+
+            test('reads the title of the older layout from #video-title', () => {
+                document.body.innerHTML = `<div id="a"><a id="video-title" href="/watch?v=abc12345678" title="Old Layout Title">Old Layout Title</a></div>
+                    <div id="b"><a id="video-title" href="/watch?v=abc12345678">  Text Only  </a></div>`;
+                expect(getVideoTitle(document.getElementById('a'))).toBe('Old Layout Title');
+                expect(getVideoTitle(document.getElementById('b'))).toBe('Text Only');
+            });
+
+            test('a card that has not rendered its title yet has an empty title', () => {
+                document.body.innerHTML = '<div id="container"><a href="/watch?v=abc12345678"></a></div>';
+                expect(getVideoTitle(document.getElementById('container'))).toBe('');
+            });
+
+            test('hides a card whose title matches a pattern, ignoring case', () => {
+                expect(hides(lockupCard('AVENGERS DOOMSDAY TRAILER BREAKDOWN'), 'doomsday')).toBe(true);
+                expect(hides(lockupCard('Comparing GTA VI on Every Console'), 'trailer\ngta (6|vi)')).toBe(true);
+                expect(hides(lockupCard('Mac Gaming is Solved But Not By Apple'), 'doomsday\ngta (6|vi)')).toBe(false);
+            });
+
+            test('does not match the duration YouTube appends to the aria-label', () => {
+                expect(hides(lockupCard('Some Video'), '12 minutes')).toBe(false);
+                expect(hides(lockupCard('Some Video'), '12:34')).toBe(false);
+            });
+
+            test('no patterns, blank lines only or only invalid lines hide nothing, and never throw', () => {
+                for (const patterns of ['', '\n  \n', '(unclosed', '*', 'trailer|']) {
+                    expect(hides(lockupCard('Any Title'), patterns)).toBe(false);
+                }
+            });
+
+            test('an invalid line does not stop the others', () => {
+                expect(hides(lockupCard('Bigfoot Files'), '(unclosed\nbigfoot')).toBe(true);
+            });
+
+            test('a card without a title is never hidden by it', () => {
+                document.body.innerHTML = '<div id="container"><a href="/watch?v=abc12345678"></a><div class="ytBadgeShapeText">3:00</div></div>';
+                expect(hides(document.getElementById('container'), '.+')).toBe(false);
+            });
+
+            test('applies to Shorts too', () => {
+                document.body.innerHTML = `
+                    <div id="container">
+                        <h3><a href="/shorts/abc12345678" title="Beware of Static Discharge"></a></h3>
+                    </div>
+                `;
+                expect(hides(document.getElementById('container'), 'static discharge')).toBe(true);
+            });
+
+            test('a channel on the exception list does not exempt a matching video', () => {
+                const saved = { hasChannelExceptions: global.hasChannelExceptions, isChannelExempt: global.isChannelExempt };
+                global.hasChannelExceptions = () => true;
+                global.isChannelExempt = () => true;
+                try {
+                    // the exception applies: a premiere from the channel stays
+                    const premiere = lockupCard('Doomsday Premiere');
+                    premiere.querySelector('.ytBadgeShapeText').remove();
+                    premiere.insertAdjacentHTML('beforeend', '<a href="/@somechannel">Some Channel</a>');
+                    expect(hides(premiere, '', { hidePremieres: true })).toBe(false);
+                    // but not to the title filter
+                    expect(hides(premiere, 'doomsday', { hidePremieres: true })).toBe(true);
+                } finally {
+                    Object.assign(global, saved);
+                }
+            });
+
+            test('does not store the video as watched', () => {
+                global.settings = { ...DEFAULT_SETTINGS, 'settings.hide.title.patterns': 'doomsday' };
+                const Video = videoClass();
+                const video = new Video(lockupCard('Doomsday Theories'));
+                expect(video.shouldHide()).toBe(true);
+                expect(video.isStored).toBeFalsy();
+                expect(global.watchVideo).not.toHaveBeenCalled();
+            });
+        });
+
         test('hide() hides the card and remembers it', () => {
             const Video = videoClass();
             const div = card('/watch?v=abc12345678');

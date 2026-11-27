@@ -22,6 +22,7 @@ const DEFAULT_SETTINGS = {
     "settings.hide.duration.shorter.minutes": 10,
     "settings.hide.duration.longer": false,
     "settings.hide.duration.longer.minutes": 120,
+    "settings.hide.title.patterns": "", // one pattern per line, see parseTitlePatterns()
     "settings.hide.most.relevant": false,
     "settings.hide.mark.watched.button": false,
     "settings.mark.watched.button.compact": true,
@@ -43,13 +44,80 @@ const CLEAR_SENTINEL_KEY = "vw_last_cleared";
 
 // browser.storage.sync total quota (same in Chrome and Firefox)
 const SYNC_QUOTA_BYTES = 102400;
+// The most the title patterns (#70) may take in the settings item in sync storage, as UTF-8 bytes of
+// the JSON string (a backslash counts twice)
+const MAX_TITLE_PATTERNS_BYTES = 1024;
 // Room syncWatchedVideos() keeps free on top of what the other keys take: the channel exception list
-// may still grow to its cap (MAX_CHANNEL_EXCEPTIONS_BYTES in channelExceptions.js), plus some slack
-// for settings to grow
-const SYNC_RESERVED_BYTES = 1024 + 512;
+// may still grow to its cap (MAX_CHANNEL_EXCEPTIONS_BYTES in channelExceptions.js), the title patterns
+// to theirs, plus some slack for the other settings to grow
+const SYNC_RESERVED_BYTES = 1024 + MAX_TITLE_PATTERNS_BYTES + 512;
 // syncWatchedVideos() fills the quota with watch history up to that reserve, so sync storage above
 // this threshold means older videos were dropped because of the quota
 const SYNC_QUOTA_NEARLY_FULL_BYTES = SYNC_QUOTA_BYTES * 0.95;
+
+// --- Title patterns (#70) ---
+// One pattern per line, each a JavaScript regular expression matched case-insensitively anywhere in
+// the title (so a plain word works too). Blank lines and spaces at either end of a line are ignored.
+// An invalid line, or one that matches an empty string (so every title, e.g. "trailer|"), is
+// reported and skipped, never thrown.
+
+// {patterns: [{line, source, regex}], errors: [{line, source, message}]}, lines numbered from 1
+function parseTitlePatterns(text) {
+    const patterns = [];
+    const errors = [];
+    if (typeof text !== "string") {
+        return {patterns, errors};
+    }
+    text.split(/\r?\n/).forEach((rawLine, index) => {
+        const source = rawLine.trim();
+        if (source === "") {
+            return;
+        }
+        let regex;
+        try {
+            // "i" only: "g" or "y" would make test() remember where it stopped
+            regex = new RegExp(source, "i");
+        } catch (e) {
+            // the browser's reason, without its "Invalid regular expression: /…/i:" prefix
+            errors.push({line: index + 1, source, message: e.message.replace(/^Invalid regular expression: \/.*\/[a-z]*: /s, "")});
+            return;
+        }
+        if (regex.test("")) {
+            // it would hide every video, and the feed would keep loading older ones to fill up
+            errors.push({line: index + 1, source, message: "it matches every title"});
+            return;
+        }
+        patterns.push({line: index + 1, source, regex});
+    });
+    return {patterns, errors};
+}
+
+// The bytes the patterns text takes in the settings item in sync storage
+function getTitlePatternsBytes(text) {
+    return utf8ByteLength(JSON.stringify(typeof text === "string" ? text : ""));
+}
+
+// Compiled once per patterns text, not per card per scan: settings is replaced as a whole when it
+// loads or changes, so the text itself is the cache key
+let compiledTitlePatternsSource = null;
+let compiledTitlePatterns = [];
+
+function getTitlePatterns(text) {
+    const source = typeof text === "string" ? text : "";
+    if (source !== compiledTitlePatternsSource) {
+        compiledTitlePatternsSource = source;
+        compiledTitlePatterns = parseTitlePatterns(source).patterns.map(pattern => pattern.regex);
+    }
+    return compiledTitlePatterns;
+}
+
+// Whether a title matches one of the patterns in the text; an empty or missing title never does
+function matchesTitlePattern(title, text) {
+    if (typeof title !== "string" || title.trim() === "") {
+        return false;
+    }
+    return getTitlePatterns(text).some(regex => regex.test(title));
+}
 
 function isVideoKey(key) {
     return key.length === 12 && (key[0] === 'w' || key[0] === 'n');
